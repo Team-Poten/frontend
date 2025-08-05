@@ -5,6 +5,8 @@ import Header from "./components/Header";
 import MainContent from "./components/MainContent";
 import Footer from "./components/Footer";
 import QuizPage from "./components/QuizPage";
+import ProblemHistoryPage from "./components/ProblemHistoryPage";
+import ProblemDetailPage from "./components/ProblemDetailPage";
 import { Question } from "./services/api";
 
 const AppContainer = styled.div`
@@ -63,6 +65,26 @@ const App: React.FC = () => {
               ) : (
                 <Navigate to="/" replace />
               )
+            }
+          />
+          <Route
+            path="/history"
+            element={
+              <>
+                <Header />
+                <ProblemHistoryPage />
+                <Footer />
+              </>
+            }
+          />
+          <Route
+            path="/history/:date"
+            element={
+              <>
+                <Header />
+                <ProblemDetailPage />
+                <Footer />
+              </>
             }
           />
         </Routes>

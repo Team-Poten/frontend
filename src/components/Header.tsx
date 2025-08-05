@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const HeaderContainer = styled.header`
   width: 100%;
@@ -56,12 +57,29 @@ const LoginButton = styled.button`
 `;
 
 const Header: React.FC = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleNavigation = (path: string) => {
+    navigate(path);
+  };
+
+  const isActive = (path: string) => {
+    if (path === "/" && location.pathname === "/") return true;
+    if (path === "/history" && location.pathname.startsWith("/history")) return true;
+    return false;
+  };
+
   return (
     <HeaderContainer>
       <div></div>
       <Navigation>
-        <NavTab active>문제 만들기</NavTab>
-        <NavTab>문제 모아보기</NavTab>
+        <NavTab active={isActive("/")} onClick={() => handleNavigation("/")}>
+          문제 만들기
+        </NavTab>
+        <NavTab active={isActive("/history")} onClick={() => handleNavigation("/history")}>
+          문제 모아보기
+        </NavTab>
         <NavTab>틀린문제 풀어보기</NavTab>
       </Navigation>
       <LoginButton>로그인</LoginButton>
