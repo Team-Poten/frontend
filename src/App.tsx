@@ -1,12 +1,18 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import Header from "./components/Header";
 import MainContent from "./components/MainContent";
 import Footer from "./components/Footer";
 import QuizPage from "./components/QuizPage";
 import ProblemHistoryPage from "./components/ProblemHistoryPage";
 import ProblemDetailPage from "./components/ProblemDetailPage";
+import WrongProblemPage from "./components/WrongProblemPage";
 import { Question } from "./services/api";
 
 const AppContainer = styled.div`
@@ -48,7 +54,9 @@ const App: React.FC = () => {
               ) : (
                 <>
                   <Header />
-                  <MainContent onQuestionsGenerated={handleQuestionsGenerated} />
+                  <MainContent
+                    onQuestionsGenerated={handleQuestionsGenerated}
+                  />
                   <Footer />
                 </>
               )
@@ -58,10 +66,7 @@ const App: React.FC = () => {
             path="/quiz"
             element={
               questions.length > 0 ? (
-                <QuizPage 
-                  questions={questions} 
-                  onBack={handleBackToHome} 
-                />
+                <QuizPage questions={questions} onBack={handleBackToHome} />
               ) : (
                 <Navigate to="/" replace />
               )
@@ -83,6 +88,16 @@ const App: React.FC = () => {
               <>
                 <Header />
                 <ProblemDetailPage />
+                <Footer />
+              </>
+            }
+          />
+          <Route
+            path="/wrong-problems"
+            element={
+              <>
+                <Header />
+                <WrongProblemPage />
                 <Footer />
               </>
             }
