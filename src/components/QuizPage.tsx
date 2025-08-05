@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { Question } from "../services/api";
+import { Question, submitGuestAnswer, submitAnswer, GuestAnswerResponse, AnswerResponse } from "../services/api";
 import Header from "./Header";
 import Footer from "./Footer";
 
@@ -84,14 +84,34 @@ const QuestionCard = styled.div`
   justify-content: space-between;
 `;
 
-const QuestionText = styled.h2`
+const QuestionNumber = styled.span<{ isCorrect?: boolean; showResult?: boolean }>`
+  font-weight: 700;
+  color: ${props => 
+    props.showResult 
+      ? (props.isCorrect ? '#3b82f6' : '#ff4444') 
+      : '#30a10e'
+  };
+  position: relative;
+  display: inline-block;
+  margin-right: 8px;
+  transition: color 0.3s ease;
+  
+
+`;
+
+const QuestionText = styled.h2<{ isCorrect?: boolean; showResult?: boolean }>`
   font-family: "Pretendard", sans-serif;
   font-weight: 700;
   font-size: 24px;
   line-height: 1.4;
-  color: #30a10e;
+  color: ${props => 
+    props.showResult 
+      ? (props.isCorrect ? '#3b82f6' : '#ff4444') 
+      : '#30a10e'
+  };
   margin: 0;
   text-align: left;
+  transition: color 0.3s ease;
 `;
 
 const AnswerContainer = styled.div`
@@ -120,10 +140,17 @@ const AnswerButton = styled.button<{
   font-weight: 500;
   font-size: 18px;
   color: #222222;
+  position: relative;
+  overflow: hidden;
 
   &:hover {
     border-color: #30a10e;
     background-color: #f8f9fa;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
   }
 
   ${(props) =>
@@ -151,6 +178,8 @@ const AnswerButton = styled.button<{
     background-color: #fff0f0;
   `}
 `;
+
+
 
 const NextButton = styled.button`
   background-color: #b7b7b7;
@@ -183,38 +212,183 @@ const CharacterImage = styled.img`
   margin-bottom: 20px;
 `;
 
+const ExplanationText = styled.div`
+  font-family: "Pretendard", sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #666666;
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 20px;
+  text-align: left;
+`;
+
+const LoadingText = styled.div`
+  font-family: "Pretendard", sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  color: #30a10e;
+  text-align: center;
+  margin-top: 10px;
+`;
+
+const ErrorText = styled.div`
+  font-family: "Pretendard", sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  color: #ff4444;
+  text-align: center;
+  margin-top: 10px;
+`;
+
+const CorrectAnswerText = styled.div`
+  font-family: "Pretendard", sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  color: #666666;
+  margin-top: 12px;
+  padding: 8px 12px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  border-left: 3px solid #30a10e;
+`;
+
+interface QuestionState {
+  selectedAnswer: string | null;
+  showResult: boolean;
+  isLoading: boolean;
+  error: string | null;
+  answerResult: GuestAnswerResponse | AnswerResponse | null;
+}
+
 const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
-  const [showResult, setShowResult] = useState(false);
   const [correctAnswers, setCorrectAnswers] = useState(0);
+  const [questionStates, setQuestionStates] = useState<{ [key: number]: QuestionState }>({});
 
   const currentQuestion = questions[currentQuestionIndex];
+  const currentQuestionState = questionStates[currentQuestion.id || 0] || {
+    selectedAnswer: null,
+    showResult: false,
+    isLoading: false,
+    error: null,
+    answerResult: null,
+  };
+  
   const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
 
-  const handleAnswerSelect = (answer: string) => {
-    if (!showResult) {
-      setSelectedAnswer(answer);
+  const updateQuestionState = (questionId: number, updates: Partial<QuestionState>) => {
+    setQuestionStates(prev => ({
+      ...prev,
+      [questionId]: {
+        ...prev[questionId],
+        ...updates,
+      },
+    }));
+  };
+
+  // 회원 여부 확인 함수
+  const isLoggedIn = (): boolean => {
+    return localStorage.getItem("accessToken") !== null;
+  };
+
+  // 정답 여부를 판단하는 함수
+  const isAnswerCorrect = (): boolean => {
+    if (!currentQuestionState.selectedAnswer || !currentQuestionState.answerResult) {
+      return false;
+    }
+    
+    // API 응답의 correct 필드 사용 (isCorrect 대신)
+    const apiCorrect = currentQuestionState.answerResult?.correct;
+    
+    // 선택한 답변과 문제 정답을 직접 비교
+    const selectedAnswer = currentQuestionState.selectedAnswer;
+    const correctAnswer = currentQuestion.answer;
+    
+    // 답변 매핑 (O/X -> TRUE/FALSE)
+    const answerMapping: { [key: string]: string } = {
+      'O': 'TRUE',
+      'X': 'FALSE'
+    };
+    
+    const mappedSelectedAnswer = answerMapping[selectedAnswer];
+    const isCorrectByComparison = mappedSelectedAnswer === correctAnswer;
+    
+    
+    // API의 correct 필드가 있으면 사용, 없으면 직접 비교 결과 사용
+    return apiCorrect !== undefined ? apiCorrect : isCorrectByComparison;
+  };
+
+  const handleAnswerSelect = async (answer: string) => {
+    const questionId: number | undefined = currentQuestion.id;
+    console.log("현재 문제 ID:", questionId, "타입:", typeof questionId); // 디버깅용 로그
+    console.log("현재 문제 전체 데이터:", currentQuestion); // 현재 문제의 전체 데이터 확인
+    console.log("회원 여부:", isLoggedIn()); // 회원 여부 확인
+    
+    // questionId가 유효하지 않은 경우 처리
+    if (!questionId || isNaN(questionId)) {
+      console.error("유효하지 않은 questionId:", questionId);
+      return;
+    }
+    
+    // TypeScript 타입 가드: questionId가 유효한 number임을 확인
+    const validQuestionId: number = questionId;
+    const currentState = questionStates[validQuestionId];
+    
+    if (!currentState?.showResult && !currentState?.isLoading) {
+      updateQuestionState(validQuestionId, {
+        selectedAnswer: answer,
+        isLoading: true,
+        error: null,
+      });
+
+      try {
+        let result: GuestAnswerResponse | AnswerResponse;
+        
+        if (isLoggedIn()) {
+          // 회원인 경우 회원용 API 호출
+          console.log(`회원 API 호출: /api/questions/${validQuestionId}/answer`);
+          result = await submitAnswer(validQuestionId, answer);
+        } else {
+          // 비회원인 경우 게스트 API 호출
+          console.log(`게스트 API 호출: /api/questions/${validQuestionId}/guest-answer`);
+          result = await submitGuestAnswer(validQuestionId, answer);
+        }
+        
+        console.log("API 응답 결과:", result); // API 응답 결과 확인
+        updateQuestionState(validQuestionId, {
+          answerResult: result,
+          showResult: true,
+          isLoading: false,
+        });
+      } catch (err) {
+        updateQuestionState(validQuestionId, {
+          error: "채점 중 오류가 발생했습니다. 다시 시도해주세요.",
+          isLoading: false,
+        });
+        console.error("Error submitting answer:", err);
+      }
     }
   };
 
   const handleNextQuestion = () => {
-    if (selectedAnswer === currentQuestion.answer) {
-      setCorrectAnswers(correctAnswers + 1);
+    const questionId = currentQuestion.id;
+    if (questionId && !isNaN(questionId)) {
+      const currentState = questionStates[questionId];
+      if (currentState?.answerResult?.isCorrect) {
+        setCorrectAnswers(correctAnswers + 1);
+      }
     }
 
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
-      setSelectedAnswer(null);
-      setShowResult(false);
     } else {
       // 퀴즈 완료
       console.log("퀴즈 완료!");
     }
-  };
-
-  const handleShowResult = () => {
-    setShowResult(true);
   };
 
   return (
@@ -233,35 +407,62 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
         <QuestionCard>
           <div>
             <CharacterImage src="/images/character2.png" alt="Character" />
-            <QuestionText>
-              Q{currentQuestionIndex + 1}. {currentQuestion.question}
+            <QuestionText
+              isCorrect={isAnswerCorrect()}
+              showResult={currentQuestionState.showResult}
+            >
+              <QuestionNumber
+                isCorrect={isAnswerCorrect()}
+                showResult={currentQuestionState.showResult}
+              >
+                Q{currentQuestionIndex + 1}.
+              </QuestionNumber>
+              {currentQuestion.question}
             </QuestionText>
+            {currentQuestionState.showResult && (
+              <div style={{ marginTop: "10px", fontSize: "14px", color: "#666" }}>
+              </div>
+            )}
           </div>
 
           <AnswerContainer>
             <AnswerButton
-              selected={selectedAnswer === "TRUE"}
-              isCorrect={currentQuestion.answer === "TRUE"}
-              showResult={showResult}
-              onClick={() => handleAnswerSelect("TRUE")}
+              selected={currentQuestionState.selectedAnswer === "O"}
+              isCorrect={currentQuestionState.answerResult?.isCorrect && currentQuestionState.selectedAnswer === "O"}
+              showResult={currentQuestionState.showResult}
+              onClick={() => handleAnswerSelect("O")}
+              disabled={currentQuestionState.showResult || currentQuestionState.isLoading}
             >
               O (참)
             </AnswerButton>
             <AnswerButton
-              selected={selectedAnswer === "FALSE"}
-              isCorrect={currentQuestion.answer === "FALSE"}
-              showResult={showResult}
-              onClick={() => handleAnswerSelect("FALSE")}
+              selected={currentQuestionState.selectedAnswer === "X"}
+              isCorrect={currentQuestionState.answerResult?.isCorrect && currentQuestionState.selectedAnswer === "X"}
+              showResult={currentQuestionState.showResult}
+              onClick={() => handleAnswerSelect("X")}
+              disabled={currentQuestionState.showResult || currentQuestionState.isLoading}
             >
               X (거짓)
             </AnswerButton>
           </AnswerContainer>
 
+          {currentQuestionState.isLoading && <LoadingText>채점 중...</LoadingText>}
+          {currentQuestionState.error && <ErrorText>{currentQuestionState.error}</ErrorText>}
+          
+          {currentQuestionState.showResult && currentQuestionState.answerResult && (
+            <ExplanationText>
+              <strong>해설:</strong> {currentQuestionState.answerResult.explanation}
+            </ExplanationText>
+          )}
+          
+          {currentQuestionState.showResult && (
+            <CorrectAnswerText>
+              <strong>정답:</strong> {currentQuestion.answer === 'TRUE' ? 'O' : 'X'}
+            </CorrectAnswerText>
+          )}
+
           <div style={{ textAlign: "right" }}>
-            {selectedAnswer && !showResult && (
-              <NextButton onClick={handleShowResult}>정답 확인</NextButton>
-            )}
-            {showResult && (
+            {currentQuestionState.showResult && (
               <NextButton onClick={handleNextQuestion}>
                 {currentQuestionIndex < questions.length - 1 ? "다음 문제" : "완료"}
               </NextButton>

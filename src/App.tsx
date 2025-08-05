@@ -56,7 +56,10 @@ const App: React.FC = () => {
             path="/quiz"
             element={
               questions.length > 0 ? (
-                <QuizPage questions={questions} onBack={handleBackToHome} />
+                <QuizPage 
+                  questions={questions} 
+                  onBack={handleBackToHome} 
+                />
               ) : (
                 <Navigate to="/" replace />
               )
