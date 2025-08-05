@@ -66,7 +66,10 @@ const Header: React.FC = () => {
 
   const isActive = (path: string) => {
     if (path === "/" && location.pathname === "/") return true;
-    if (path === "/history" && location.pathname.startsWith("/history")) return true;
+    if (path === "/history" && location.pathname.startsWith("/history"))
+      return true;
+    if (path === "/wrong-problems" && location.pathname === "/wrong-problems")
+      return true;
     return false;
   };
 
@@ -77,10 +80,18 @@ const Header: React.FC = () => {
         <NavTab active={isActive("/")} onClick={() => handleNavigation("/")}>
           문제 만들기
         </NavTab>
-        <NavTab active={isActive("/history")} onClick={() => handleNavigation("/history")}>
+        <NavTab
+          active={isActive("/history")}
+          onClick={() => handleNavigation("/history")}
+        >
           문제 모아보기
         </NavTab>
-        <NavTab>틀린문제 풀어보기</NavTab>
+        <NavTab
+          active={isActive("/wrong-problems")}
+          onClick={() => handleNavigation("/wrong-problems")}
+        >
+          틀린문제 풀어보기
+        </NavTab>
       </Navigation>
       <LoginButton>로그인</LoginButton>
     </HeaderContainer>
