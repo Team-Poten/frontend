@@ -36,17 +36,13 @@ const SearchInput = styled.input`
   }
 `;
 
-const SearchIcon = styled.div`
+const SearchIcon = styled.img`
   position: absolute;
   left: 32px;
   top: 50%;
   transform: translateY(-50%);
   width: 32px;
   height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #777777;
 `;
 
 const SearchBar: React.FC<SearchBarProps> = ({
@@ -69,25 +65,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   return (
     <SearchContainer>
-      <SearchIcon>
-        <svg
-          width="21"
-          height="22"
-          viewBox="0 0 21 22"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <rect x="12.71" y="13.75" width="8.08" height="7.92" fill="#000000" />
-          <ellipse
-            cx="8.68"
-            cy="8.68"
-            rx="8.68"
-            ry="8.68"
-            stroke="#000000"
-            strokeWidth="2.5"
-          />
-        </svg>
-      </SearchIcon>
+      <SearchIcon src="/images/input.png" alt="Input icon" />
       <SearchInput
         type="text"
         placeholder="텍스트를 입력하거나 파일을 업로드 해주세요."
