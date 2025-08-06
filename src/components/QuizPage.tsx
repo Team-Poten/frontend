@@ -670,11 +670,8 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
                   <ModalSubtitle>모든 문제를 다 풀었어요!</ModalSubtitle>
                   <ModalTitle>문제 정답 결과</ModalTitle>
                   <ResultText>
-                    {totalCorrect} / {questions.length}문제
+                    {totalCorrect} / {questions.length}문제 (정답{totalCorrect}, 오답{totalWrong})
                   </ResultText>
-                  <MemberScoreText>
-                    (정답{totalCorrect}, 오답{totalWrong})
-                  </MemberScoreText>
                   
                   <ButtonContainer>
                     <ModalButton onClick={handleViewQuestions}>
@@ -691,11 +688,8 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
                   <ModalImage src="/images/guest-result.png" alt="결과 이미지" />
                   <ModalTitle>문제 정답 결과</ModalTitle>
                   <ResultText>
-                    {totalCorrect} / {questions.length}문제
+                    {totalCorrect} / {questions.length}문제 (정답{totalCorrect}, 오답{totalWrong})
                   </ResultText>
-                  <ScoreText>
-                    (정답{totalCorrect}, 오답{totalWrong})
-                  </ScoreText>
                   
                   <GuestMessage>
                     회원가입을 통해 문제를 더 만들고 복습도 할 수 있어요!
