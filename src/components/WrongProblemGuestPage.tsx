@@ -108,10 +108,10 @@ const WrongProblemGuestPage: React.FC = () => {
           <Character src={character4} alt="캐릭터4" />
         </CharacterGroup>
         <MainText>
-          틀린 문제를 확인하려면 회원가입 또는 로그인이 필요해요
+            틀린문제 풀어보기 서비스를 준비중입니다.
+            <br />
+            조금만 기다려주세요!
         </MainText>
-        <SubText>퀴즐리 계정이 없다면 지금 바로 회원가입을 해보세요.</SubText>
-        <SignUpButton onClick={handleSignUp}>지금 가입하기</SignUpButton>
       </ContentWrapper>
     </Container>
   );
