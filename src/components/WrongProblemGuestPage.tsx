@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
 import character1 from "../assets/character1.png";
 import character2 from "../assets/character2.png";
 import character3 from "../assets/character3.png";
@@ -93,9 +94,10 @@ const SignUpButton = styled.button`
 `;
 
 const WrongProblemGuestPage: React.FC = () => {
+  const navigate = useNavigate();
+
   const handleSignUp = () => {
-    // 추후 회원가입 페이지로 이동하는 로직 구현 예정
-    console.log("회원가입 버튼 클릭");
+    navigate("/signup");
   };
 
   return (
@@ -108,9 +110,9 @@ const WrongProblemGuestPage: React.FC = () => {
           <Character src={character4} alt="캐릭터4" />
         </CharacterGroup>
         <MainText>
-            틀린문제 풀어보기 서비스를 준비중입니다.
-            <br />
-            조금만 기다려주세요!
+          틀린문제 풀어보기 서비스를 준비중입니다.
+          <br />
+          조금만 기다려주세요!
         </MainText>
       </ContentWrapper>
     </Container>
