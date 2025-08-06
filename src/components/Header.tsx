@@ -27,7 +27,7 @@ const NavTab = styled.button<{ active?: boolean }>`
   font-family: "Pretendard", sans-serif;
   font-weight: 500;
   font-size: 16px;
-  line-height: 1.4;
+  line-height: 1.399999976158142em;
   color: ${(props) => (props.active ? "#222222" : "#777777")};
   cursor: pointer;
   transition: color 0.2s ease;
@@ -48,7 +48,7 @@ const LoginButton = styled.button`
   font-family: "Pretendard", sans-serif;
   font-weight: 400;
   font-size: 14px;
-  line-height: 1.193;
+  line-height: 1.193359375em;
   cursor: pointer;
   transition: background-color 0.2s ease;
 
@@ -57,18 +57,53 @@ const LoginButton = styled.button`
   }
 `;
 
+const UserInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: "Pretendard", sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  color: #222222;
+`;
+
+const LogoutButton = styled.button`
+  background: none;
+  border: none;
+  color: #777777;
+  font-family: "Pretendard", sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: #222222;
+  }
+`;
+
 const Header: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const loggedIn = isLoggedIn();
 
   const handleNavigation = (path: string) => {
     // 로그인하지 않은 상태에서 틀린문제 풀어보기나 문제 모아보기 접근 시
-    if (!isLoggedIn() && (path === "/wrong-problems" || path === "/history")) {
+    if (!loggedIn && (path === "/wrong-problems" || path === "/history")) {
       // 로그인하지 않은 상태에서는 해당 페이지로 이동 (게스트 페이지가 표시됨)
       navigate(path);
     } else {
       navigate(path);
     }
+  };
+
+  const handleLogin = () => {
+    navigate("/signup");
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("accessToken");
+    window.location.reload();
   };
 
   const isActive = (path: string) => {
@@ -100,7 +135,14 @@ const Header: React.FC = () => {
           틀린문제 풀어보기
         </NavTab>
       </Navigation>
-      <LoginButton>로그인</LoginButton>
+      {loggedIn ? (
+        <UserInfo>
+          <span>회원님</span>
+          <LogoutButton onClick={handleLogout}>로그아웃</LogoutButton>
+        </UserInfo>
+      ) : (
+        <LoginButton onClick={handleLogin}>로그인</LoginButton>
+      )}
     </HeaderContainer>
   );
 };
