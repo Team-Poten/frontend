@@ -11,9 +11,11 @@ import MainContent from "./components/MainContent";
 import Footer from "./components/Footer";
 import QuizPage from "./components/QuizPage";
 import ProblemHistoryPage from "./components/ProblemHistoryPage";
+import ProblemHistoryGuestPage from "./components/ProblemHistoryGuestPage";
 import ProblemDetailPage from "./components/ProblemDetailPage";
 import WrongProblemPage from "./components/WrongProblemPage";
-import { Question } from "./services/api";
+import WrongProblemGuestPage from "./components/WrongProblemGuestPage";
+import { Question, isLoggedIn } from "./services/api";
 
 const AppContainer = styled.div`
   width: 100%;
@@ -77,7 +79,11 @@ const App: React.FC = () => {
             element={
               <>
                 <Header />
-                <ProblemHistoryPage />
+                {isLoggedIn() ? (
+                  <ProblemHistoryPage />
+                ) : (
+                  <ProblemHistoryGuestPage />
+                )}
                 <Footer />
               </>
             }
@@ -97,7 +103,11 @@ const App: React.FC = () => {
             element={
               <>
                 <Header />
-                <WrongProblemPage />
+                {isLoggedIn() ? (
+                  <WrongProblemPage />
+                ) : (
+                  <WrongProblemGuestPage />
+                )}
                 <Footer />
               </>
             }

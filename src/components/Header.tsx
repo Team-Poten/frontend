@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { useLocation, useNavigate } from "react-router-dom";
+import { isLoggedIn } from "../services/api";
 
 const HeaderContainer = styled.header`
   width: 100%;
@@ -61,7 +62,13 @@ const Header: React.FC = () => {
   const navigate = useNavigate();
 
   const handleNavigation = (path: string) => {
-    navigate(path);
+    // 로그인하지 않은 상태에서 틀린문제 풀어보기나 문제 모아보기 접근 시
+    if (!isLoggedIn() && (path === "/wrong-problems" || path === "/history")) {
+      // 로그인하지 않은 상태에서는 해당 페이지로 이동 (게스트 페이지가 표시됨)
+      navigate(path);
+    } else {
+      navigate(path);
+    }
   };
 
   const isActive = (path: string) => {
