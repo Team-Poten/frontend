@@ -68,7 +68,7 @@ export interface SignUpResponse {
   message?: string;
 }
 
-const API_BASE_URL = "http://49.50.134.195:8080/api";
+const API_BASE_URL = "http://localhost:8080/api";
 
 // 로그인 상태 확인
 export const isLoggedIn = (): boolean => {
@@ -257,6 +257,31 @@ export const signUp = async (
     return {};
   } catch (error) {
     console.error("Error signing up:", error);
+    throw error;
+  }
+};
+
+// ID 중복 확인 API
+export const checkIdDuplicate = async (loginId: string): Promise<boolean> => {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/user/check-id?loginId=${encodeURIComponent(loginId)}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data; // true: 중복, false: 사용 가능
+  } catch (error) {
+    console.error("Error checking ID duplicate:", error);
     throw error;
   }
 };
