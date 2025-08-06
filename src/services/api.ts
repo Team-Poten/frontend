@@ -57,6 +57,17 @@ export interface AnswerResponse {
   explanation: string;
 }
 
+export interface SignUpRequest {
+  loginId: string;
+  password: string;
+  nickname: string;
+}
+
+export interface SignUpResponse {
+  code?: string;
+  message?: string;
+}
+
 const API_BASE_URL = "http://49.50.134.195:8080/api";
 
 // 로그인 상태 확인
@@ -214,6 +225,31 @@ export const submitAnswer = async (
     return data;
   } catch (error) {
     console.error("Error submitting answer:", error);
+    throw error;
+  }
+};
+
+// 회원가입 API
+export const signUp = async (
+  request: SignUpRequest
+): Promise<SignUpResponse> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/user/signup`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(request),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return errorData;
+    }
+
+    return {};
+  } catch (error) {
+    console.error("Error signing up:", error);
     throw error;
   }
 };
