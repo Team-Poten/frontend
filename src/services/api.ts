@@ -57,7 +57,7 @@ export interface AnswerResponse {
   explanation: string;
 }
 
-const API_BASE_URL = "http://localhost:8080/api";
+const API_BASE_URL = "http://49.50.134.195:8080/api";
 
 // 로그인 상태 확인
 export const isLoggedIn = (): boolean => {
@@ -70,7 +70,9 @@ export const getAccessToken = (): string | null => {
   return localStorage.getItem("accessToken");
 };
 
-export const createQuestions = async (plainText: string): Promise<Question[]> => {
+export const createQuestions = async (
+  plainText: string
+): Promise<Question[]> => {
   try {
     const response = await fetch(`${API_BASE_URL}/v1/clova/question`, {
       method: "POST",
@@ -96,7 +98,9 @@ export const createQuestions = async (plainText: string): Promise<Question[]> =>
 };
 
 // 문제 날짜별 조회 API
-export const getProblemHistory = async (): Promise<ProblemHistoryResponse[]> => {
+export const getProblemHistory = async (): Promise<
+  ProblemHistoryResponse[]
+> => {
   try {
     const token = getAccessToken();
     if (!token) {
@@ -130,15 +134,18 @@ export const submitGuestAnswer = async (
   userAnswer: string
 ): Promise<GuestAnswerResponse> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/questions/${questionId}/guest-answer`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        userAnswer,
-      } as GuestAnswerRequest),
-    });
+    const response = await fetch(
+      `${API_BASE_URL}/questions/${questionId}/guest-answer`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userAnswer,
+        } as GuestAnswerRequest),
+      }
+    );
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -185,16 +192,19 @@ export const submitAnswer = async (
       throw new Error("Access token not found");
     }
 
-    const response = await fetch(`${API_BASE_URL}/questions/${questionId}/answer`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
-      body: JSON.stringify({
-        userAnswer,
-      } as AnswerRequest),
-    });
+    const response = await fetch(
+      `${API_BASE_URL}/questions/${questionId}/answer`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          userAnswer,
+        } as AnswerRequest),
+      }
+    );
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
