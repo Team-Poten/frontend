@@ -256,6 +256,143 @@ const CorrectAnswerText = styled.div`
   border-left: 3px solid #30a10e;
 `;
 
+const ResultModal = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+`;
+
+const ModalContent = styled.div`
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 40px;
+  max-width: 480px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  position: relative;
+`;
+
+const ModalImage = styled.img`
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 20px;
+  display: block;
+`;
+
+const ModalTitle = styled.h2`
+  font-family: "Pretendard", sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  color: #222222;
+  margin-bottom: 24px;
+`;
+
+const ModalSubtitle = styled.div`
+  font-family: "Pretendard", sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  color: #30a10e;
+  margin-bottom: 16px;
+`;
+
+const ResultText = styled.div`
+  font-family: "Pretendard", sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  color: #30a10e;
+  margin-bottom: 16px;
+`;
+
+const ScoreText = styled.div`
+  font-family: "Pretendard", sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  color: #666666;
+  margin-bottom: 8px;
+`;
+
+const MemberScoreText = styled.div`
+  font-family: "Pretendard", sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  color: #222222;
+  margin-bottom: 8px;
+`;
+
+const GuestMessage = styled.div`
+  font-family: "Pretendard", sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  color: #666666;
+  line-height: 1.5;
+  margin-top: 16px;
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 32px;
+`;
+
+const ModalButton = styled.button<{ primary?: boolean }>`
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-family: "Pretendard", sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  
+  ${props => props.primary ? `
+    background-color: #30a10e;
+    color: #ffffff;
+    
+    &:hover {
+      background-color: #2a8f0c;
+    }
+  ` : `
+    background-color: #f8f9fa;
+    color: #666666;
+    border: 1px solid #e9ecef;
+    
+    &:hover {
+      background-color: #e9ecef;
+    }
+  `}
+`;
+
+const CloseButton = styled.button`
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #999999;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  
+  &:hover {
+    color: #666666;
+  }
+`;
+
 interface QuestionState {
   selectedAnswer: string | null;
   showResult: boolean;
@@ -268,6 +405,7 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [questionStates, setQuestionStates] = useState<{ [key: number]: QuestionState }>({});
+  const [showResultModal, setShowResultModal] = useState(false);
 
   const currentQuestion = questions[currentQuestionIndex];
   const currentQuestionState = questionStates[currentQuestion.id || 0] || {
@@ -316,7 +454,6 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
     
     const mappedSelectedAnswer = answerMapping[selectedAnswer];
     const isCorrectByComparison = mappedSelectedAnswer === correctAnswer;
-    
     
     // API의 correct 필드가 있으면 사용, 없으면 직접 비교 결과 사용
     return apiCorrect !== undefined ? apiCorrect : isCorrectByComparison;
@@ -386,10 +523,58 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
-      // 퀴즈 완료
-      console.log("퀴즈 완료!");
+      // 퀴즈 완료 - 결과 모달 표시
+      setShowResultModal(true);
     }
   };
+
+  const handleViewQuestions = () => {
+    // 문제 모아보기 페이지로 이동 (/history)
+    setShowResultModal(false);
+    // 회원의 히스토리 페이지로 이동
+    window.location.href = '/history';
+  };
+
+  const handleCreateMoreQuestions = () => {
+    // 문제 더 만들기 페이지로 이동 (메인 홈)
+    setShowResultModal(false);
+    onBack();
+  };
+
+  const handleCloseModal = () => {
+    setShowResultModal(false);
+    onBack(); // 메인 홈으로 이동
+  };
+
+  // 정답 개수 계산
+  const totalCorrect = Object.values(questionStates).filter(state => {
+    if (!state.answerResult) return false;
+    
+    // API 응답의 correct 필드 사용
+    const apiCorrect = state.answerResult.correct;
+    
+    // 선택한 답변과 문제 정답을 직접 비교
+    const selectedAnswer = state.selectedAnswer;
+    const questionIndex = Object.keys(questionStates).find(key => 
+      questionStates[parseInt(key)] === state
+    );
+    const question = questions[parseInt(questionIndex || '0')];
+    const correctAnswer = question?.answer;
+    
+    // 답변 매핑 (O/X -> TRUE/FALSE)
+    const answerMapping: { [key: string]: string } = {
+      'O': 'TRUE',
+      'X': 'FALSE'
+    };
+    
+    const mappedSelectedAnswer = answerMapping[selectedAnswer || ''];
+    const isCorrectByComparison = mappedSelectedAnswer === correctAnswer;
+    
+    // API의 correct 필드가 있으면 사용, 없으면 직접 비교 결과 사용
+    return apiCorrect !== undefined ? apiCorrect : isCorrectByComparison;
+  }).length;
+
+  const totalWrong = questions.length - totalCorrect;
 
   return (
     <QuizContainer>
@@ -471,6 +656,49 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
         </QuestionCard>
       </MainContent>
       <Footer />
+
+                           {/* 결과 모달 */}
+        {showResultModal && (
+          <ResultModal>
+            <ModalContent>
+              {!isLoggedIn() && <CloseButton onClick={handleCloseModal}>×</CloseButton>}
+              
+              {isLoggedIn() ? (
+                // 회원용 모달
+                <>
+                  <ModalImage src="/images/confetti.png" alt="축하 이미지" />
+                  <ModalSubtitle>모든 문제를 다 풀었어요!</ModalSubtitle>
+                  <ModalTitle>문제 정답 결과</ModalTitle>
+                  <ResultText>
+                    {totalCorrect} / {questions.length}문제 (정답{totalCorrect}, 오답{totalWrong})
+                  </ResultText>
+                  
+                  <ButtonContainer>
+                    <ModalButton onClick={handleViewQuestions}>
+                      문제 모아보기
+                    </ModalButton>
+                    <ModalButton primary onClick={handleCreateMoreQuestions}>
+                      문제 더 만들기
+                    </ModalButton>
+                  </ButtonContainer>
+                </>
+              ) : (
+                // 비회원용 모달
+                <>
+                  <ModalImage src="/images/guest-result.png" alt="결과 이미지" />
+                  <ModalTitle>문제 정답 결과</ModalTitle>
+                  <ResultText>
+                    {totalCorrect} / {questions.length}문제 (정답{totalCorrect}, 오답{totalWrong})
+                  </ResultText>
+                  
+                  <GuestMessage>
+                    회원가입을 통해 문제를 더 만들고 복습도 할 수 있어요!
+                  </GuestMessage>
+                </>
+              )}
+            </ModalContent>
+          </ResultModal>
+        )}
     </QuizContainer>
   );
 };
