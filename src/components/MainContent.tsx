@@ -27,7 +27,7 @@ const MainTitle = styled.h1`
   text-align: center;
   margin-bottom: 40px;
   max-width: 580px;
-  margin-top: 362px;
+  margin-top: 62px;
 `;
 
 const SearchSection = styled.div`
@@ -116,6 +116,7 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
 
   return (
     <MainContainer>
+      <CharacterGroup />
       <MainTitle>퀴즐리로 문제 생성부터 오답 정리까지 한 번에!</MainTitle>
 
       <SearchSection>
@@ -132,7 +133,6 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
         ))}
       </MenuSection>
 
-      <CharacterGroup />
     </MainContainer>
   );
 };
