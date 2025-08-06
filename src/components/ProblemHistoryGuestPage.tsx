@@ -104,10 +104,10 @@ const ProblemHistoryGuestPage: React.FC = () => {
     <Container>
       <ContentWrapper>
         <CharacterGroup>
-          <Character src={character1} alt="캐릭터1" />
-          <Character2 src={character2} alt="캐릭터2" />
-          <Character src={character3} alt="캐릭터3" />
-          <Character src={character4} alt="캐릭터4" />
+          <Character src={"/images/character1.png"} alt="캐릭터1" />
+          <Character2 src={"/images/character2.png"} alt="캐릭터2" />
+          <Character src={"/images/character3.png"} alt="캐릭터3" />
+          <Character src={"/images/character4.png"} alt="캐릭터4" />
         </CharacterGroup>
         <MainText>문제를 확인하려면 회원가입 또는 로그인이 필요해요</MainText>
         <SubText>퀴즐리 계정이 없다면 지금 바로 회원가입을 해보세요.</SubText>
