@@ -36,14 +36,25 @@ const Title = styled.h1`
   font-size: 32px;
   line-height: 1.4;
   color: #222222;
-  text-align: center;
+  text-align: left;
   margin-bottom: 40px;
-  max-width: 580px;
+  max-width: 976px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+`;
+
+const TitleIcon = styled.img`
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
 `;
 
 const ProgressContainer = styled.div`
   width: 976px;
   margin-bottom: 40px;
+  position: relative;
 `;
 
 const ProgressBar = styled.div`
@@ -62,18 +73,23 @@ const ProgressFill = styled.div<{ progress: number }>`
   transition: width 0.3s ease;
 `;
 
-const ProgressText = styled.div`
+const ProgressText = styled.div<{ progress: number }>`
   text-align: center;
   margin-top: 10px;
   font-family: "Pretendard", sans-serif;
   font-weight: 500;
   font-size: 18px;
   color: #30a10e;
+  position: absolute;
+  top: 16px;
+  left: ${(props) => props.progress}%;
+  transform: translateX(-50%);
+  transition: left 0.3s ease;
 `;
 
 const QuestionCard = styled.div`
   width: 976px;
-  height: 288px;
+  min-height: 200px;
   background-color: #ffffff;
   border: 1px solid #dedede;
   border-radius: 16px;
@@ -181,21 +197,21 @@ const AnswerButton = styled.button<{
 
 
 
-const NextButton = styled.button`
-  background-color: #b7b7b7;
+const NextButton = styled.button<{ isSelected?: boolean }>`
+  background-color: ${(props) => (props.isSelected ? "#30a10e" : "#b7b7b7")};
   color: #ffffff;
-  border: none;
+  border: ${(props) => (props.isSelected ? "1px solid #30a10e" : "none")};
   border-radius: 6px;
   padding: 12px 16px;
   font-family: "Pretendard", sans-serif;
   font-weight: 400;
   font-size: 16px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
   margin-top: 20px;
 
   &:hover {
-    background-color: #a0a0a0;
+    background-color: ${(props) => (props.isSelected ? "#2a8f0c" : "#a0a0a0")};
   }
 
   &:disabled {
@@ -204,12 +220,16 @@ const NextButton = styled.button`
   }
 `;
 
-const CharacterImage = styled.img`
+const CharacterImage = styled.img<{ progress: number }>`
   width: 40px;
   height: 36px;
   object-fit: cover;
   border-radius: 8px;
-  margin-bottom: 20px;
+  position: absolute;
+  top: -10px;
+  left: ${(props) => props.progress}%;
+  transform: translateX(-50%);
+  transition: left 0.3s ease;
 `;
 
 const ExplanationText = styled.div`
@@ -580,80 +600,89 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
     <QuizContainer>
       <Header />
       <MainContent>
-        <Title>퀴즐리로 문제 생성부터 오답 정리까지 한 번에!</Title>
+      <Title>
+        지금부터 본격 <span style={{ color: "#30a10e" }}>문제 타임!</span> 집중해서 풀어봐요
+        <TitleIcon src="/images/icn_write.png" alt="Write icon" />
+      </Title>
 
         <ProgressContainer>
           <ProgressBar>
             <ProgressFill progress={progress} />
           </ProgressBar>
-          <ProgressText>{Math.round(progress)}%</ProgressText>
+          <CharacterImage 
+            src="/images/character2.png" 
+            alt="Character" 
+            progress={progress}
+          />
+          <ProgressText progress={progress}>{Math.round(progress)}%</ProgressText>
         </ProgressContainer>
 
-        <QuestionCard>
-          <div>
-            <CharacterImage src="/images/character2.png" alt="Character" />
-            <QuestionText
-              isCorrect={isAnswerCorrect()}
-              showResult={currentQuestionState.showResult}
-            >
-              <QuestionNumber
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", width: "976px" }}>
+          <QuestionCard>
+            <div>
+              <QuestionText
                 isCorrect={isAnswerCorrect()}
                 showResult={currentQuestionState.showResult}
               >
-                Q{currentQuestionIndex + 1}.
-              </QuestionNumber>
-              {currentQuestion.question}
-            </QuestionText>
-            {currentQuestionState.showResult && (
-              <div style={{ marginTop: "10px", fontSize: "14px", color: "#666" }}>
-              </div>
-            )}
-          </div>
+                <QuestionNumber
+                  isCorrect={isAnswerCorrect()}
+                  showResult={currentQuestionState.showResult}
+                >
+                  Q{currentQuestionIndex + 1}.
+                </QuestionNumber>
+                {currentQuestion.question}
+              </QuestionText>
+            </div>
 
-          <AnswerContainer>
-            <AnswerButton
-              selected={currentQuestionState.selectedAnswer === "O"}
-              isCorrect={currentQuestionState.answerResult?.isCorrect && currentQuestionState.selectedAnswer === "O"}
-              showResult={currentQuestionState.showResult}
-              onClick={() => handleAnswerSelect("O")}
-              disabled={currentQuestionState.showResult || currentQuestionState.isLoading}
-            >
-              O (참)
-            </AnswerButton>
-            <AnswerButton
-              selected={currentQuestionState.selectedAnswer === "X"}
-              isCorrect={currentQuestionState.answerResult?.isCorrect && currentQuestionState.selectedAnswer === "X"}
-              showResult={currentQuestionState.showResult}
-              onClick={() => handleAnswerSelect("X")}
-              disabled={currentQuestionState.showResult || currentQuestionState.isLoading}
-            >
-              X (거짓)
-            </AnswerButton>
-          </AnswerContainer>
+            <AnswerContainer>
+              <AnswerButton
+                selected={currentQuestionState.selectedAnswer === "O"}
+                isCorrect={currentQuestionState.answerResult?.isCorrect && currentQuestionState.selectedAnswer === "O"}
+                showResult={currentQuestionState.showResult}
+                onClick={() => handleAnswerSelect("O")}
+                disabled={currentQuestionState.showResult || currentQuestionState.isLoading}
+              >
+                O 
+              </AnswerButton>
+              <AnswerButton
+                selected={currentQuestionState.selectedAnswer === "X"}
+                isCorrect={currentQuestionState.answerResult?.isCorrect && currentQuestionState.selectedAnswer === "X"}
+                showResult={currentQuestionState.showResult}
+                onClick={() => handleAnswerSelect("X")}
+                disabled={currentQuestionState.showResult || currentQuestionState.isLoading}
+              >
+                X 
+              </AnswerButton>
+            </AnswerContainer>
 
-          {currentQuestionState.isLoading && <LoadingText>채점 중...</LoadingText>}
-          {currentQuestionState.error && <ErrorText>{currentQuestionState.error}</ErrorText>}
-          
+            {currentQuestionState.isLoading && <LoadingText>채점 중...</LoadingText>}
+            {currentQuestionState.error && <ErrorText>{currentQuestionState.error}</ErrorText>}
+          </QuestionCard>
+
+          <NextButtonContainer>
+            <NextButton 
+              onClick={handleNextQuestion}
+              isSelected={currentQuestionState.showResult}
+              disabled={!currentQuestionState.showResult}
+            >
+              {currentQuestionIndex < questions.length - 1 ? "다음 문제" : "완료"}
+            </NextButton>
+          </NextButtonContainer>
+
           {currentQuestionState.showResult && currentQuestionState.answerResult && (
-            <ExplanationText>
-              <strong>해설:</strong> {currentQuestionState.answerResult.explanation}
-            </ExplanationText>
+            <ExplanationBox>
+              <ExplanationSummary>
+                해설 요약
+              </ExplanationSummary>
+              <ExplanationContent>
+                {currentQuestionState.answerResult.explanation}
+              </ExplanationContent>
+              <ExplanationContent>
+                <strong>정답:</strong> {currentQuestion.answer === 'TRUE' ? 'O' : 'X'}
+              </ExplanationContent>
+            </ExplanationBox>
           )}
-          
-          {currentQuestionState.showResult && (
-            <CorrectAnswerText>
-              <strong>정답:</strong> {currentQuestion.answer === 'TRUE' ? 'O' : 'X'}
-            </CorrectAnswerText>
-          )}
-
-          <div style={{ textAlign: "right" }}>
-            {currentQuestionState.showResult && (
-              <NextButton onClick={handleNextQuestion}>
-                {currentQuestionIndex < questions.length - 1 ? "다음 문제" : "완료"}
-              </NextButton>
-            )}
-          </div>
-        </QuestionCard>
+        </div>
       </MainContent>
       <Footer />
 
@@ -704,3 +733,40 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
 };
 
 export default QuizPage;
+
+const ExplanationBox = styled.div`
+  width: 976px;
+  height: 174px;
+  background-color: #ffffff;
+  border: 1px solid #dedede;
+  border-radius: 16px;
+  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.04);
+  padding: 40px;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+`;
+
+const ExplanationSummary = styled.div`
+  font-family: "Pretendard", sans-serif;
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 1.4;
+  color: #30a10e;
+`;
+
+const ExplanationContent = styled.div`
+  font-family: "Pretendard", sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 1.5;
+  color: #666666;
+`;
+
+const NextButtonContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+  width: 976px;
+`;

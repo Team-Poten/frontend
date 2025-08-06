@@ -1,9 +1,10 @@
-import React, { useState } from "react";
-import styled from "styled-components";
+import React, { useState, useEffect } from "react";
+import styled, { keyframes } from "styled-components";
+import { useNavigate } from "react-router-dom";
+import { createQuestions, Question } from "../services/api";
+import CharacterGroup from "./CharacterGroup";
 import SearchBar from "./SearchBar";
 import MenuCard from "./MenuCard";
-import CharacterGroup from "./CharacterGroup";
-import { createQuestions, Question } from "../services/api";
 
 interface MainContentProps {
   onQuestionsGenerated: (questions: Question[]) => void;
@@ -82,30 +83,8 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
 
     try {
       const questions = await createQuestions(text);
-      console.log("API 응답 데이터:", questions); // 디버깅용 로그
-      console.log("첫 번째 문제 구조:", questions[0]); // 첫 번째 문제의 상세 구조 확인
-
-      // 각 문제에 id 필드가 없으면 기본값 설정
-      const questionsWithIds = questions.map((question, index) => {
-        console.log(`문제 ${index + 1} 구조:`, question); // 각 문제의 구조 확인
-
-        // 서버에서 다양한 ID 필드명을 사용할 수 있으므로 확인
-        const questionAny = question as any; // 타입 단언으로 다양한 필드 접근
-        const questionId =
-          question.id ||
-          questionAny.questionId ||
-          questionAny.question_id ||
-          index + 1;
-        console.log(`문제 ${index + 1} ID:`, questionId);
-
-        return {
-          ...question,
-          id: questionId, // 서버에서 응답받은 ID 또는 기본값 사용
-        };
-      });
-
-      console.log("처리된 문제 데이터:", questionsWithIds); // 디버깅용 로그
-      onQuestionsGenerated(questionsWithIds);
+      console.log("API 응답 데이터:", questions);
+      onQuestionsGenerated(questions);
     } catch (err) {
       setError("문제 생성 중 오류가 발생했습니다. 다시 시도해주세요.");
       console.error("Error generating questions:", err);
