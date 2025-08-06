@@ -2,10 +2,6 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import { signUp, SignUpRequest, checkIdDuplicate } from "../services/api";
-import character1 from "../assets/character1.png";
-import character2 from "../assets/character2.png";
-import character3 from "../assets/character3.png";
-import character4 from "../assets/character4.png";
 
 const Container = styled.div`
   width: 100%;
@@ -36,9 +32,34 @@ const LeftSection = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   position: relative;
   overflow: hidden;
+  padding-top: 80px;
+`;
+
+const Title = styled.h1`
+  font-family: "Pretendard", sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 1.3999999364217122em;
+  color: #222222;
+  text-align: center;
+  margin: 0 0 20px 0;
+  width: 316px;
+  height: 68px;
+`;
+
+const Subtitle = styled.p`
+  font-family: "Pretendard", sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 1.3999999364217122em;
+  color: #777777;
+  text-align: center;
+  margin: 0 0 40px 0;
+  width: 185px;
+  height: 50px;
 `;
 
 const CharacterGroup = styled.div`
@@ -46,7 +67,7 @@ const CharacterGroup = styled.div`
   height: 284px;
   display: flex;
   position: relative;
-  margin-bottom: 40px;
+  margin-top: 40px;
 `;
 
 const Character = styled.img`
@@ -82,30 +103,6 @@ const Character4 = styled(Character)`
   height: 72px;
   top: 0px;
   left: 204px;
-`;
-
-const Title = styled.h1`
-  font-family: "Pretendard", sans-serif;
-  font-weight: 700;
-  font-size: 24px;
-  line-height: 1.3999999364217122em;
-  color: #222222;
-  text-align: center;
-  margin: 0 0 20px 0;
-  width: 316px;
-  height: 68px;
-`;
-
-const Subtitle = styled.p`
-  font-family: "Pretendard", sans-serif;
-  font-weight: 400;
-  font-size: 18px;
-  line-height: 1.3999999364217122em;
-  color: #777777;
-  text-align: center;
-  margin: 0;
-  width: 185px;
-  height: 50px;
 `;
 
 const RightSection = styled.div`
@@ -357,14 +354,15 @@ const SignUpPage: React.FC = () => {
   };
 
   // 각 단계별 활성화 상태 확인
-  const isPasswordEnabled = idDuplicateStatus === "available";
+  const isNicknameEnabled = formData.nickname.trim() !== "";
+  const isPasswordEnabled = isNicknameEnabled && idDuplicateStatus === "available";
   const isPasswordConfirmEnabled =
     isPasswordEnabled && validatePassword(formData.password).isValid;
-  const isNicknameEnabled =
+  const isSignUpEnabled = 
     isPasswordConfirmEnabled &&
     formData.passwordConfirm &&
-    formData.password === formData.passwordConfirm;
-  const isSignUpEnabled = isNicknameEnabled && formData.nickname.trim() !== "";
+    formData.password === formData.passwordConfirm &&
+    formData.nickname.trim() !== "";
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -484,12 +482,6 @@ const SignUpPage: React.FC = () => {
     <Container>
       <SignUpCard>
         <LeftSection>
-          <CharacterGroup>
-            <Character1 src={character1} alt="캐릭터1" />
-            <Character2 src={character2} alt="캐릭터2" />
-            <Character3 src={character3} alt="캐릭터3" />
-            <Character4 src={character4} alt="캐릭터4" />
-          </CharacterGroup>
           <Title>
             요약한 내용을 문제로!
             <br />
@@ -500,9 +492,26 @@ const SignUpPage: React.FC = () => {
             <br />
             생성하고 복습해보세요!
           </Subtitle>
+          <CharacterGroup>
+            <Character1 src="/images/character1.png" alt="캐릭터1" />
+            <Character2 src="/images/character3.png" alt="캐릭터3" />
+            <Character3 src="/images/character2.png" alt="캐릭터2" />
+            <Character4 src="/images/character4.png" alt="캐릭터4" />
+          </CharacterGroup>
         </LeftSection>
         <RightSection>
           <FormTitle>회원가입</FormTitle>
+
+          <InputGroup>
+            <InputLabel>닉네임</InputLabel>
+            <Input
+              type="text"
+              name="nickname"
+              value={formData.nickname}
+              onChange={handleInputChange}
+              placeholder="닉네임을 입력하세요"
+            />
+          </InputGroup>
 
           <InputGroup>
             <InputLabel>아이디</InputLabel>
@@ -513,6 +522,7 @@ const SignUpPage: React.FC = () => {
                 value={formData.loginId}
                 onChange={handleInputChange}
                 placeholder="아이디를 입력하세요"
+                disabled={!isNicknameEnabled}
               />
               <DuplicateCheckButton onClick={handleDuplicateCheck}>
                 {idDuplicateStatus === "checking" ? "확인중..." : "중복확인"}
@@ -543,11 +553,6 @@ const SignUpPage: React.FC = () => {
               !validatePassword(formData.password).isValid && (
                 <MessageText type="error">{passwordError}</MessageText>
               )}
-            {!isPasswordEnabled && (
-              <MessageText type="info">
-                아이디 중복 확인을 먼저 완료해주세요.
-              </MessageText>
-            )}
           </InputGroup>
 
           <InputGroup>
@@ -568,28 +573,6 @@ const SignUpPage: React.FC = () => {
               formData.password === formData.passwordConfirm && (
                 <MessageText type="success">비밀번호가 일치합니다.</MessageText>
               )}
-            {!isPasswordConfirmEnabled && isPasswordEnabled && (
-              <MessageText type="info">
-                비밀번호 조건을 만족해주세요.
-              </MessageText>
-            )}
-          </InputGroup>
-
-          <InputGroup>
-            <InputLabel>닉네임</InputLabel>
-            <Input
-              type="text"
-              name="nickname"
-              value={formData.nickname}
-              onChange={handleInputChange}
-              placeholder="닉네임을 입력하세요"
-              disabled={!isNicknameEnabled}
-            />
-            {!isNicknameEnabled && isPasswordConfirmEnabled && (
-              <MessageText type="info">
-                비밀번호 확인을 완료해주세요.
-              </MessageText>
-            )}
           </InputGroup>
 
           <SignUpButton

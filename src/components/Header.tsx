@@ -5,19 +5,33 @@ import { isLoggedIn } from "../services/api";
 
 const HeaderContainer = styled.header`
   width: 100%;
-  height: 90px;
   background-color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 40px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
 `;
 
+// 전체 폭 기준 여백 적용
+const HeaderContent = styled.div`
+  display: flex;
+  align-items: center;
+  padding-top: 26px;
+  padding-bottom: 26px;
+
+  /* 1920px 기준 비율 적용 */
+  padding-left: calc(1030 / 1920 * 100%);
+  padding-right: calc(792 / 1920 * 100%);
+
+  /* 최소 여백 보장 (너무 작아졌을 때) */
+  @media (max-width: 1024px) {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+`;
+
+
+// 메뉴 네비게이션
 const Navigation = styled.nav`
   display: flex;
   align-items: center;
-  gap: 40px;
 `;
 
 const NavTab = styled.button<{ active?: boolean }>`
@@ -27,30 +41,40 @@ const NavTab = styled.button<{ active?: boolean }>`
   font-family: "Pretendard", sans-serif;
   font-weight: 500;
   font-size: 16px;
-  line-height: 1.399999976158142em;
+  line-height: 1.4em;
   color: ${(props) => (props.active ? "#222222" : "#777777")};
   cursor: pointer;
-  transition: color 0.2s ease;
+  white-space: nowrap;
 
   &:hover {
     color: #222222;
   }
+
+  &:nth-child(2) {
+    margin-left: 40px;
+  }
+
+  &:nth-child(3) {
+    margin-left: 40px;
+  }
 `;
 
+// 로그인 버튼
 const LoginButton = styled.button`
   background-color: #30a10e;
   color: #ffffff;
   border: none;
   border-radius: 200px;
-  padding: 10px 8px;
+  padding: 10px 16px;
   width: 70px;
   height: 38px;
   font-family: "Pretendard", sans-serif;
   font-weight: 400;
   font-size: 14px;
-  line-height: 1.193359375em;
+  line-height: 1.19em;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  white-space: nowrap;
+  margin-left: 32px;
 
   &:hover {
     background-color: #2a8f0c;
@@ -65,6 +89,7 @@ const UserInfo = styled.div`
   font-weight: 500;
   font-size: 16px;
   color: #222222;
+  margin-left: 32px;
 `;
 
 const LogoutButton = styled.button`
@@ -88,13 +113,7 @@ const Header: React.FC = () => {
   const loggedIn = isLoggedIn();
 
   const handleNavigation = (path: string) => {
-    // 로그인하지 않은 상태에서 틀린문제 풀어보기나 문제 모아보기 접근 시
-    if (!loggedIn && (path === "/wrong-problems" || path === "/history")) {
-      // 로그인하지 않은 상태에서는 해당 페이지로 이동 (게스트 페이지가 표시됨)
-      navigate(path);
-    } else {
-      navigate(path);
-    }
+    navigate(path);
   };
 
   const handleLogin = () => {
@@ -108,41 +127,34 @@ const Header: React.FC = () => {
 
   const isActive = (path: string) => {
     if (path === "/" && location.pathname === "/") return true;
-    if (path === "/history" && location.pathname.startsWith("/history"))
-      return true;
-    if (path === "/wrong-problems" && location.pathname === "/wrong-problems")
-      return true;
+    if (path === "/history" && location.pathname.startsWith("/history")) return true;
+    if (path === "/wrong-problems" && location.pathname === "/wrong-problems") return true;
     return false;
   };
 
   return (
     <HeaderContainer>
-      <div></div>
-      <Navigation>
-        <NavTab active={isActive("/")} onClick={() => handleNavigation("/")}>
-          문제 만들기
-        </NavTab>
-        <NavTab
-          active={isActive("/history")}
-          onClick={() => handleNavigation("/history")}
-        >
-          문제 모아보기
-        </NavTab>
-        <NavTab
-          active={isActive("/wrong-problems")}
-          onClick={() => handleNavigation("/wrong-problems")}
-        >
-          틀린문제 풀어보기
-        </NavTab>
-      </Navigation>
-      {loggedIn ? (
-        <UserInfo>
-          <span>회원님</span>
-          <LogoutButton onClick={handleLogout}>로그아웃</LogoutButton>
-        </UserInfo>
-      ) : (
-        <LoginButton onClick={handleLogin}>로그인</LoginButton>
-      )}
+      <HeaderContent>
+        <Navigation>
+          <NavTab active={isActive("/")} onClick={() => handleNavigation("/")}>
+            문제 만들기
+          </NavTab>
+          <NavTab active={isActive("/history")} onClick={() => handleNavigation("/history")}>
+            문제 모아보기
+          </NavTab>
+          <NavTab active={isActive("/wrong-problems")} onClick={() => handleNavigation("/wrong-problems")}>
+            틀린문제 풀어보기
+          </NavTab>
+        </Navigation>
+        {loggedIn ? (
+          <UserInfo>
+            <span>회원님</span>
+            <LogoutButton onClick={handleLogout}>로그아웃</LogoutButton>
+          </UserInfo>
+        ) : (
+          <LoginButton onClick={handleLogin}>로그인</LoginButton>
+        )}
+      </HeaderContent>
     </HeaderContainer>
   );
 };

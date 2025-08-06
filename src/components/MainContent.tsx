@@ -117,7 +117,9 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
   return (
     <MainContainer>
       <CharacterGroup />
-      <MainTitle>퀴즐리로 문제 생성부터 오답 정리까지 한 번에!</MainTitle>
+      <MainTitle>
+        <span style={{ color: "#30a10e" }}>퀴즐리</span>로 문제 생성부터 오답 정리까지 한 번에!
+      </MainTitle>
 
       <SearchSection>
         <SearchBar
