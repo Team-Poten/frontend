@@ -15,7 +15,7 @@ const PageContainer = styled.div`
   width: 100%;
   min-height: calc(100vh - 180px);
   background-color: #f8f9fa;
-  padding: 40px;
+  padding: 80px;
 `;
 
 const ContentContainer = styled.div`
@@ -83,6 +83,11 @@ const QuestionSection = styled.div`
   display: flex;
   flex-direction: column;
   gap: 4px;
+`;
+
+const QuestionNumber = styled.span`
+  color: #30a10e; 
+  font-weight: 500;
 `;
 
 const QuestionText = styled.div`
@@ -232,9 +237,9 @@ const ProblemDetailPage: React.FC = () => {
               <ProblemCard key={problem.id}>
                 <QuestionSection>
                   <QuestionText>
-                    Q{leftColumnProblems.indexOf(problem) * 2 + 1}.{" "}
+                    <QuestionNumber>Q{leftColumnProblems.indexOf(problem) * 2 + 1}.</QuestionNumber>{" "}
                     {problem.question}
-                  </QuestionText>
+                </QuestionText>
                   <AnswerText>정답 : {problem.answer}</AnswerText>
                 </QuestionSection>
                 <ExplanationSection>
@@ -248,10 +253,10 @@ const ProblemDetailPage: React.FC = () => {
             {rightColumnProblems.map((problem, index) => (
               <ProblemCard key={problem.id}>
                 <QuestionSection>
-                  <QuestionText>
-                    Q{rightColumnProblems.indexOf(problem) * 2 + 2}.{" "}
-                    {problem.question}
-                  </QuestionText>
+                <QuestionText>
+                  <QuestionNumber>Q{rightColumnProblems.indexOf(problem) * 2 + 2}.</QuestionNumber>{" "}
+                  {problem.question}
+                </QuestionText>
                   <AnswerText>정답 : {problem.answer}</AnswerText>
                 </QuestionSection>
                 <ExplanationSection>
