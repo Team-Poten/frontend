@@ -6,8 +6,7 @@ import LoginModal from "./LoginModal";
 
 const HeaderContainer = styled.header`
   width: 100%;
-  background-color: #ffffff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  background-color:  #f8f9fa;
 `;
 
 // 전체 디스플레이 컨테이너 (1920px 기준)
