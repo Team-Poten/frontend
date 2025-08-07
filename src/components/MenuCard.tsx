@@ -1,6 +1,5 @@
 import React from "react";
 import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
 
 interface MenuCardProps {
   title: string;
@@ -21,14 +20,12 @@ const CardContainer = styled.div`
   cursor: pointer;
   transition:
     transform 0.2s ease,
-    box-shadow 0.2s ease,
-    border-color 0.2s ease;
+    box-shadow 0.2s ease;
   width: 260px;
 
   &:hover {
     transform: translateY(-2px);
     box-shadow: 6px 6px 16px rgba(0, 0, 0, 0.08);
-    border-color: #30a10e;
   }
 `;
 
@@ -44,12 +41,6 @@ const IconBox = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-`;
-
-const IconImage = styled.img`
-  width: 28px;
-  height: 28px;
-  object-fit: contain;
 `;
 
 const Title = styled.h3`
@@ -72,44 +63,66 @@ const Description = styled.p`
   width: 260px;
 `;
 
+const LightIcon = () => (
+  <svg
+    width="17"
+    height="23"
+    viewBox="0 0 17 23"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path d="M5.54 2.33L16.92 23.33H0L5.54 2.33Z" fill="#FFE267" />
+  </svg>
+);
+
+
+
+const BookIcon = () => (
+  <svg
+    width="28"
+    height="28"
+    viewBox="0 0 28 28"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <rect width="28" height="28" fill="white" />
+    <rect x="4" y="2" width="20" height="24" fill="#2EB05B" rx="3" />
+    <rect x="7" y="6" width="14" height="6" fill="white" rx="1" />
+  </svg>
+);
+
+const WriteIcon = () => (
+  <svg
+    width="26"
+    height="26"
+    viewBox="0 0 26 26"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path d="M4.92 0.01L20.21 20.21H0.01L4.92 0.01Z" fill="#FFB682" />
+    <path d="M1.25 16.77L7.12 23.89H0L1.25 16.77Z" fill="#00BCF8" />
+    <path d="M16.17 0.01L25.12 8.96H16.17V0.01Z" fill="#00BCF8" />
+  </svg>
+);
+
 const MenuCard: React.FC<MenuCardProps> = ({ title, description, icon }) => {
-  const navigate = useNavigate();
-
-  const handleClick = () => {
-    switch (title) {
-      case "문제 만들기":
-        navigate("/");
-        break;
-      case "문제 모아보기":
-        navigate("/history");
-        break;
-      case "틀린문제 풀어보기":
-        navigate("/wrong-problems");
-        break;
-      default:
-        break;
-    }
-  };
-
-  const getIconSrc = () => {
+  const renderIcon = () => {
     switch (icon) {
       case "light":
-        return "/images/icn_light.png";
+        return <LightIcon />;
       case "book":
-        return "/images/icn_book.png";
+        return <BookIcon />;
       case "write":
-        return "/images/icn_write.png";
+        return <WriteIcon />;
       default:
-        return "";
+        return null;
     }
   };
 
   return (
-    <CardContainer onClick={handleClick}>
+    <CardContainer>
       <IconContainer>
-        <IconBox>
-          <IconImage src={getIconSrc()} alt={title} />
-        </IconBox>
+        <IconBox>{renderIcon()}</IconBox>
         <Title>{title}</Title>
       </IconContainer>
       <Description>{description}</Description>
