@@ -1,10 +1,6 @@
 import React from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import character1 from "../assets/character1.png";
-import character2 from "../assets/character2.png";
-import character3 from "../assets/character3.png";
-import character4 from "../assets/character4.png";
 
 const Container = styled.div`
   width: 100%;
@@ -54,44 +50,11 @@ const MainText = styled.h1`
   font-weight: 600;
   font-size: 24px;
   line-height: 1.4;
-  color: #222222;
+  color: #b7b7b7;
   text-align: center;
-  margin: 0 0 8px 0;
-  width: 485px;
-  height: 34px;
+  word-break: keep-all;
 `;
 
-const SubText = styled.p`
-  font-family: "Pretendard", sans-serif;
-  font-weight: 400;
-  font-size: 18px;
-  line-height: 1.4;
-  color: #777777;
-  text-align: center;
-  margin: 0 0 32px 0;
-  width: 374px;
-  height: 25px;
-`;
-
-const SignUpButton = styled.button`
-  background-color: #30a10e;
-  color: #ffffff;
-  border: none;
-  border-radius: 6px;
-  padding: 12px 16px;
-  width: 128px;
-  height: 44px;
-  font-family: "Pretendard", sans-serif;
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 1.4;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background-color: #2a8f0c;
-  }
-`;
 
 const WrongProblemGuestPage: React.FC = () => {
   const navigate = useNavigate();
@@ -104,10 +67,10 @@ const WrongProblemGuestPage: React.FC = () => {
     <Container>
       <ContentWrapper>
         <CharacterGroup>
-          <Character src={character1} alt="캐릭터1" />
-          <Character2 src={character2} alt="캐릭터2" />
-          <Character src={character3} alt="캐릭터3" />
-          <Character src={character4} alt="캐릭터4" />
+          <Character src="/images/black-white-character1.png" alt="캐릭터1" />
+          <Character2 src="/images/black-white-character2.png" alt="캐릭터2" />
+          <Character src="/images/black-white-character3.png" alt="캐릭터3" />
+          <Character src="/images/black-white-character4.png" alt="캐릭터4" />
         </CharacterGroup>
         <MainText>
           틀린문제 풀어보기 서비스를 준비중입니다.

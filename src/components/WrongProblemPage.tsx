@@ -59,25 +59,25 @@ const WrongProblemPage: React.FC = () => {
       <ContentContainer>
         <CharacterGroup>
           <Character
-            src="/images/character1.png"
+            src="/images/black-white-character1.png"
             alt="캐릭터 1"
             width={60}
             height={60}
           />
           <Character
-            src="/images/character2.png"
+            src="/images/black-white-character2.png"
             alt="캐릭터 2"
             width={66}
             height={60}
           />
           <Character
-            src="/images/character3.png"
+            src="/images/black-white-character3.png"
             alt="캐릭터 3"
             width={60}
             height={60}
           />
           <Character
-            src="/images/character4.png"
+            src="/images/black-white-character4.png"
             alt="캐릭터 4"
             width={60}
             height={60}
