@@ -96,6 +96,7 @@ const ProgressText = styled.div<{ progress: number }>`
 const QuestionCard = styled.div`
   width: 976px;
   min-height: 200px;
+  margin-top: 24px;
   background-color: #ffffff;
   border: 1px solid #dedede;
   border-radius: 16px;
@@ -301,7 +302,7 @@ const ModalContent = styled.div`
 
 const ModalImage = styled.img`
   width: 80px;
-  height: 80px;
+  object-fit: contain;
   margin: 0 auto 20px;
   display: block;
 `;
@@ -311,7 +312,7 @@ const ModalTitle = styled.h2`
   font-weight: 700;
   font-size: 24px;
   color: #222222;
-  margin-bottom: 24px;
+  margin-bottom: 8px;
 `;
 
 const ModalSubtitle = styled.div`
@@ -326,7 +327,7 @@ const ResultText = styled.div`
   font-family: "Pretendard", sans-serif;
   font-weight: 600;
   font-size: 18px;
-  color: #30a10e;
+  color: #222222e;
   margin-bottom: 16px;
 `;
 
@@ -350,7 +351,7 @@ const GuestMessage = styled.div`
   font-family: "Pretendard", sans-serif;
   font-weight: 400;
   font-size: 14px;
-  color: #666666;
+  color: #777777;
   line-height: 1.5;
   margin-top: 16px;
 `;
@@ -617,7 +618,7 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
       <Header />
       <MainContent>
         <Title>
-          지금부터 본격 <span style={{ color: "#30a10e" }}>문제 타임!</span>{" "}
+          지금부터 본격 <span style={{ color: "#222222" }}>문제 타임!</span>{" "}
           집중해서 풀어봐요
           <TitleIcon src="/images/icn_write.png" alt="Write icon" />
         </Title>
@@ -718,11 +719,10 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
               <ExplanationBox>
                 <ExplanationSummary>해설 요약</ExplanationSummary>
                 <ExplanationContent>
-                  {currentQuestionState.answerResult.explanation}
+                    {currentQuestionState.answerResult.explanation}
                 </ExplanationContent>
                 <ExplanationContent>
-                  <strong>정답:</strong>{" "}
-                  {currentQuestion.answer === "TRUE" ? "O" : "X"}
+                  정답 : {currentQuestion.answer === "TRUE" ? "O" : "X"}
                 </ExplanationContent>
               </ExplanationBox>
             )}
@@ -745,9 +745,12 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
                 <ModalSubtitle>모든 문제를 다 풀었어요!</ModalSubtitle>
                 <ModalTitle>문제 정답 결과</ModalTitle>
                 <ResultText>
-                  {totalCorrect} / {questions.length}문제 (정답{totalCorrect},
-                  오답{totalWrong})
+                  {totalCorrect} / {questions.length}문제{" "}
+                  <span style={{ color: "#777777" }}>
+                    (정답{totalCorrect}, 오답{totalWrong})
+                  </span>
                 </ResultText>
+      
 
                 <ButtonContainer>
                   <ModalButton onClick={handleViewQuestions}>
@@ -764,12 +767,14 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
                 <ModalImage src="/images/guest-result.png" alt="결과 이미지" />
                 <ModalTitle>문제 정답 결과</ModalTitle>
                 <ResultText>
-                  {totalCorrect} / {questions.length}문제 (정답{totalCorrect},
-                  오답{totalWrong})
+                  {totalCorrect} / {questions.length}문제{" "}
+                  <span style={{ color: "#777777" }}>
+                    (정답{totalCorrect}, 오답{totalWrong})
+                  </span>
                 </ResultText>
-
                 <GuestMessage>
-                  회원가입을 통해 문제를 더 만들고 복습도 할 수 있어요!
+                  회원가입을 통해 문제를 더 만들고<br />
+                  복습도 할 수 있어요!
                 </GuestMessage>
               </>
             )}
@@ -793,7 +798,7 @@ const ExplanationBox = styled.div`
   margin-top: 20px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 3px;
 `;
 
 const ExplanationSummary = styled.div`
@@ -802,14 +807,15 @@ const ExplanationSummary = styled.div`
   font-size: 20px;
   line-height: 1.4;
   color: #30a10e;
+  margin-bottom: 13px;
 `;
 
 const ExplanationContent = styled.div`
   font-family: "Pretendard", sans-serif;
-  font-weight: 400;
+  font-weight: 500;
   font-size: 18px;
   line-height: 1.5;
-  color: #666666;
+  color: #777777;
 `;
 
 const NextButtonContainer = styled.div`
