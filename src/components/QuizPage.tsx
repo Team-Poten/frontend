@@ -433,7 +433,7 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
 
   const currentQuestion = questions[currentQuestionIndex];
   // questionId가 없으면 인덱스를 사용하여 고유한 ID 생성
-  const currentQuestionId = currentQuestion.id || currentQuestionIndex;
+  const currentQuestionId = currentQuestion.questionId || currentQuestionIndex;
   const currentQuestionState = questionStates[currentQuestionId] || {
     selectedAnswer: null,
     showResult: false,
@@ -493,9 +493,12 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
 
   const handleAnswerSelect = async (answer: string) => {
     // questionId가 없으면 인덱스를 사용하여 고유한 ID 생성
-    const questionId: number = currentQuestion.id || currentQuestionIndex;
+    const questionId: number =
+      currentQuestion.questionId || currentQuestionIndex;
     console.log("현재 문제 ID:", questionId, "타입:", typeof questionId); // 디버깅용 로그
     console.log("현재 문제 전체 데이터:", currentQuestion); // 현재 문제의 전체 데이터 확인
+    console.log("currentQuestion.questionId 값:", currentQuestion.questionId); // questionId 필드 값 확인
+    console.log("currentQuestionIndex 값:", currentQuestionIndex); // 인덱스 값 확인
     console.log("회원 여부:", isLoggedIn()); // 회원 여부 확인
 
     // questionId가 유효하지 않은 경우 처리
@@ -545,7 +548,7 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
   };
 
   const handleNextQuestion = () => {
-    const questionId = currentQuestion.id || currentQuestionIndex;
+    const questionId = currentQuestion.questionId || currentQuestionIndex;
     if (!isNaN(questionId)) {
       const currentState = questionStates[questionId];
       if (currentState?.answerResult?.isCorrect) {
