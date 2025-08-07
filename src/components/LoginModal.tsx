@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -168,6 +169,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
   onLogin,
   error,
 }) => {
+  const navigate = useNavigate();
   const [loginId, setLoginId] = useState("");
   const [password, setPassword] = useState("");
 
@@ -182,6 +184,11 @@ const LoginModal: React.FC<LoginModalProps> = ({
     setLoginId("");
     setPassword("");
     onClose();
+  };
+
+  const handleSignUp = () => {
+    handleClose();
+    navigate("/signup");
   };
 
   return (
@@ -219,7 +226,9 @@ const LoginModal: React.FC<LoginModalProps> = ({
           {error && <ErrorMessage>{error}</ErrorMessage>}
         </form>
         <BottomLinks>
-          <LinkButton type="button">회원가입</LinkButton>
+          <LinkButton type="button" onClick={handleSignUp}>
+            회원가입
+          </LinkButton>
           <LinkButton type="button">아이디/비밀번호 찾기</LinkButton>
         </BottomLinks>
       </ModalContainer>
