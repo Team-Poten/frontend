@@ -9,8 +9,6 @@ interface Problem {
   question: string;
   answer: string;
   explanation: string;
-  questionStyle?: "bold" | "medium";
-  answerColor?: "#777777" | "#222222";
 }
 
 const PageContainer = styled.div`
@@ -21,15 +19,15 @@ const PageContainer = styled.div`
 `;
 
 const ContentContainer = styled.div`
-  max-width: 1200px;
+  max-width: 1000px;
   margin: 0 auto;
 `;
 
 const DateHeader = styled.div`
   font-family: "Pretendard", sans-serif;
-  font-weight: 500;
-  font-size: 18px;
-  line-height: 1.4;
+  font-weight: 700;
+  font-size: 32px;
+  line-height: 1.399999976158142em;
   color: #222222;
   margin-bottom: 40px;
   text-align: center;
@@ -54,66 +52,82 @@ const ErrorMessage = styled.div`
 `;
 
 const ProblemGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(441px, 1fr));
-  gap: 24px;
-  justify-items: center;
+  display: flex;
+  gap: 20px;
+  justify-content: center;
   max-width: 1000px;
   margin: 0 auto;
 `;
 
-const ProblemCard = styled.div`
-  width: 441px;
-  min-height: 180px;
-  background-color: #ffffff;
-  border: 1px solid #dfdfdf;
-  border-radius: 16px;
-  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.04);
-  padding: 20px 40px;
+const Column = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
+  width: 478px;
 `;
 
-const QuestionText = styled.div<{ questionStyle?: "bold" | "medium" }>`
+const ProblemCard = styled.div`
+  width: 478px;
+  background-color: #ffffff;
+  border: 1px solid #dedede;
+  border-radius: 12px;
+  box-shadow: 4px 4px 12px 0px rgba(0, 0, 0, 0.04);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: fit-content;
+`;
+
+const QuestionSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`;
+
+const QuestionText = styled.div`
   font-family: "Pretendard", sans-serif;
-  font-weight: ${(props) => (props.questionStyle === "bold" ? 700 : 500)};
-  font-size: ${(props) => (props.questionStyle === "bold" ? 24 : 20)}px;
-  line-height: 1.4;
-  color: #30a10e;
-  word-break: keep-all;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 1.3999999364217122em;
+  color: #222222;
+  width: 414px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+`;
+
+const AnswerText = styled.div`
+  font-family: "Pretendard", sans-serif;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 1.3999999364217122em;
+  color: #222222;
+  height: 26px;
 `;
 
 const ExplanationSection = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 16px;
 `;
 
 const ExplanationTitle = styled.div`
   font-family: "Pretendard", sans-serif;
   font-weight: 500;
-  font-size: 20px;
-  line-height: 1.4;
+  font-size: 16px;
+  line-height: 1.399999976158142em;
   color: #30a10e;
+  width: 100%;
 `;
 
 const ExplanationText = styled.div`
   font-family: "Pretendard", sans-serif;
-  font-weight: 500;
-  font-size: 20px;
-  line-height: 1.4;
-  color: #30a10e;
-  word-break: keep-all;
-`;
-
-const AnswerText = styled.div<{ color?: "#777777" | "#222222" }>`
-  font-family: "Pretendard", sans-serif;
-  font-weight: 500;
-  font-size: 18px;
-  line-height: 1.4;
-  color: ${(props) => props.color || "#777777"};
-  margin-top: 8px;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.399999976158142em;
+  color: #777777;
+  width: 414px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 `;
 
 const ProblemDetailPage: React.FC = () => {
@@ -147,25 +161,33 @@ const ProblemDetailPage: React.FC = () => {
         }
 
         // API 응답을 문제 형태로 변환
-        const problemList: Problem[] = targetDate.questions.map((question, index) => {
-          // TRUE_FALSE 타입의 경우 O/X로 변환
-          const answer =
-            question.answer === "TRUE" ? "O" : question.answer === "FALSE" ? "X" : question.answer;
+        const problemList: Problem[] = targetDate.questions.map(
+          (question, index) => {
+            // TRUE_FALSE 타입의 경우 O/X로 변환
+            const answer =
+              question.answer === "TRUE"
+                ? "O"
+                : question.answer === "FALSE"
+                  ? "X"
+                  : question.answer;
 
-          return {
-            id: index.toString(),
-            question: question.questionText,
-            answer: answer,
-            explanation: question.explanation,
-            questionStyle: index === 0 || index === 4 ? "bold" : "medium", // Q1, Q5는 bold
-            answerColor: index === 0 ? "#777777" : "#222222", // Q1만 회색
-          };
-        });
+            return {
+              id: index.toString(),
+              question: question.questionText,
+              answer: answer,
+              explanation: question.explanation,
+            };
+          }
+        );
 
         setProblems(problemList);
       } catch (err) {
         console.error("Error fetching problem detail:", err);
-        setError(err instanceof Error ? err.message : "문제를 불러오는 중 오류가 발생했습니다");
+        setError(
+          err instanceof Error
+            ? err.message
+            : "문제를 불러오는 중 오류가 발생했습니다"
+        );
       } finally {
         setLoading(false);
       }
@@ -175,6 +197,10 @@ const ProblemDetailPage: React.FC = () => {
       fetchProblemDetail();
     }
   }, [date]);
+
+  // 카드들을 왼쪽과 오른쪽 컬럼으로 나누기
+  const leftColumnProblems = problems.filter((_, index) => index % 2 === 0);
+  const rightColumnProblems = problems.filter((_, index) => index % 2 === 1);
 
   if (loading) {
     return (
@@ -201,18 +227,40 @@ const ProblemDetailPage: React.FC = () => {
       <ContentContainer>
         <DateHeader>{date}</DateHeader>
         <ProblemGrid>
-          {problems.map((problem, index) => (
-            <ProblemCard key={problem.id}>
-              <QuestionText questionStyle={problem.questionStyle}>
-                Q{index + 1}. {problem.question}
-              </QuestionText>
-              <ExplanationSection>
-                <ExplanationTitle>해설 요약</ExplanationTitle>
-                <ExplanationText>{problem.explanation}</ExplanationText>
-                <AnswerText color={problem.answerColor}>정답 : {problem.answer}</AnswerText>
-              </ExplanationSection>
-            </ProblemCard>
-          ))}
+          <Column>
+            {leftColumnProblems.map((problem, index) => (
+              <ProblemCard key={problem.id}>
+                <QuestionSection>
+                  <QuestionText>
+                    Q{leftColumnProblems.indexOf(problem) * 2 + 1}.{" "}
+                    {problem.question}
+                  </QuestionText>
+                  <AnswerText>정답 : {problem.answer}</AnswerText>
+                </QuestionSection>
+                <ExplanationSection>
+                  <ExplanationTitle>해설 요약</ExplanationTitle>
+                  <ExplanationText>{problem.explanation}</ExplanationText>
+                </ExplanationSection>
+              </ProblemCard>
+            ))}
+          </Column>
+          <Column>
+            {rightColumnProblems.map((problem, index) => (
+              <ProblemCard key={problem.id}>
+                <QuestionSection>
+                  <QuestionText>
+                    Q{rightColumnProblems.indexOf(problem) * 2 + 2}.{" "}
+                    {problem.question}
+                  </QuestionText>
+                  <AnswerText>정답 : {problem.answer}</AnswerText>
+                </QuestionSection>
+                <ExplanationSection>
+                  <ExplanationTitle>해설 요약</ExplanationTitle>
+                  <ExplanationText>{problem.explanation}</ExplanationText>
+                </ExplanationSection>
+              </ProblemCard>
+            ))}
+          </Column>
         </ProblemGrid>
       </ContentContainer>
     </PageContainer>

@@ -21,13 +21,54 @@ const ContentContainer = styled.div`
   margin: 0 auto;
 `;
 
+const TitleSection = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin-bottom: 40px;
+`;
+
 const Title = styled.h1`
   font-family: "Pretendard", sans-serif;
-  font-weight: 600;
-  font-size: 28px;
+  font-weight: 700;
+  font-size: 32px;
+  line-height: 1.4;
   color: #222222;
-  margin-bottom: 40px;
   text-align: center;
+  margin: 0;
+`;
+
+const BookIcon = styled.div`
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #2eb05b 0%, #30a10e 100%);
+  border-radius: 8px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &::before {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 24px;
+    background-color: #ffffff;
+    border-radius: 2px;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 2px;
+    background-color: #ffffff;
+    border-radius: 1px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
 `;
 
 const LoginRequiredMessage = styled.div`
@@ -59,70 +100,79 @@ const ErrorMessage = styled.div`
 
 const ProblemGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(312px, 1fr));
+  grid-template-columns: repeat(3, 312px);
   gap: 20px;
-  justify-items: center;
+  justify-content: center;
   max-width: 1000px;
   margin: 0 auto;
 `;
 
-const ProblemCard = styled.div`
+const ProblemCard = styled.div<{ isHovered?: boolean }>`
   width: 312px;
   height: 120px;
   background-color: #ffffff;
-  border: 1px solid #ededed;
-  border-radius: 16px;
-  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.04);
+  border: 1px solid ${(props) => (props.isHovered ? "#30A10E" : "#ededed")};
+  border-radius: 12px;
+  box-shadow: ${(props) =>
+    props.isHovered
+      ? "4px 4px 12px 0px rgba(48, 161, 14, 0.04)"
+      : "4px 4px 12px 0px rgba(0, 0, 0, 0.04)"};
   display: flex;
   align-items: center;
-  padding: 0 20px;
+  justify-content: center;
   cursor: pointer;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+  transition: all 0.2s ease;
+  padding: 40px 26px;
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 6px 6px 16px rgba(0, 0, 0, 0.08);
+    border-color: #30a10e;
+    box-shadow: 4px 4px 12px 0px rgba(48, 161, 14, 0.04);
   }
 `;
 
 const CardContent = styled.div`
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 12px;
   width: 100%;
-  height: 30px;
-  position: relative;
 `;
 
-const NotepadIcon = styled.div`
-  width: 20px;
-  height: 20px;
-  background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+const IconAndDateContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+`;
+
+const CalendarIcon = styled.div`
+  width: 28px;
+  height: 28px;
+  background-color: #ffffff;
   border-radius: 4px;
-  flex-shrink: 0;
   position: relative;
-  margin-left: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   &::before {
     content: "";
     position: absolute;
-    top: 2px;
-    left: 2px;
-    right: 2px;
-    height: 1px;
-    background-color: #d0d0d0;
+    width: 21px;
+    height: 21px;
+    background-color: #e4e4e4;
+    border-radius: 2px;
   }
 
   &::after {
     content: "";
     position: absolute;
-    top: 6px;
-    left: 2px;
-    right: 2px;
-    height: 1px;
-    background-color: #d0d0d0;
+    width: 15px;
+    height: 12px;
+    background-color: #e4e4e4;
+    border-radius: 1px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
   }
 `;
 
@@ -132,7 +182,6 @@ const DateText = styled.span`
   font-size: 20px;
   line-height: 1.4;
   color: #222222;
-  margin-left: 4px;
 `;
 
 const ProblemHistoryPage: React.FC = () => {
@@ -140,6 +189,7 @@ const ProblemHistoryPage: React.FC = () => {
   const [problemCards, setProblemCards] = useState<ProblemCard[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProblemHistory = async () => {
@@ -165,7 +215,11 @@ const ProblemHistoryPage: React.FC = () => {
         setProblemCards(cards);
       } catch (err) {
         console.error("Error fetching problem history:", err);
-        setError(err instanceof Error ? err.message : "문제를 불러오는 중 오류가 발생했습니다");
+        setError(
+          err instanceof Error
+            ? err.message
+            : "문제를 불러오는 중 오류가 발생했습니다"
+        );
       } finally {
         setLoading(false);
       }
@@ -176,6 +230,14 @@ const ProblemHistoryPage: React.FC = () => {
 
   const handleCardClick = (card: ProblemCard) => {
     navigate(`/history/${card.date}`);
+  };
+
+  const handleCardHover = (cardId: string) => {
+    setHoveredCard(cardId);
+  };
+
+  const handleCardLeave = () => {
+    setHoveredCard(null);
   };
 
   if (loading) {
@@ -201,13 +263,24 @@ const ProblemHistoryPage: React.FC = () => {
   return (
     <PageContainer>
       <ContentContainer>
-        <Title>지난 문제 모아보기</Title>
+        <TitleSection>
+          <Title>복습하고 싶은 문제 다 모아봤어요</Title>
+          <BookIcon />
+        </TitleSection>
         <ProblemGrid>
           {problemCards.map((card) => (
-            <ProblemCard key={card.id} onClick={() => handleCardClick(card)}>
+            <ProblemCard
+              key={card.id}
+              onClick={() => handleCardClick(card)}
+              onMouseEnter={() => handleCardHover(card.id)}
+              onMouseLeave={handleCardLeave}
+              isHovered={hoveredCard === card.id}
+            >
               <CardContent>
-                <NotepadIcon />
-                <DateText>{card.date}</DateText>
+                <IconAndDateContainer>
+                  <CalendarIcon />
+                  <DateText>{card.date}</DateText>
+                </IconAndDateContainer>
               </CardContent>
             </ProblemCard>
           ))}
