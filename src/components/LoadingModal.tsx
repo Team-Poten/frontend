@@ -155,10 +155,10 @@ const LoadingModal: React.FC<LoadingModalProps> = ({
         const timer3 = setTimeout(() => {
           setStep3Completed(true);
 
-          // 0.5초 후 완료 콜백 호출
+          // 2초 후 완료 콜백 호출
           const timer4 = setTimeout(() => {
             onComplete();
-          }, 500);
+          }, 2000);
 
           return () => clearTimeout(timer4);
         }, 1000);
