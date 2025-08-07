@@ -14,9 +14,17 @@ const MainContainer = styled.main`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 40px 0;
-  min-height: calc(100vh - 180px);
+  min-height: calc(100vh - 170px);
   background-color: #f8f9fa;
+  width: 100%;
+  padding: 0 24px;
+  box-sizing: border-box;
+  position: relative;
+`;
+
+const CharacterSection = styled.div`
+  margin-top: 250px;
+  margin-bottom: 25px;
 `;
 
 const MainTitle = styled.h1`
@@ -26,9 +34,9 @@ const MainTitle = styled.h1`
   line-height: 1.399999976158142em;
   color: #222222;
   text-align: center;
-  margin-bottom: 40px;
   max-width: 580px;
-  margin-top: 62px;
+  margin: 0;
+  margin-bottom: 40px;
 `;
 
 const SearchSection = styled.div`
@@ -41,7 +49,6 @@ const MenuSection = styled.div`
   display: flex;
   gap: 32px;
   margin-bottom: 40px;
-  margin-top: 60px;
 `;
 
 const ErrorMessage = styled.div`
@@ -95,9 +102,13 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
 
   return (
     <MainContainer>
-      <CharacterGroup />
+      <CharacterSection>
+        <CharacterGroup />
+      </CharacterSection>
+
       <MainTitle>
-        <span style={{ color: "#30a10e" }}>퀴즐리</span>로 문제 생성부터 오답 정리까지 한 번에!
+        <span style={{ color: "#30a10e" }}>퀴즐리</span>로 문제 생성부터 오답
+        정리까지 한 번에!
       </MainTitle>
 
       <SearchSection>
@@ -113,7 +124,6 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
           <MenuCard key={item.id} {...item} />
         ))}
       </MenuSection>
-
     </MainContainer>
   );
 };

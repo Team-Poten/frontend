@@ -12,7 +12,7 @@ const CardContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   padding: 40px 26px;
   background-color: #ffffff;
   border: 1px solid #ededed;
@@ -23,7 +23,7 @@ const CardContainer = styled.div`
     transform 0.2s ease,
     box-shadow 0.2s ease,
     border-color 0.2s ease;
-  width: 260px;
+  width: 312px;
 
   &:hover {
     transform: translateY(-2px);

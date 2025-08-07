@@ -9,29 +9,26 @@ const HeaderContainer = styled.header`
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
 `;
 
-// 전체 폭 기준 여백 적용
-const HeaderContent = styled.div`
+// 전체 디스플레이 컨테이너 (1920px 기준)
+const DisplayContainer = styled.div`
+  max-width: 1920px;
+  margin: 0 auto;
+  width: 100%;
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   padding-top: 26px;
   padding-bottom: 26px;
-
-  /* 1920px 기준 비율 적용 */
-  padding-left: calc(1030 / 1920 * 100%);
-  padding-right: calc(792 / 1920 * 100%);
-
-  /* 최소 여백 보장 (너무 작아졌을 때) */
-  @media (max-width: 1024px) {
-    padding-left: 24px;
-    padding-right: 24px;
-  }
+  padding-left: 1030px;
+  padding-right: 430px;
+  box-sizing: border-box;
 `;
-
 
 // 메뉴 네비게이션
 const Navigation = styled.nav`
   display: flex;
   align-items: center;
+  gap: 40px;
 `;
 
 const NavTab = styled.button<{ active?: boolean }>`
@@ -49,23 +46,15 @@ const NavTab = styled.button<{ active?: boolean }>`
   &:hover {
     color: #222222;
   }
-
-  &:nth-child(2) {
-    margin-left: 40px;
-  }
-
-  &:nth-child(3) {
-    margin-left: 40px;
-  }
 `;
 
-// 로그인 버튼
-const LoginButton = styled.button`
+// 로그인/로그아웃 버튼
+const AuthButton = styled.button`
   background-color: #30a10e;
   color: #ffffff;
   border: none;
   border-radius: 200px;
-  padding: 10px 16px;
+  padding: 10px 8px;
   width: 70px;
   height: 38px;
   font-family: "Pretendard", sans-serif;
@@ -81,32 +70,6 @@ const LoginButton = styled.button`
   }
 `;
 
-const UserInfo = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-family: "Pretendard", sans-serif;
-  font-weight: 500;
-  font-size: 16px;
-  color: #222222;
-  margin-left: 32px;
-`;
-
-const LogoutButton = styled.button`
-  background: none;
-  border: none;
-  color: #777777;
-  font-family: "Pretendard", sans-serif;
-  font-weight: 400;
-  font-size: 14px;
-  cursor: pointer;
-  transition: color 0.2s ease;
-
-  &:hover {
-    color: #222222;
-  }
-`;
-
 const Header: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -116,45 +79,48 @@ const Header: React.FC = () => {
     navigate(path);
   };
 
-  const handleLogin = () => {
-    navigate("/signup");
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("accessToken");
-    window.location.reload();
+  const handleAuth = () => {
+    if (loggedIn) {
+      localStorage.removeItem("accessToken");
+      window.location.reload();
+    } else {
+      navigate("/signup");
+    }
   };
 
   const isActive = (path: string) => {
     if (path === "/" && location.pathname === "/") return true;
-    if (path === "/history" && location.pathname.startsWith("/history")) return true;
-    if (path === "/wrong-problems" && location.pathname === "/wrong-problems") return true;
+    if (path === "/history" && location.pathname.startsWith("/history"))
+      return true;
+    if (path === "/wrong-problems" && location.pathname === "/wrong-problems")
+      return true;
     return false;
   };
 
   return (
     <HeaderContainer>
-      <HeaderContent>
+      <DisplayContainer>
         <Navigation>
           <NavTab active={isActive("/")} onClick={() => handleNavigation("/")}>
             문제 만들기
           </NavTab>
-          <NavTab active={isActive("/history")} onClick={() => handleNavigation("/history")}>
+          <NavTab
+            active={isActive("/history")}
+            onClick={() => handleNavigation("/history")}
+          >
             문제 모아보기
           </NavTab>
-          <NavTab active={isActive("/wrong-problems")} onClick={() => handleNavigation("/wrong-problems")}>
+          <NavTab
+            active={isActive("/wrong-problems")}
+            onClick={() => handleNavigation("/wrong-problems")}
+          >
             틀린문제 풀어보기
           </NavTab>
         </Navigation>
-        {loggedIn ? (
-          <UserInfo>
-            <span>회원님</span>
-            <LogoutButton onClick={handleLogout}>로그아웃</LogoutButton>
-          </UserInfo>
-        ) : (
-          <LoginButton onClick={handleLogin}>로그인</LoginButton>
-        )}
-      </HeaderContent>
+        <AuthButton onClick={handleAuth}>
+          {loggedIn ? "로그아웃" : "로그인"}
+        </AuthButton>
+      </DisplayContainer>
     </HeaderContainer>
   );
 };
