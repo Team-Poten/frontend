@@ -1,6 +1,12 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { Question, submitGuestAnswer, submitAnswer, GuestAnswerResponse, AnswerResponse } from "../services/api";
+import {
+  Question,
+  submitGuestAnswer,
+  submitAnswer,
+  GuestAnswerResponse,
+  AnswerResponse,
+} from "../services/api";
 import Header from "./Header";
 import Footer from "./Footer";
 
@@ -100,19 +106,17 @@ const QuestionCard = styled.div`
   justify-content: space-between;
 `;
 
-const QuestionNumber = styled.span<{ isCorrect?: boolean; showResult?: boolean }>`
+const QuestionNumber = styled.span<{
+  isCorrect?: boolean;
+  showResult?: boolean;
+}>`
   font-weight: 700;
-  color: ${props => 
-    props.showResult 
-      ? (props.isCorrect ? '#3b82f6' : '#ff4444') 
-      : '#30a10e'
-  };
+  color: ${(props) =>
+    props.showResult ? (props.isCorrect ? "#3b82f6" : "#ff4444") : "#30a10e"};
   position: relative;
   display: inline-block;
   margin-right: 8px;
   transition: color 0.3s ease;
-  
-
 `;
 
 const QuestionText = styled.h2<{ isCorrect?: boolean; showResult?: boolean }>`
@@ -120,11 +124,8 @@ const QuestionText = styled.h2<{ isCorrect?: boolean; showResult?: boolean }>`
   font-weight: 700;
   font-size: 24px;
   line-height: 1.4;
-  color: ${props => 
-    props.showResult 
-      ? (props.isCorrect ? '#3b82f6' : '#ff4444') 
-      : '#30a10e'
-  };
+  color: ${(props) =>
+    props.showResult ? (props.isCorrect ? "#3b82f6" : "#ff4444") : "#30a10e"};
   margin: 0;
   text-align: left;
   transition: color 0.3s ease;
@@ -194,8 +195,6 @@ const AnswerButton = styled.button<{
     background-color: #fff0f0;
   `}
 `;
-
-
 
 const NextButton = styled.button<{ isSelected?: boolean }>`
   background-color: ${(props) => (props.isSelected ? "#30a10e" : "#b7b7b7")};
@@ -372,15 +371,18 @@ const ModalButton = styled.button<{ primary?: boolean }>`
   cursor: pointer;
   transition: all 0.2s ease;
   border: none;
-  
-  ${props => props.primary ? `
+
+  ${(props) =>
+    props.primary
+      ? `
     background-color: #30a10e;
     color: #ffffff;
     
     &:hover {
       background-color: #2a8f0c;
     }
-  ` : `
+  `
+      : `
     background-color: #f8f9fa;
     color: #666666;
     border: 1px solid #e9ecef;
@@ -407,7 +409,7 @@ const CloseButton = styled.button`
   align-items: center;
   justify-content: center;
   z-index: 1;
-  
+
   &:hover {
     color: #666666;
   }
@@ -424,22 +426,29 @@ interface QuestionState {
 const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
-  const [questionStates, setQuestionStates] = useState<{ [key: number]: QuestionState }>({});
+  const [questionStates, setQuestionStates] = useState<{
+    [key: number]: QuestionState;
+  }>({});
   const [showResultModal, setShowResultModal] = useState(false);
 
   const currentQuestion = questions[currentQuestionIndex];
-  const currentQuestionState = questionStates[currentQuestion.id || 0] || {
+  // questionId가 없으면 인덱스를 사용하여 고유한 ID 생성
+  const currentQuestionId = currentQuestion.id || currentQuestionIndex;
+  const currentQuestionState = questionStates[currentQuestionId] || {
     selectedAnswer: null,
     showResult: false,
     isLoading: false,
     error: null,
     answerResult: null,
   };
-  
+
   const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
 
-  const updateQuestionState = (questionId: number, updates: Partial<QuestionState>) => {
-    setQuestionStates(prev => ({
+  const updateQuestionState = (
+    questionId: number,
+    updates: Partial<QuestionState>
+  ) => {
+    setQuestionStates((prev) => ({
       ...prev,
       [questionId]: {
         ...prev[questionId],
@@ -455,48 +464,50 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
 
   // 정답 여부를 판단하는 함수
   const isAnswerCorrect = (): boolean => {
-    if (!currentQuestionState.selectedAnswer || !currentQuestionState.answerResult) {
+    if (
+      !currentQuestionState.selectedAnswer ||
+      !currentQuestionState.answerResult
+    ) {
       return false;
     }
-    
+
     // API 응답의 correct 필드 사용 (isCorrect 대신)
     const apiCorrect = currentQuestionState.answerResult?.correct;
-    
+
     // 선택한 답변과 문제 정답을 직접 비교
     const selectedAnswer = currentQuestionState.selectedAnswer;
     const correctAnswer = currentQuestion.answer;
-    
+
     // 답변 매핑 (O/X -> TRUE/FALSE)
     const answerMapping: { [key: string]: string } = {
-      'O': 'TRUE',
-      'X': 'FALSE'
+      O: "TRUE",
+      X: "FALSE",
     };
-    
+
     const mappedSelectedAnswer = answerMapping[selectedAnswer];
     const isCorrectByComparison = mappedSelectedAnswer === correctAnswer;
-    
+
     // API의 correct 필드가 있으면 사용, 없으면 직접 비교 결과 사용
     return apiCorrect !== undefined ? apiCorrect : isCorrectByComparison;
   };
 
   const handleAnswerSelect = async (answer: string) => {
-    const questionId: number | undefined = currentQuestion.id;
+    // questionId가 없으면 인덱스를 사용하여 고유한 ID 생성
+    const questionId: number = currentQuestion.id || currentQuestionIndex;
     console.log("현재 문제 ID:", questionId, "타입:", typeof questionId); // 디버깅용 로그
     console.log("현재 문제 전체 데이터:", currentQuestion); // 현재 문제의 전체 데이터 확인
     console.log("회원 여부:", isLoggedIn()); // 회원 여부 확인
-    
+
     // questionId가 유효하지 않은 경우 처리
-    if (!questionId || isNaN(questionId)) {
+    if (isNaN(questionId)) {
       console.error("유효하지 않은 questionId:", questionId);
       return;
     }
-    
-    // TypeScript 타입 가드: questionId가 유효한 number임을 확인
-    const validQuestionId: number = questionId;
-    const currentState = questionStates[validQuestionId];
-    
+
+    const currentState = questionStates[questionId];
+
     if (!currentState?.showResult && !currentState?.isLoading) {
-      updateQuestionState(validQuestionId, {
+      updateQuestionState(questionId, {
         selectedAnswer: answer,
         isLoading: true,
         error: null,
@@ -504,25 +515,27 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
 
       try {
         let result: GuestAnswerResponse | AnswerResponse;
-        
+
         if (isLoggedIn()) {
           // 회원인 경우 회원용 API 호출
-          console.log(`회원 API 호출: /api/questions/${validQuestionId}/answer`);
-          result = await submitAnswer(validQuestionId, answer);
+          console.log(`회원 API 호출: /api/questions/${questionId}/answer`);
+          result = await submitAnswer(questionId, answer);
         } else {
           // 비회원인 경우 게스트 API 호출
-          console.log(`게스트 API 호출: /api/questions/${validQuestionId}/guest-answer`);
-          result = await submitGuestAnswer(validQuestionId, answer);
+          console.log(
+            `게스트 API 호출: /api/questions/${questionId}/guest-answer`
+          );
+          result = await submitGuestAnswer(questionId, answer);
         }
-        
+
         console.log("API 응답 결과:", result); // API 응답 결과 확인
-        updateQuestionState(validQuestionId, {
+        updateQuestionState(questionId, {
           answerResult: result,
           showResult: true,
           isLoading: false,
         });
       } catch (err) {
-        updateQuestionState(validQuestionId, {
+        updateQuestionState(questionId, {
           error: "채점 중 오류가 발생했습니다. 다시 시도해주세요.",
           isLoading: false,
         });
@@ -532,8 +545,8 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
   };
 
   const handleNextQuestion = () => {
-    const questionId = currentQuestion.id;
-    if (questionId && !isNaN(questionId)) {
+    const questionId = currentQuestion.id || currentQuestionIndex;
+    if (!isNaN(questionId)) {
       const currentState = questionStates[questionId];
       if (currentState?.answerResult?.isCorrect) {
         setCorrectAnswers(correctAnswers + 1);
@@ -552,7 +565,7 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
     // 문제 모아보기 페이지로 이동 (/history)
     setShowResultModal(false);
     // 회원의 히스토리 페이지로 이동
-    window.location.href = '/history';
+    window.location.href = "/history";
   };
 
   const handleCreateMoreQuestions = () => {
@@ -567,29 +580,29 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
   };
 
   // 정답 개수 계산
-  const totalCorrect = Object.values(questionStates).filter(state => {
+  const totalCorrect = Object.values(questionStates).filter((state) => {
     if (!state.answerResult) return false;
-    
+
     // API 응답의 correct 필드 사용
     const apiCorrect = state.answerResult.correct;
-    
+
     // 선택한 답변과 문제 정답을 직접 비교
     const selectedAnswer = state.selectedAnswer;
-    const questionIndex = Object.keys(questionStates).find(key => 
-      questionStates[parseInt(key)] === state
+    const questionIndex = Object.keys(questionStates).find(
+      (key) => questionStates[parseInt(key)] === state
     );
-    const question = questions[parseInt(questionIndex || '0')];
+    const question = questions[parseInt(questionIndex || "0")];
     const correctAnswer = question?.answer;
-    
+
     // 답변 매핑 (O/X -> TRUE/FALSE)
     const answerMapping: { [key: string]: string } = {
-      'O': 'TRUE',
-      'X': 'FALSE'
+      O: "TRUE",
+      X: "FALSE",
     };
-    
-    const mappedSelectedAnswer = answerMapping[selectedAnswer || ''];
+
+    const mappedSelectedAnswer = answerMapping[selectedAnswer || ""];
     const isCorrectByComparison = mappedSelectedAnswer === correctAnswer;
-    
+
     // API의 correct 필드가 있으면 사용, 없으면 직접 비교 결과 사용
     return apiCorrect !== undefined ? apiCorrect : isCorrectByComparison;
   }).length;
@@ -600,24 +613,34 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
     <QuizContainer>
       <Header />
       <MainContent>
-      <Title>
-        지금부터 본격 <span style={{ color: "#30a10e" }}>문제 타임!</span> 집중해서 풀어봐요
-        <TitleIcon src="/images/icn_write.png" alt="Write icon" />
-      </Title>
+        <Title>
+          지금부터 본격 <span style={{ color: "#30a10e" }}>문제 타임!</span>{" "}
+          집중해서 풀어봐요
+          <TitleIcon src="/images/icn_write.png" alt="Write icon" />
+        </Title>
 
         <ProgressContainer>
           <ProgressBar>
             <ProgressFill progress={progress} />
           </ProgressBar>
-          <CharacterImage 
-            src="/images/character2.png" 
-            alt="Character" 
+          <CharacterImage
+            src="/images/character2.png"
+            alt="Character"
             progress={progress}
           />
-          <ProgressText progress={progress}>{Math.round(progress)}%</ProgressText>
+          <ProgressText progress={progress}>
+            {Math.round(progress)}%
+          </ProgressText>
         </ProgressContainer>
 
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", width: "976px" }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-end",
+            width: "976px",
+          }}
+        >
           <QuestionCard>
             <div>
               <QuestionText
@@ -637,97 +660,119 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
             <AnswerContainer>
               <AnswerButton
                 selected={currentQuestionState.selectedAnswer === "O"}
-                isCorrect={currentQuestionState.answerResult?.isCorrect && currentQuestionState.selectedAnswer === "O"}
+                isCorrect={
+                  currentQuestionState.answerResult?.isCorrect &&
+                  currentQuestionState.selectedAnswer === "O"
+                }
                 showResult={currentQuestionState.showResult}
                 onClick={() => handleAnswerSelect("O")}
-                disabled={currentQuestionState.showResult || currentQuestionState.isLoading}
+                disabled={
+                  currentQuestionState.showResult ||
+                  currentQuestionState.isLoading
+                }
               >
-                O 
+                O
               </AnswerButton>
               <AnswerButton
                 selected={currentQuestionState.selectedAnswer === "X"}
-                isCorrect={currentQuestionState.answerResult?.isCorrect && currentQuestionState.selectedAnswer === "X"}
+                isCorrect={
+                  currentQuestionState.answerResult?.isCorrect &&
+                  currentQuestionState.selectedAnswer === "X"
+                }
                 showResult={currentQuestionState.showResult}
                 onClick={() => handleAnswerSelect("X")}
-                disabled={currentQuestionState.showResult || currentQuestionState.isLoading}
+                disabled={
+                  currentQuestionState.showResult ||
+                  currentQuestionState.isLoading
+                }
               >
-                X 
+                X
               </AnswerButton>
             </AnswerContainer>
 
-            {currentQuestionState.isLoading && <LoadingText>채점 중...</LoadingText>}
-            {currentQuestionState.error && <ErrorText>{currentQuestionState.error}</ErrorText>}
+            {currentQuestionState.isLoading && (
+              <LoadingText>채점 중...</LoadingText>
+            )}
+            {currentQuestionState.error && (
+              <ErrorText>{currentQuestionState.error}</ErrorText>
+            )}
           </QuestionCard>
 
           <NextButtonContainer>
-            <NextButton 
+            <NextButton
               onClick={handleNextQuestion}
               isSelected={currentQuestionState.showResult}
               disabled={!currentQuestionState.showResult}
             >
-              {currentQuestionIndex < questions.length - 1 ? "다음 문제" : "완료"}
+              {currentQuestionIndex < questions.length - 1
+                ? "다음 문제"
+                : "완료"}
             </NextButton>
           </NextButtonContainer>
 
-          {currentQuestionState.showResult && currentQuestionState.answerResult && (
-            <ExplanationBox>
-              <ExplanationSummary>
-                해설 요약
-              </ExplanationSummary>
-              <ExplanationContent>
-                {currentQuestionState.answerResult.explanation}
-              </ExplanationContent>
-              <ExplanationContent>
-                <strong>정답:</strong> {currentQuestion.answer === 'TRUE' ? 'O' : 'X'}
-              </ExplanationContent>
-            </ExplanationBox>
-          )}
+          {currentQuestionState.showResult &&
+            currentQuestionState.answerResult && (
+              <ExplanationBox>
+                <ExplanationSummary>해설 요약</ExplanationSummary>
+                <ExplanationContent>
+                  {currentQuestionState.answerResult.explanation}
+                </ExplanationContent>
+                <ExplanationContent>
+                  <strong>정답:</strong>{" "}
+                  {currentQuestion.answer === "TRUE" ? "O" : "X"}
+                </ExplanationContent>
+              </ExplanationBox>
+            )}
         </div>
       </MainContent>
       <Footer />
 
-                           {/* 결과 모달 */}
-        {showResultModal && (
-          <ResultModal>
-            <ModalContent>
-              {!isLoggedIn() && <CloseButton onClick={handleCloseModal}>×</CloseButton>}
-              
-              {isLoggedIn() ? (
-                // 회원용 모달
-                <>
-                  <ModalImage src="/images/confetti.png" alt="축하 이미지" />
-                  <ModalSubtitle>모든 문제를 다 풀었어요!</ModalSubtitle>
-                  <ModalTitle>문제 정답 결과</ModalTitle>
-                  <ResultText>
-                    {totalCorrect} / {questions.length}문제 (정답{totalCorrect}, 오답{totalWrong})
-                  </ResultText>
-                  
-                  <ButtonContainer>
-                    <ModalButton onClick={handleViewQuestions}>
-                      문제 모아보기
-                    </ModalButton>
-                    <ModalButton primary onClick={handleCreateMoreQuestions}>
-                      문제 더 만들기
-                    </ModalButton>
-                  </ButtonContainer>
-                </>
-              ) : (
-                // 비회원용 모달
-                <>
-                  <ModalImage src="/images/guest-result.png" alt="결과 이미지" />
-                  <ModalTitle>문제 정답 결과</ModalTitle>
-                  <ResultText>
-                    {totalCorrect} / {questions.length}문제 (정답{totalCorrect}, 오답{totalWrong})
-                  </ResultText>
-                  
-                  <GuestMessage>
-                    회원가입을 통해 문제를 더 만들고 복습도 할 수 있어요!
-                  </GuestMessage>
-                </>
-              )}
-            </ModalContent>
-          </ResultModal>
-        )}
+      {/* 결과 모달 */}
+      {showResultModal && (
+        <ResultModal>
+          <ModalContent>
+            {!isLoggedIn() && (
+              <CloseButton onClick={handleCloseModal}>×</CloseButton>
+            )}
+
+            {isLoggedIn() ? (
+              // 회원용 모달
+              <>
+                <ModalImage src="/images/confetti.png" alt="축하 이미지" />
+                <ModalSubtitle>모든 문제를 다 풀었어요!</ModalSubtitle>
+                <ModalTitle>문제 정답 결과</ModalTitle>
+                <ResultText>
+                  {totalCorrect} / {questions.length}문제 (정답{totalCorrect},
+                  오답{totalWrong})
+                </ResultText>
+
+                <ButtonContainer>
+                  <ModalButton onClick={handleViewQuestions}>
+                    문제 모아보기
+                  </ModalButton>
+                  <ModalButton primary onClick={handleCreateMoreQuestions}>
+                    문제 더 만들기
+                  </ModalButton>
+                </ButtonContainer>
+              </>
+            ) : (
+              // 비회원용 모달
+              <>
+                <ModalImage src="/images/guest-result.png" alt="결과 이미지" />
+                <ModalTitle>문제 정답 결과</ModalTitle>
+                <ResultText>
+                  {totalCorrect} / {questions.length}문제 (정답{totalCorrect},
+                  오답{totalWrong})
+                </ResultText>
+
+                <GuestMessage>
+                  회원가입을 통해 문제를 더 만들고 복습도 할 수 있어요!
+                </GuestMessage>
+              </>
+            )}
+          </ModalContent>
+        </ResultModal>
+      )}
     </QuizContainer>
   );
 };
