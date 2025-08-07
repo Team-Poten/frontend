@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { useLocation, useNavigate } from "react-router-dom";
-import { isLoggedIn } from "../services/api";
+import { isLoggedIn, login } from "../services/api";
+import LoginModal from "./LoginModal";
 
 const HeaderContainer = styled.header`
   width: 100%;
@@ -74,6 +75,8 @@ const Header: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const loggedIn = isLoggedIn();
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [loginError, setLoginError] = useState<string | undefined>(undefined);
 
   const handleNavigation = (path: string) => {
     navigate(path);
@@ -82,10 +85,37 @@ const Header: React.FC = () => {
   const handleAuth = () => {
     if (loggedIn) {
       localStorage.removeItem("accessToken");
+      // 쿠키에서 refreshToken 제거
+      document.cookie =
+        "refreshToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
       window.location.reload();
     } else {
-      navigate("/signup");
+      setIsLoginModalOpen(true);
+      setLoginError(undefined);
     }
+  };
+
+  const handleLogin = async (loginId: string, password: string) => {
+    try {
+      const response = await login({ loginId, password });
+
+      if (response.accessToken) {
+        // 로그인 성공
+        setIsLoginModalOpen(false);
+        window.location.reload();
+      } else {
+        // 로그인 실패
+        setLoginError(response.message || "로그인에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      setLoginError("로그인 중 오류가 발생했습니다.");
+    }
+  };
+
+  const handleCloseModal = () => {
+    setIsLoginModalOpen(false);
+    setLoginError(undefined);
   };
 
   const isActive = (path: string) => {
@@ -98,30 +128,42 @@ const Header: React.FC = () => {
   };
 
   return (
-    <HeaderContainer>
-      <DisplayContainer>
-        <Navigation>
-          <NavTab active={isActive("/")} onClick={() => handleNavigation("/")}>
-            문제 만들기
-          </NavTab>
-          <NavTab
-            active={isActive("/history")}
-            onClick={() => handleNavigation("/history")}
-          >
-            문제 모아보기
-          </NavTab>
-          <NavTab
-            active={isActive("/wrong-problems")}
-            onClick={() => handleNavigation("/wrong-problems")}
-          >
-            틀린문제 풀어보기
-          </NavTab>
-        </Navigation>
-        <AuthButton onClick={handleAuth}>
-          {loggedIn ? "로그아웃" : "로그인"}
-        </AuthButton>
-      </DisplayContainer>
-    </HeaderContainer>
+    <>
+      <HeaderContainer>
+        <DisplayContainer>
+          <Navigation>
+            <NavTab
+              active={isActive("/")}
+              onClick={() => handleNavigation("/")}
+            >
+              문제 만들기
+            </NavTab>
+            <NavTab
+              active={isActive("/history")}
+              onClick={() => handleNavigation("/history")}
+            >
+              문제 모아보기
+            </NavTab>
+            <NavTab
+              active={isActive("/wrong-problems")}
+              onClick={() => handleNavigation("/wrong-problems")}
+            >
+              틀린문제 풀어보기
+            </NavTab>
+          </Navigation>
+          <AuthButton onClick={handleAuth}>
+            {loggedIn ? "로그아웃" : "로그인"}
+          </AuthButton>
+        </DisplayContainer>
+      </HeaderContainer>
+
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={handleCloseModal}
+        onLogin={handleLogin}
+        error={loginError}
+      />
+    </>
   );
 };
 
