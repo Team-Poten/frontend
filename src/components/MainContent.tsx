@@ -25,7 +25,7 @@ const MainContainer = styled.main`
 
 const CharacterSection = styled.div`
   margin-top: 250px;
-  margin-bottom: 60px;
+  margin-bottom: 20px;
 `;
 
 const MainTitle = styled.h1`
@@ -37,11 +37,11 @@ const MainTitle = styled.h1`
   text-align: center;
   max-width: 580px;
   margin: 0;
-  margin-bottom: 86px;
+  margin-bottom: 44px;
 `;
 
 const SearchSection = styled.div`
-  margin-bottom: 132px;
+  margin-bottom: 60px;
   width: 976px;
   height: 72px;
 `;

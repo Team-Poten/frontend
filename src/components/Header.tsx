@@ -21,7 +21,7 @@ const DisplayContainer = styled.div`
   padding-top: 26px;
   padding-bottom: 26px;
   padding-left: 1030px;
-  padding-right: 430px;
+  padding-right: 300px;
   box-sizing: border-box;
 `;
 

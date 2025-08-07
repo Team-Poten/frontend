@@ -13,7 +13,7 @@ const PageContainer = styled.div`
   width: 100%;
   min-height: calc(100vh - 180px);
   background-color: #f8f9fa;
-  padding: 40px;
+  padding: 90px;
 `;
 
 const ContentContainer = styled.div`
@@ -39,36 +39,10 @@ const Title = styled.h1`
   margin: 0;
 `;
 
-const BookIcon = styled.div`
+const BookIcon = styled.img`
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, #2eb05b 0%, #30a10e 100%);
-  border-radius: 8px;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  &::before {
-    content: "";
-    position: absolute;
-    width: 20px;
-    height: 24px;
-    background-color: #ffffff;
-    border-radius: 2px;
-  }
-
-  &::after {
-    content: "";
-    position: absolute;
-    width: 16px;
-    height: 2px;
-    background-color: #ffffff;
-    border-radius: 1px;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
+  object-fit: contain;
 `;
 
 const LoginRequiredMessage = styled.div`
@@ -109,7 +83,7 @@ const ProblemGrid = styled.div`
 
 const ProblemCard = styled.div<{ isHovered?: boolean }>`
   width: 312px;
-  height: 120px;
+  height: 108px;
   background-color: #ffffff;
   border: 1px solid ${(props) => (props.isHovered ? "#30A10E" : "#ededed")};
   border-radius: 12px;
@@ -144,36 +118,10 @@ const IconAndDateContainer = styled.div`
   gap: 4px;
 `;
 
-const CalendarIcon = styled.div`
+const CalendarIcon = styled.img`
   width: 28px;
   height: 28px;
-  background-color: #ffffff;
-  border-radius: 4px;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  &::before {
-    content: "";
-    position: absolute;
-    width: 21px;
-    height: 21px;
-    background-color: #e4e4e4;
-    border-radius: 2px;
-  }
-
-  &::after {
-    content: "";
-    position: absolute;
-    width: 15px;
-    height: 12px;
-    background-color: #e4e4e4;
-    border-radius: 1px;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
+  object-fit: contain;
 `;
 
 const DateText = styled.span`
@@ -265,7 +213,7 @@ const ProblemHistoryPage: React.FC = () => {
       <ContentContainer>
         <TitleSection>
           <Title>복습하고 싶은 문제 다 모아봤어요</Title>
-          <BookIcon />
+          <BookIcon src="/images/icn_book.png" alt="Book" />
         </TitleSection>
         <ProblemGrid>
           {problemCards.map((card) => (
@@ -278,7 +226,7 @@ const ProblemHistoryPage: React.FC = () => {
             >
               <CardContent>
                 <IconAndDateContainer>
-                  <CalendarIcon />
+                  <CalendarIcon src="/images/icn_calendar.png" alt="Calendar" />
                   <DateText>{card.date}</DateText>
                 </IconAndDateContainer>
               </CardContent>
