@@ -102,6 +102,9 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
 
       const questions = await questionsPromise;
       console.log("API 응답 데이터:", questions);
+      console.log("첫 번째 문제 데이터:", questions[0]);
+      console.log("첫 번째 문제의 questionId 필드:", questions[0]?.questionId);
+      console.log("첫 번째 문제의 모든 키:", Object.keys(questions[0] || {}));
       setPendingQuestions(questions);
       // 로딩 모달에서 완료 콜백을 통해 처리됨
     } catch (err) {
