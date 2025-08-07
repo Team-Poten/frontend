@@ -113,7 +113,7 @@ const QuestionNumber = styled.span<{
 }>`
   font-weight: 700;
   color: ${(props) =>
-    props.showResult ? (props.isCorrect ? "#3b82f6" : "#ff4444") : "#30a10e"};
+    props.showResult ? (props.isCorrect ? "#2473FC" : "#FF243E") : "#30a10e"};
   position: relative;
   display: inline-block;
   margin-right: 8px;
@@ -126,7 +126,7 @@ const QuestionText = styled.h2<{ isCorrect?: boolean; showResult?: boolean }>`
   font-size: 24px;
   line-height: 1.4;
   color: ${(props) =>
-    props.showResult ? (props.isCorrect ? "#3b82f6" : "#ff4444") : "#30a10e"};
+    props.showResult ? (props.isCorrect ? "#2473FC" : "#FF243E") : "#30a10e"};
   margin: 0;
   text-align: left;
   transition: color 0.3s ease;
@@ -147,19 +147,22 @@ const AnswerButton = styled.button<{
   width: 395px;
   height: 120px;
   background-color: #ffffff;
-  border: 1px solid #ededed;
+  border: 2px solid #ededed;
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-family: "Pretendard", sans-serif;
-  font-weight: 500;
-  font-size: 18px;
-  color: #222222;
+  font-family: "Arial Rounded MT Bold", "Arial", "Pretendard", sans-serif;
+  font-weight: 700;
+  font-size: 48px;
+  color: #999999;
   position: relative;
   overflow: hidden;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 
   &:hover {
     border-color: #30a10e;
@@ -177,14 +180,16 @@ const AnswerButton = styled.button<{
     `
     border-color: #30a10e;
     background-color: #f0f8f0;
+    color: #30a10e;
   `}
 
   ${(props) =>
     props.showResult &&
     props.isCorrect &&
     `
-    border-color: #30a10e;
-    background-color: #f0f8f0;
+    border-color: #2473FC;
+    background-color: #f0f8ff;
+    color: #2473FC;
   `}
 
   ${(props) =>
@@ -192,15 +197,24 @@ const AnswerButton = styled.button<{
     !props.isCorrect &&
     props.selected &&
     `
-    border-color: #ff4444;
+    border-color: #FF243E;
     background-color: #fff0f0;
+    color: #FF243E;
   `}
 `;
 
-const NextButton = styled.button<{ isSelected?: boolean }>`
-  background-color: ${(props) => (props.isSelected ? "#30a10e" : "#b7b7b7")};
+const NextButton = styled.button<{ isSelected?: boolean; isLastQuestion?: boolean }>`
+  background-color: ${(props) => 
+    props.isLastQuestion 
+      ? (props.isSelected ? "#30a10e" : "#b7b7b7")
+      : (props.isSelected ? "#30a10e" : "#b7b7b7")
+  };
   color: #ffffff;
-  border: ${(props) => (props.isSelected ? "1px solid #30a10e" : "none")};
+  border: ${(props) => 
+    props.isLastQuestion 
+      ? (props.isSelected ? "1px solid #30a10e" : "none")
+      : (props.isSelected ? "1px solid #30a10e" : "none")
+  };
   border-radius: 6px;
   padding: 12px 16px;
   font-family: "Pretendard", sans-serif;
@@ -211,7 +225,11 @@ const NextButton = styled.button<{ isSelected?: boolean }>`
   margin-top: 20px;
 
   &:hover {
-    background-color: ${(props) => (props.isSelected ? "#2a8f0c" : "#a0a0a0")};
+    background-color: ${(props) => 
+      props.isLastQuestion 
+        ? (props.isSelected ? "#2a8f0c" : "#a0a0a0")
+        : (props.isSelected ? "#2a8f0c" : "#a0a0a0")
+    };
   }
 
   &:disabled {
@@ -665,8 +683,7 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
               <AnswerButton
                 selected={currentQuestionState.selectedAnswer === "O"}
                 isCorrect={
-                  currentQuestionState.answerResult?.isCorrect &&
-                  currentQuestionState.selectedAnswer === "O"
+                  currentQuestionState.selectedAnswer === "O" && isAnswerCorrect()
                 }
                 showResult={currentQuestionState.showResult}
                 onClick={() => handleAnswerSelect("O")}
@@ -680,8 +697,7 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
               <AnswerButton
                 selected={currentQuestionState.selectedAnswer === "X"}
                 isCorrect={
-                  currentQuestionState.answerResult?.isCorrect &&
-                  currentQuestionState.selectedAnswer === "X"
+                  currentQuestionState.selectedAnswer === "X" && isAnswerCorrect()
                 }
                 showResult={currentQuestionState.showResult}
                 onClick={() => handleAnswerSelect("X")}
@@ -707,10 +723,11 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
               onClick={handleNextQuestion}
               isSelected={currentQuestionState.showResult}
               disabled={!currentQuestionState.showResult}
+              isLastQuestion={currentQuestionIndex === questions.length - 1}
             >
               {currentQuestionIndex < questions.length - 1
                 ? "다음 문제"
-                : "완료"}
+                : "결과보기"}
             </NextButton>
           </NextButtonContainer>
 
