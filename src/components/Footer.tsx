@@ -65,8 +65,20 @@ const Footer: React.FC = () => {
     <FooterContainer>
       <DisplayContainer>
         <ContentContainer>
-          <FooterLink href="#">이용약관</FooterLink>
-          <FooterLink href="#">개인정보처리방침</FooterLink>
+          <FooterLink
+            href="https://www.notion.so/2480d810a5198028a431f471d3327ce0?source=copy_link"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            이용약관
+          </FooterLink>
+          <FooterLink
+            href="https://www.notion.so/2480d810a51980b8831edc3dbb13333d?source=copy_link"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            개인정보처리방침
+          </FooterLink>
           <FooterLink href="#">Team. 에스F레소</FooterLink>
           <FooterLink href="mailto:liz021229@gmail.com">
             문의: liz021229@gmail.com
