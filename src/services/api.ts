@@ -68,7 +68,19 @@ export interface SignUpResponse {
   message?: string;
 }
 
-const API_BASE_URL = "http://localhost:8080/api";
+export interface LoginRequest {
+  loginId: string;
+  password: string;
+}
+
+export interface LoginResponse {
+  accessToken?: string;
+  refreshToken?: string;
+  code?: string;
+  message?: string;
+}
+
+const API_BASE_URL = "http://49.50.134.195:8080/api";
 
 // 로그인 상태 확인
 export const isLoggedIn = (): boolean => {
@@ -79,6 +91,38 @@ export const isLoggedIn = (): boolean => {
 // Access Token 가져오기
 export const getAccessToken = (): string | null => {
   return localStorage.getItem("accessToken");
+};
+
+// 로그인 API
+export const login = async (request: LoginRequest): Promise<LoginResponse> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/user/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(request),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return data; // 에러 응답
+    }
+
+    // 성공 시 토큰 저장
+    if (data.accessToken) {
+      localStorage.setItem("accessToken", data.accessToken);
+
+      // refreshToken을 쿠키에 저장
+      document.cookie = `refreshToken=${data.refreshToken}; path=/; max-age=2592000`; // 30일
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error logging in:", error);
+    throw error;
+  }
 };
 
 export const createQuestions = async (
