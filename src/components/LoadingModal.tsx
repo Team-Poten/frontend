@@ -80,10 +80,28 @@ const Card = styled.div<{ isCompleted: boolean }>`
 const CardContent = styled.div`
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 16px;
 `;
 
-const CheckIcon = styled.div<{ isCompleted: boolean }>`
+const LoadingSpinner = styled.div`
+  width: 20px;
+  height: 20px;
+  border: 2px solid #f6fbf4;
+  border-top: 2px solid #30a10e;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+`;
+
+const CheckIcon = styled.div<{ isCompleted: boolean; isLoading: boolean }>`
   width: 28px;
   height: 28px;
   display: flex;
@@ -104,6 +122,7 @@ const CheckIcon = styled.div<{ isCompleted: boolean }>`
     mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 15 12'%3E%3Cpath d='M1.5 6L5.5 10L13.5 2' stroke='%2330A10E' stroke-width='2' fill='none'/%3E%3C/svg%3E")
       no-repeat center;
     mask-size: contain;
+    display: ${(props) => (props.isCompleted ? "block" : "none")};
   }
 `;
 
@@ -124,70 +143,128 @@ const LoadingModal: React.FC<LoadingModalProps> = ({
   const [step2Completed, setStep2Completed] = useState(false);
   const [step3Completed, setStep3Completed] = useState(false);
 
+  // 로딩 상태 관리 (스피너 표시)
+  const [step1Loading, setStep1Loading] = useState(false);
+  const [step2Loading, setStep2Loading] = useState(false);
+  const [step3Loading, setStep3Loading] = useState(false);
+
   useEffect(() => {
     if (!isOpen) {
       // 모달이 닫힐 때 상태 초기화
       setStep1Completed(false);
       setStep2Completed(false);
       setStep3Completed(false);
+      setStep1Loading(false);
+      setStep2Loading(false);
+      setStep3Loading(false);
       return;
     }
 
-    // 3초 후 첫 번째 단계 완료 (입력 텍스트 분석)
-    const timer1 = setTimeout(() => {
-      setStep1Completed(true);
-    }, 3000);
+    let timers: NodeJS.Timeout[] = []; // 모든 타이머 추적
+    let isCancelled = false;
 
-    // API 응답을 기다리는 로직
-    const handleApiResponse = async () => {
+    const executeSequence = async () => {
       try {
+        // === 1단계: 입력 텍스트 분석 ===
+        setStep1Loading(true);
+
+        await new Promise((resolve) => {
+          const timer = setTimeout(() => {
+            if (!isCancelled) {
+              setStep1Loading(false);
+              setStep1Completed(true);
+            }
+            resolve(void 0);
+          }, 3000);
+          timers.push(timer);
+        });
+
+        if (isCancelled) return;
+
+        // === 2단계: 문제 생성 중 ===
+        setStep2Loading(true);
+
+        // API 응답 대기
         if (apiPromise) {
-          await apiPromise; // API 응답 대기
+          await apiPromise;
         } else {
-          // API Promise가 없으면 8초 후 시뮬레이션
-          await new Promise((resolve) => setTimeout(resolve, 8000));
+          await new Promise((resolve) => {
+            const timer = setTimeout(resolve, 8000);
+            timers.push(timer);
+          });
         }
 
-        // API 응답 후 두 번째 단계 완료 (문제 생성 중)
+        if (isCancelled) return;
+
+        setStep2Loading(false);
         setStep2Completed(true);
 
-        // 1초 후 세 번째 단계 완료 (문제 생성 완료)
-        const timer3 = setTimeout(() => {
-          setStep3Completed(true);
+        // === 3단계: 문제 생성 완료 ===
+        setStep3Loading(true);
 
-          // 2초 후 완료 콜백 호출
-          const timer4 = setTimeout(() => {
-            onComplete();
+        await new Promise((resolve) => {
+          const timer = setTimeout(() => {
+            if (!isCancelled) {
+              setStep3Loading(false);
+              setStep3Completed(true);
+            }
+            resolve(void 0);
+          }, 1000);
+          timers.push(timer);
+        });
+
+        if (isCancelled) return;
+
+        // === 완료 후 대기 ===
+        await new Promise((resolve) => {
+          const timer = setTimeout(() => {
+            if (!isCancelled) {
+              onComplete();
+            }
+            resolve(void 0);
           }, 2000);
-
-          return () => clearTimeout(timer4);
-        }, 1000);
-
-        return () => clearTimeout(timer3);
+          timers.push(timer);
+        });
       } catch (error) {
+        if (isCancelled) return;
+
         console.error("API Error:", error);
-        // 에러 발생 시에도 UI는 계속 진행
+
+        // 에러 시에도 2단계 완료하고 3단계 진행
+        setStep2Loading(false);
         setStep2Completed(true);
+        setStep3Loading(true);
 
-        const timer3 = setTimeout(() => {
-          setStep3Completed(true);
+        await new Promise((resolve) => {
+          const timer = setTimeout(() => {
+            if (!isCancelled) {
+              setStep3Loading(false);
+              setStep3Completed(true);
+            }
+            resolve(void 0);
+          }, 1000);
+          timers.push(timer);
+        });
 
-          const timer4 = setTimeout(() => {
-            onComplete();
+        if (isCancelled) return;
+
+        await new Promise((resolve) => {
+          const timer = setTimeout(() => {
+            if (!isCancelled) {
+              onComplete();
+            }
+            resolve(void 0);
           }, 500);
-
-          return () => clearTimeout(timer4);
-        }, 1000);
-
-        return () => clearTimeout(timer3);
+          timers.push(timer);
+        });
       }
     };
 
-    // API 응답 처리 시작
-    handleApiResponse();
+    executeSequence();
 
     return () => {
-      clearTimeout(timer1);
+      isCancelled = true;
+      timers.forEach((timer) => clearTimeout(timer));
     };
   }, [isOpen, onComplete, apiPromise]);
 
@@ -204,21 +281,42 @@ const LoadingModal: React.FC<LoadingModalProps> = ({
         <CardsContainer>
           <Card isCompleted={step1Completed}>
             <CardContent>
-              <CheckIcon isCompleted={step1Completed} />
+              {step1Loading ? (
+                <LoadingSpinner />
+              ) : (
+                <CheckIcon
+                  isCompleted={step1Completed}
+                  isLoading={step1Loading}
+                />
+              )}
               <CardText>입력 텍스트 분석</CardText>
             </CardContent>
           </Card>
 
           <Card isCompleted={step2Completed}>
             <CardContent>
-              <CheckIcon isCompleted={step2Completed} />
+              {step2Loading ? (
+                <LoadingSpinner />
+              ) : (
+                <CheckIcon
+                  isCompleted={step2Completed}
+                  isLoading={step2Loading}
+                />
+              )}
               <CardText>문제 생성 중...</CardText>
             </CardContent>
           </Card>
 
           <Card isCompleted={step3Completed}>
             <CardContent>
-              <CheckIcon isCompleted={step3Completed} />
+              {step3Loading ? (
+                <LoadingSpinner />
+              ) : (
+                <CheckIcon
+                  isCompleted={step3Completed}
+                  isLoading={step3Loading}
+                />
+              )}
               <CardText>문제 생성 완료!</CardText>
             </CardContent>
           </Card>

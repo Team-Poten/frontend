@@ -155,7 +155,7 @@ const AnswerButton = styled.button<{
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: "Arial Rounded MT Bold", "Arial", "Pretendard", sans-serif;
-  font-weight: 700;
+  font-weight: 500;
   font-size: 48px;
   color: #999999;
   position: relative;
@@ -222,7 +222,7 @@ const NextButton = styled.button<{ isSelected?: boolean; isLastQuestion?: boolea
   font-size: 16px;
   cursor: pointer;
   transition: all 0.2s ease;
-  margin-top: 20px;
+  
 
   &:hover {
     background-color: ${(props) => 
