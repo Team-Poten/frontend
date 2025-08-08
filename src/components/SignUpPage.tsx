@@ -63,46 +63,17 @@ const Subtitle = styled.p`
 `;
 
 const CharacterGroup = styled.div`
-  width: 334px;
-  height: 284px;
+  width: 286px;
+  height: 330px;
   display: flex;
   position: relative;
   margin-top: 40px;
 `;
 
-const Character = styled.img`
-  position: absolute;
-  object-fit: cover;
-  border-radius: 8px;
-  box-shadow: -6px 6px 12px 0px rgba(0, 0, 0, 0.16);
-`;
-
-const Character1 = styled(Character)`
-  width: 156px;
-  height: 156px;
-  top: 154px;
-  left: 204px;
-`;
-
-const Character2 = styled(Character)`
-  width: 85px;
-  height: 78px;
-  top: 92px;
-  left: 0px;
-`;
-
-const Character3 = styled(Character)`
-  width: 120px;
-  height: 120px;
-  top: 204px;
-  left: 76px;
-`;
-
-const Character4 = styled(Character)`
-  width: 72px;
-  height: 72px;
-  top: 0px;
-  left: 204px;
+const SignUpImage = styled.img`
+  width: 286px;
+  height: 330px;
+  object-fit: contain;
 `;
 
 const RightSection = styled.div`
@@ -493,10 +464,7 @@ const SignUpPage: React.FC = () => {
             생성하고 복습해보세요!
           </Subtitle>
           <CharacterGroup>
-            <Character1 src="/images/character1.png" alt="캐릭터1" />
-            <Character2 src="/images/character3.png" alt="캐릭터3" />
-            <Character3 src="/images/character2.png" alt="캐릭터2" />
-            <Character4 src="/images/character4.png" alt="캐릭터4" />
+            <SignUpImage src="/images/signupGroup.png" alt="회원가입 그룹" />
           </CharacterGroup>
         </LeftSection>
         <RightSection>
