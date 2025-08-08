@@ -222,9 +222,6 @@ const ProblemDetailPage: React.FC = () => {
           setLoading(false);
           return;
         }
-        console.log("******************************");
-        console.log(targetDate.questions);
-        console.log("******************************");
         // 문제들을 분 단위로 그룹화
         const grouped = groupProblemsByMinute(targetDate.questions);
         setGroupedProblems(grouped);

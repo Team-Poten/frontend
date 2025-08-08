@@ -21,7 +21,7 @@ export interface ProblemHistory {
 }
 
 export interface QuestionDetail {
-  questionText: string;
+  question: string;
   answer: string;
   questionType: string;
   explanation: string;
