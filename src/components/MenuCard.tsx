@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
 
 interface MenuCardProps {
   title: string;
@@ -11,7 +12,7 @@ const CardContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   padding: 40px 26px;
   background-color: #ffffff;
   border: 1px solid #ededed;
@@ -20,12 +21,14 @@ const CardContainer = styled.div`
   cursor: pointer;
   transition:
     transform 0.2s ease,
-    box-shadow 0.2s ease;
-  width: 260px;
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+  width: 312px;
 
   &:hover {
     transform: translateY(-2px);
     box-shadow: 6px 6px 16px rgba(0, 0, 0, 0.08);
+    border-color: #30a10e;
   }
 `;
 
@@ -38,19 +41,22 @@ const IconContainer = styled.div`
 const IconBox = styled.div`
   width: 28px;
   height: 28px;
-  background-color: #d9d9d9;
-  border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
+`;
+
+const IconImage = styled.img`
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
 `;
 
 const Title = styled.h3`
   font-family: "Pretendard", sans-serif;
   font-weight: 500;
   font-size: 20px;
-  line-height: 1.4;
+  line-height: 1.4em;
   color: #222222;
   margin: 0;
 `;
@@ -59,7 +65,7 @@ const Description = styled.p`
   font-family: "Pretendard", sans-serif;
   font-weight: 400;
   font-size: 16px;
-  line-height: 1.4;
+  line-height: 1.399999976158142em;
   color: #777777;
   text-align: center;
   margin: 0;
@@ -67,10 +73,43 @@ const Description = styled.p`
 `;
 
 const MenuCard: React.FC<MenuCardProps> = ({ title, description, icon }) => {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    switch (title) {
+      case "문제 만들기":
+        navigate("/");
+        break;
+      case "문제 모아보기":
+        navigate("/history");
+        break;
+      case "틀린문제 풀어보기":
+        navigate("/wrong-problems");
+        break;
+      default:
+        break;
+    }
+  };
+
+  const getIconSrc = () => {
+    switch (icon) {
+      case "light":
+        return "/images/icn_light.png";
+      case "book":
+        return "/images/icn_book.png";
+      case "write":
+        return "/images/icn_write.png";
+      default:
+        return "";
+    }
+  };
+
   return (
-    <CardContainer>
+    <CardContainer onClick={handleClick}>
       <IconContainer>
-        <IconBox>{icon}</IconBox>
+        <IconBox>
+          <IconImage src={getIconSrc()} alt={title} />
+        </IconBox>
         <Title>{title}</Title>
       </IconContainer>
       <Description>{description}</Description>
