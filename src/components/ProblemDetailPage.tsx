@@ -192,7 +192,7 @@ const ProblemDetailPage: React.FC = () => {
 
           return {
             id: `${timeGroup}-${index}`,
-            question: question.questionText,
+            question: question.question,
             answer: answer,
             explanation: question.explanation,
             createdAt: question.createdAt,
@@ -214,7 +214,6 @@ const ProblemDetailPage: React.FC = () => {
         }
 
         const data = await getProblemHistory();
-
         // 특정 날짜의 문제 찾기
         const targetDate = data.find((item) => item.date === date);
 
@@ -223,7 +222,9 @@ const ProblemDetailPage: React.FC = () => {
           setLoading(false);
           return;
         }
-
+        console.log("******************************");
+        console.log(targetDate.questions);
+        console.log("******************************");
         // 문제들을 분 단위로 그룹화
         const grouped = groupProblemsByMinute(targetDate.questions);
         setGroupedProblems(grouped);
