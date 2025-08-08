@@ -117,7 +117,7 @@ const AnswerText = styled.div`
   font-weight: 500;
   font-size: 18px;
   line-height: 1.3999999364217122em;
-  color: #222222;
+  color: #777777;
   height: 26px;
 `;
 
@@ -140,7 +140,7 @@ const ExplanationText = styled.div`
   font-weight: 400;
   font-size: 16px;
   line-height: 1.399999976158142em;
-  color: #777777;
+  color: #222222;
   width: 414px;
   word-wrap: break-word;
   overflow-wrap: break-word;
