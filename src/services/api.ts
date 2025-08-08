@@ -25,6 +25,8 @@ export interface QuestionDetail {
   answer: string;
   questionType: string;
   explanation: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface ProblemHistoryResponse {
@@ -81,10 +83,39 @@ export interface LoginResponse {
 }
 
 const API_BASE_URL = "https://api.quicklyapp.store/api";
+//const API_BASE_URL = "http://localhost:8080/api";
+
+// 403 에러를 위한 커스텀 에러 클래스
+export class UnauthorizedError extends Error {
+  constructor(
+    message: string = "인증이 만료되었습니다. 로그인을 다시 해주세요."
+  ) {
+    super(message);
+    this.name = "UnauthorizedError";
+  }
+}
+
 // 로그인 상태 확인
 export const isLoggedIn = (): boolean => {
   const token = localStorage.getItem("accessToken");
   return !!token;
+};
+
+// 로그아웃 (토큰 제거)
+export const logout = (): void => {
+  localStorage.removeItem("accessToken");
+  // 쿠키에서 refreshToken 제거
+  document.cookie =
+    "refreshToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+};
+
+// 자동 로그아웃 (403 에러 시 사용) - 토큰 제거 후 로그인 모달 표시용 파라미터와 함께 새로고침
+export const autoLogout = (): void => {
+  logout();
+  // 새로고침 후 로그인 모달을 열기 위한 쿼리 파라미터 추가
+  const url = new URL(window.location.href);
+  url.searchParams.set("showLogin", "true");
+  window.location.href = url.toString();
 };
 
 // Access Token 가져오기
@@ -178,6 +209,9 @@ export const getProblemHistory = async (): Promise<
     });
 
     if (!response.ok) {
+      if (response.status === 403) {
+        throw new UnauthorizedError();
+      }
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 

@@ -6,8 +6,7 @@ import LoginModal from "./LoginModal";
 
 const HeaderContainer = styled.header`
   width: 100%;
-  background-color: #ffffff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  background-color: #f8f9fa;
 `;
 
 // 전체 디스플레이 컨테이너 (1920px 기준)
@@ -77,6 +76,19 @@ const Header: React.FC = () => {
   const loggedIn = isLoggedIn();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [loginError, setLoginError] = useState<string | undefined>(undefined);
+
+  // URL 파라미터 확인해서 로그인 모달 자동 열기 (403 에러 후 새로고침 시)
+  React.useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("showLogin") === "true" && !loggedIn) {
+      setIsLoginModalOpen(true);
+      setLoginError("인증이 만료되었습니다. 로그인을 다시 해주세요.");
+      // URL에서 파라미터 제거
+      urlParams.delete("showLogin");
+      const newUrl = `${window.location.pathname}${urlParams.toString() ? "?" + urlParams.toString() : ""}`;
+      window.history.replaceState({}, "", newUrl);
+    }
+  }, [loggedIn]);
 
   const handleNavigation = (path: string) => {
     navigate(path);

@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useParams, useNavigate } from "react-router-dom";
-import { getProblemHistory, isLoggedIn } from "../services/api";
+import {
+  getProblemHistory,
+  isLoggedIn,
+  UnauthorizedError,
+  autoLogout,
+} from "../services/api";
 import { QuestionDetail } from "../services/api";
 
 interface Problem {
@@ -9,6 +14,12 @@ interface Problem {
   question: string;
   answer: string;
   explanation: string;
+  createdAt: string;
+}
+
+interface GroupedProblems {
+  timeGroup: string;
+  problems: Problem[];
 }
 
 const PageContainer = styled.div`
@@ -19,8 +30,10 @@ const PageContainer = styled.div`
 `;
 
 const ContentContainer = styled.div`
-  max-width: 1000px;
-  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 const DateHeader = styled.div`
@@ -54,9 +67,7 @@ const ErrorMessage = styled.div`
 const ProblemGrid = styled.div`
   display: flex;
   gap: 20px;
-  justify-content: center;
-  max-width: 1000px;
-  margin: 0 auto;
+  width: 976px;
 `;
 
 const Column = styled.div`
@@ -86,7 +97,7 @@ const QuestionSection = styled.div`
 `;
 
 const QuestionNumber = styled.span`
-  color: #30a10e; 
+  color: #30a10e;
   font-weight: 500;
 `;
 
@@ -135,12 +146,60 @@ const ExplanationText = styled.div`
   overflow-wrap: break-word;
 `;
 
+const Divider = styled.div`
+  width: 976px;
+  height: 1px;
+  background-color: #bebebe;
+  margin: 20px 0;
+`;
+
 const ProblemDetailPage: React.FC = () => {
   const { date } = useParams<{ date: string }>();
   const navigate = useNavigate();
-  const [problems, setProblems] = useState<Problem[]>([]);
+  const [groupedProblems, setGroupedProblems] = useState<GroupedProblems[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // createdAt을 분 단위로 그룹화하는 함수
+  const groupProblemsByMinute = (
+    questions: QuestionDetail[]
+  ): GroupedProblems[] => {
+    const groups: { [key: string]: QuestionDetail[] } = {};
+
+    questions.forEach((question) => {
+      // createdAt에서 분 단위까지만 추출 (YYYY-MM-DDTHH:MM)
+      const createdAt = new Date(question.createdAt);
+      const timeGroup = createdAt.toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM
+
+      if (!groups[timeGroup]) {
+        groups[timeGroup] = [];
+      }
+      groups[timeGroup].push(question);
+    });
+
+    // 시간 순으로 정렬
+    return Object.keys(groups)
+      .sort()
+      .map((timeGroup) => ({
+        timeGroup,
+        problems: groups[timeGroup].map((question, index) => {
+          const answer =
+            question.answer === "TRUE"
+              ? "O"
+              : question.answer === "FALSE"
+                ? "X"
+                : question.answer;
+
+          return {
+            id: `${timeGroup}-${index}`,
+            question: question.questionText,
+            answer: answer,
+            explanation: question.explanation,
+            createdAt: question.createdAt,
+          };
+        }),
+      }));
+  };
 
   useEffect(() => {
     const fetchProblemDetail = async () => {
@@ -165,34 +224,23 @@ const ProblemDetailPage: React.FC = () => {
           return;
         }
 
-        // API 응답을 문제 형태로 변환
-        const problemList: Problem[] = targetDate.questions.map(
-          (question, index) => {
-            // TRUE_FALSE 타입의 경우 O/X로 변환
-            const answer =
-              question.answer === "TRUE"
-                ? "O"
-                : question.answer === "FALSE"
-                  ? "X"
-                  : question.answer;
-
-            return {
-              id: index.toString(),
-              question: question.questionText,
-              answer: answer,
-              explanation: question.explanation,
-            };
-          }
-        );
-
-        setProblems(problemList);
+        // 문제들을 분 단위로 그룹화
+        const grouped = groupProblemsByMinute(targetDate.questions);
+        setGroupedProblems(grouped);
       } catch (err) {
         console.error("Error fetching problem detail:", err);
-        setError(
-          err instanceof Error
-            ? err.message
-            : "문제를 불러오는 중 오류가 발생했습니다"
-        );
+
+        if (err instanceof UnauthorizedError) {
+          // 403 에러인 경우 자동 로그아웃 (새로고침 후 Header에서 로그인 모달 자동 열림)
+          autoLogout();
+          return; // autoLogout에서 새로고침하므로 여기서 종료
+        } else {
+          setError(
+            err instanceof Error
+              ? err.message
+              : "문제를 불러오는 중 오류가 발생했습니다"
+          );
+        }
       } finally {
         setLoading(false);
       }
@@ -202,10 +250,6 @@ const ProblemDetailPage: React.FC = () => {
       fetchProblemDetail();
     }
   }, [date]);
-
-  // 카드들을 왼쪽과 오른쪽 컬럼으로 나누기
-  const leftColumnProblems = problems.filter((_, index) => index % 2 === 0);
-  const rightColumnProblems = problems.filter((_, index) => index % 2 === 1);
 
   if (loading) {
     return (
@@ -231,42 +275,51 @@ const ProblemDetailPage: React.FC = () => {
     <PageContainer>
       <ContentContainer>
         <DateHeader>{date}</DateHeader>
-        <ProblemGrid>
-          <Column>
-            {leftColumnProblems.map((problem, index) => (
-              <ProblemCard key={problem.id}>
-                <QuestionSection>
-                  <QuestionText>
-                    <QuestionNumber>Q{leftColumnProblems.indexOf(problem) * 2 + 1}.</QuestionNumber>{" "}
-                    {problem.question}
-                </QuestionText>
-                  <AnswerText>정답 : {problem.answer}</AnswerText>
-                </QuestionSection>
-                <ExplanationSection>
-                  <ExplanationTitle>해설 요약</ExplanationTitle>
-                  <ExplanationText>{problem.explanation}</ExplanationText>
-                </ExplanationSection>
-              </ProblemCard>
-            ))}
-          </Column>
-          <Column>
-            {rightColumnProblems.map((problem, index) => (
-              <ProblemCard key={problem.id}>
-                <QuestionSection>
-                <QuestionText>
-                  <QuestionNumber>Q{rightColumnProblems.indexOf(problem) * 2 + 2}.</QuestionNumber>{" "}
-                  {problem.question}
-                </QuestionText>
-                  <AnswerText>정답 : {problem.answer}</AnswerText>
-                </QuestionSection>
-                <ExplanationSection>
-                  <ExplanationTitle>해설 요약</ExplanationTitle>
-                  <ExplanationText>{problem.explanation}</ExplanationText>
-                </ExplanationSection>
-              </ProblemCard>
-            ))}
-          </Column>
-        </ProblemGrid>
+        {groupedProblems.map((group, groupIndex) => (
+          <React.Fragment key={group.timeGroup}>
+            <ProblemGrid>
+              <Column>
+                {group.problems
+                  .filter((_, index) => index % 2 === 0)
+                  .map((problem, index) => (
+                    <ProblemCard key={problem.id}>
+                      <QuestionSection>
+                        <QuestionText>
+                          <QuestionNumber>Q{index * 2 + 1}.</QuestionNumber>{" "}
+                          {problem.question}
+                        </QuestionText>
+                        <AnswerText>정답 : {problem.answer}</AnswerText>
+                      </QuestionSection>
+                      <ExplanationSection>
+                        <ExplanationTitle>해설 요약</ExplanationTitle>
+                        <ExplanationText>{problem.explanation}</ExplanationText>
+                      </ExplanationSection>
+                    </ProblemCard>
+                  ))}
+              </Column>
+              <Column>
+                {group.problems
+                  .filter((_, index) => index % 2 === 1)
+                  .map((problem, index) => (
+                    <ProblemCard key={problem.id}>
+                      <QuestionSection>
+                        <QuestionText>
+                          <QuestionNumber>Q{index * 2 + 2}.</QuestionNumber>{" "}
+                          {problem.question}
+                        </QuestionText>
+                        <AnswerText>정답 : {problem.answer}</AnswerText>
+                      </QuestionSection>
+                      <ExplanationSection>
+                        <ExplanationTitle>해설 요약</ExplanationTitle>
+                        <ExplanationText>{problem.explanation}</ExplanationText>
+                      </ExplanationSection>
+                    </ProblemCard>
+                  ))}
+              </Column>
+            </ProblemGrid>
+            {groupIndex < groupedProblems.length - 1 && <Divider />}
+          </React.Fragment>
+        ))}
       </ContentContainer>
     </PageContainer>
   );
