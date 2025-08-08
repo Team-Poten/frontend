@@ -156,8 +156,8 @@ const ErrorMessage = styled.div`
   color: #ff4444;
   font-family: "Pretendard", sans-serif;
   font-size: 14px;
-  margin-top: 8px;
-  text-align: center;
+  margin-bottom: 12px;
+  text-align: left;
 `;
 
 const LoginModal: React.FC<LoginModalProps> = ({
@@ -214,13 +214,13 @@ const LoginModal: React.FC<LoginModalProps> = ({
               required
             />
           </InputContainer>
+          {error && <ErrorMessage>{error}</ErrorMessage>}
           <LoginButton
             type="submit"
             disabled={!loginId.trim() || !password.trim()}
           >
             로그인
           </LoginButton>
-          {error && <ErrorMessage>{error}</ErrorMessage>}
         </form>
         <SignUpButton type="button" onClick={handleSignUp}>
           회원가입
