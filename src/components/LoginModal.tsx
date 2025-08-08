@@ -75,7 +75,7 @@ const ModalTitle = styled.h2`
 
 const InputContainer = styled.div`
   width: 350px;
-  margin-bottom: 36px;
+  margin-top: 24px;
 `;
 
 const InputLabel = styled.label`
@@ -100,6 +100,7 @@ const InputField = styled.input`
   color: #222222;
   background: none;
   outline: none;
+  margin-bottom: 4px;
 
   &::placeholder {
     color: #9e9e9e;
@@ -156,8 +157,11 @@ const ErrorMessage = styled.div`
   color: #ff4444;
   font-family: "Pretendard", sans-serif;
   font-size: 14px;
-  margin-bottom: 12px;
+  margin-bottom: 36px;
   text-align: left;
+  min-height: 20px;
+  display: flex;
+  align-items: center;
 `;
 
 const LoginModal: React.FC<LoginModalProps> = ({
@@ -214,7 +218,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
               required
             />
           </InputContainer>
-          {error && <ErrorMessage>{error}</ErrorMessage>}
+          <ErrorMessage>{error && error}</ErrorMessage>
           <LoginButton
             type="submit"
             disabled={!loginId.trim() || !password.trim()}
