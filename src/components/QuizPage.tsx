@@ -112,8 +112,7 @@ const QuestionNumber = styled.span<{
   showResult?: boolean;
 }>`
   font-weight: 700;
-  color: ${(props) =>
-    props.showResult ? (props.isCorrect ? "#2473FC" : "#FF243E") : "#30a10e"};
+  color: #30a10e;
   position: relative;
   display: inline-block;
   margin-right: 8px;
@@ -125,8 +124,7 @@ const QuestionText = styled.h2<{ isCorrect?: boolean; showResult?: boolean }>`
   font-weight: 700;
   font-size: 24px;
   line-height: 1.4;
-  color: ${(props) =>
-    props.showResult ? (props.isCorrect ? "#2473FC" : "#FF243E") : "#30a10e"};
+  color: #222222;
   margin: 0;
   text-align: left;
   transition: color 0.3s ease;
@@ -154,15 +152,8 @@ const AnswerButton = styled.button<{
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-family: "Arial Rounded MT Bold", "Arial", "Pretendard", sans-serif;
-  font-weight: 500;
-  font-size: 48px;
-  color: #999999;
   position: relative;
   overflow: hidden;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 
   &:hover {
     border-color: #30a10e;
@@ -180,7 +171,6 @@ const AnswerButton = styled.button<{
     `
     border-color: #30a10e;
     background-color: #f0f8f0;
-    color: #30a10e;
   `}
 
   ${(props) =>
@@ -189,7 +179,6 @@ const AnswerButton = styled.button<{
     `
     border-color: #2473FC;
     background-color: #f0f8ff;
-    color: #2473FC;
   `}
 
   ${(props) =>
@@ -199,8 +188,13 @@ const AnswerButton = styled.button<{
     `
     border-color: #FF243E;
     background-color: #fff0f0;
-    color: #FF243E;
   `}
+`;
+
+const AnswerImage = styled.img`
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
 `;
 
 const NextButton = styled.button<{ isSelected?: boolean; isLastQuestion?: boolean }>`
@@ -631,6 +625,24 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
 
   const totalWrong = questions.length - totalCorrect;
 
+  // 이미지 경로를 결정하는 함수
+  const getAnswerImagePath = (answer: string, isSelected: boolean, isCorrect: boolean, showResult: boolean) => {
+    if (!showResult) {
+      // 결과 표시 전: gray 이미지
+      return answer === "O" ? "/images/gray_o.png" : "/images/gray_x.png";
+    } else if (isSelected) {
+      // 선택된 답변: 정답 여부에 따라 색상 결정
+      if (isCorrect) {
+        return answer === "O" ? "/images/blue_o.png" : "/images/blue_x.png";
+      } else {
+        return answer === "O" ? "/images/red_o.png" : "/images/red_x.png";
+      }
+    } else {
+      // 선택되지 않은 답변: gray 이미지
+      return answer === "O" ? "/images/gray_o.png" : "/images/gray_x.png";
+    }
+  };
+
   return (
     <QuizContainer>
       <Header />
@@ -692,7 +704,7 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
                   currentQuestionState.isLoading
                 }
               >
-                O
+                <AnswerImage src={getAnswerImagePath("O", currentQuestionState.selectedAnswer === "O", isAnswerCorrect(), currentQuestionState.showResult)} alt="O" />
               </AnswerButton>
               <AnswerButton
                 selected={currentQuestionState.selectedAnswer === "X"}
@@ -706,7 +718,7 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
                   currentQuestionState.isLoading
                 }
               >
-                X
+                <AnswerImage src={getAnswerImagePath("X", currentQuestionState.selectedAnswer === "X", isAnswerCorrect(), currentQuestionState.showResult)} alt="X" />
               </AnswerButton>
             </AnswerContainer>
 
