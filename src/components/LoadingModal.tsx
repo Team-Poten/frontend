@@ -82,8 +82,8 @@ const CardContent = styled.div`
 `;
 
 const LoadingSpinner = styled.div`
-  width: 20px;
-  height: 20px;
+  width: 28px;
+  height: 28px;
   border: 2px solid #f6fbf4;
   border-top: 2px solid #30a10e;
   border-radius: 50%;
