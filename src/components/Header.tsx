@@ -16,12 +16,26 @@ const DisplayContainer = styled.div`
   width: 100%;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   padding-top: 26px;
   padding-bottom: 26px;
-  padding-left: 1030px;
+  padding-left: 360px;
   padding-right: 300px;
   box-sizing: border-box;
+`;
+
+// 로고 컨테이너
+const LogoContainer = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+// 로고 이미지
+const LogoImage = styled.img`
+  width: 120px;
+  height: 32px;
+  cursor: pointer;
+  object-fit: contain;
 `;
 
 // 메뉴 네비게이션
@@ -143,6 +157,13 @@ const Header: React.FC = () => {
     <>
       <HeaderContainer>
         <DisplayContainer>
+          <LogoContainer>
+            <LogoImage
+              src="/images/quizly_logo.png"
+              alt="Quizly Logo"
+              onClick={() => handleNavigation("/")}
+            />
+          </LogoContainer>
           <Navigation>
             <NavTab
               active={isActive("/")}
@@ -162,10 +183,10 @@ const Header: React.FC = () => {
             >
               틀린문제 풀어보기
             </NavTab>
+            <AuthButton onClick={handleAuth}>
+              {loggedIn ? "로그아웃" : "로그인"}
+            </AuthButton>
           </Navigation>
-          <AuthButton onClick={handleAuth}>
-            {loggedIn ? "로그아웃" : "로그인"}
-          </AuthButton>
         </DisplayContainer>
       </HeaderContainer>
 
