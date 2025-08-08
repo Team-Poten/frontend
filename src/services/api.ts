@@ -25,6 +25,8 @@ export interface QuestionDetail {
   answer: string;
   questionType: string;
   explanation: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface ProblemHistoryResponse {
