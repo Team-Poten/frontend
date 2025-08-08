@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useParams, useNavigate } from "react-router-dom";
-import { getProblemHistory, isLoggedIn } from "../services/api";
+import {
+  getProblemHistory,
+  isLoggedIn,
+  UnauthorizedError,
+  autoLogout,
+} from "../services/api";
 import { QuestionDetail } from "../services/api";
 
 interface Problem {
@@ -224,11 +229,18 @@ const ProblemDetailPage: React.FC = () => {
         setGroupedProblems(grouped);
       } catch (err) {
         console.error("Error fetching problem detail:", err);
-        setError(
-          err instanceof Error
-            ? err.message
-            : "문제를 불러오는 중 오류가 발생했습니다"
-        );
+
+        if (err instanceof UnauthorizedError) {
+          // 403 에러인 경우 자동 로그아웃 (새로고침 후 Header에서 로그인 모달 자동 열림)
+          autoLogout();
+          return; // autoLogout에서 새로고침하므로 여기서 종료
+        } else {
+          setError(
+            err instanceof Error
+              ? err.message
+              : "문제를 불러오는 중 오류가 발생했습니다"
+          );
+        }
       } finally {
         setLoading(false);
       }
