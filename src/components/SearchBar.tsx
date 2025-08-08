@@ -50,8 +50,8 @@ const SearchIcon = styled.div`
 
   &::before {
     content: "";
-    width: 20.79px;
-    height: 21.67px;
+    width: 32px;
+    height: 32px;
     background-image: url("/images/input.png");
     background-size: contain;
     background-repeat: no-repeat;
