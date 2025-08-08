@@ -80,7 +80,9 @@ export interface LoginResponse {
   message?: string;
 }
 
-const API_BASE_URL = "http://localhost:8080/api";
+//const API_BASE_URL = "http://localhost:8080/api";
+const API_BASE_URL = "https://quicklyapp.store/api"
+
 
 // 로그인 상태 확인
 export const isLoggedIn = (): boolean => {
