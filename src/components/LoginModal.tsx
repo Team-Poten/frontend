@@ -24,7 +24,7 @@ const ModalOverlay = styled.div<{ isOpen: boolean }>`
 
 const ModalContainer = styled.div`
   width: 500px;
-  height: 500px;
+  height: 526px;
   background-color: #ffffff;
   border: 1px solid #dedede;
   border-radius: 24px;
@@ -75,7 +75,7 @@ const ModalTitle = styled.h2`
 
 const InputContainer = styled.div`
   width: 350px;
-  margin-bottom: 24px;
+  margin-bottom: 36px;
 `;
 
 const InputLabel = styled.label`
@@ -85,12 +85,12 @@ const InputLabel = styled.label`
   line-height: 1.399999976158142em;
   color: #777777;
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 0px;
 `;
 
 const InputField = styled.input`
   width: 100%;
-  padding: 12px 0;
+  padding: 8px 0;
   border: none;
   border-bottom: 1px solid #dedede;
   font-family: "Pretendard", sans-serif;
@@ -122,7 +122,7 @@ const LoginButton = styled.button`
   font-size: 16px;
   line-height: 1.399999976158142em;
   cursor: pointer;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 
   &:hover {
     background-color: #2a8f0c;
@@ -134,24 +134,21 @@ const LoginButton = styled.button`
   }
 `;
 
-const BottomLinks = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 16px;
-`;
-
-const LinkButton = styled.button`
-  background: none;
+const SignUpButton = styled.button`
+  width: 350px;
+  padding: 12px 16px;
+  background-color: #f6fbf4;
+  color: #30a10e;
   border: none;
+  border-radius: 6px;
   font-family: "Pretendard", sans-serif;
   font-weight: 400;
-  font-size: 14px;
-  line-height: 1.4000000272478377em;
-  color: #222222;
+  font-size: 16px;
+  line-height: 1.399999976158142em;
   cursor: pointer;
 
   &:hover {
-    color: #30a10e;
+    background-color: #e8f5e8;
   }
 `;
 
@@ -225,12 +222,9 @@ const LoginModal: React.FC<LoginModalProps> = ({
           </LoginButton>
           {error && <ErrorMessage>{error}</ErrorMessage>}
         </form>
-        <BottomLinks>
-          <LinkButton type="button" onClick={handleSignUp}>
-            회원가입
-          </LinkButton>
-          <LinkButton type="button">아이디/비밀번호 찾기</LinkButton>
-        </BottomLinks>
+        <SignUpButton type="button" onClick={handleSignUp}>
+          회원가입
+        </SignUpButton>
       </ModalContainer>
     </ModalOverlay>
   );
