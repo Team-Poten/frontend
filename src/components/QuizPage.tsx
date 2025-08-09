@@ -93,26 +93,35 @@ const ProgressText = styled.div<{ progress: number }>`
   transition: left 0.3s ease;
 `;
 
-const QuestionCard = styled.div`
+const QuestionCard = styled.div<{ isCorrect?: boolean; showResult?: boolean }>`
   width: 976px;
   min-height: 200px;
   margin-top: 24px;
   background-color: #ffffff;
-  border: 1px solid #dedede;
+  border: 1px solid ${(props) => 
+    props.showResult 
+      ? (props.isCorrect ? "#2473FC" : "#FF243E")
+      : "#dedede"
+  };
   border-radius: 16px;
   box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.04);
   padding: 40px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  transition: border-color 0.3s ease;
 `;
 
 const QuestionNumber = styled.span<{
   isCorrect?: boolean;
   showResult?: boolean;
 }>`
-  font-weight: 700;
-  color: #30a10e;
+  font-weight: 400;
+  color: ${(props) => 
+    props.showResult 
+      ? (props.isCorrect ? "#2473FC" : "#FF243E")
+      : "#30a10e"
+  };
   position: relative;
   display: inline-block;
   margin-right: 8px;
@@ -121,10 +130,14 @@ const QuestionNumber = styled.span<{
 
 const QuestionText = styled.h2<{ isCorrect?: boolean; showResult?: boolean }>`
   font-family: "Pretendard", sans-serif;
-  font-weight: 700;
-  font-size: 24px;
+  font-weight: 400;
+  font-size: 20px;
   line-height: 1.4;
-  color: #222222;
+  color: ${(props) => 
+    props.showResult 
+      ? (props.isCorrect ? "#2473FC" : "#FF243E")
+      : "#222222"
+  };
   margin: 0;
   text-align: left;
   transition: color 0.3s ease;
@@ -648,7 +661,7 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
       <Header />
       <MainContent>
         <Title>
-          지금부터 본격 <span style={{ color: "#222222" }}>문제 타임!</span>{" "}
+          지금부터 본격 <span style={{ color: "#30a10e" }}>문제 타임!</span>{" "}
           집중해서 풀어봐요
           <TitleIcon src="/images/icn_write.png" alt="Write icon" />
         </Title>
@@ -675,7 +688,10 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
             width: "976px",
           }}
         >
-          <QuestionCard>
+          <QuestionCard
+            isCorrect={isAnswerCorrect()}
+            showResult={currentQuestionState.showResult}
+          >
             <div>
               <QuestionText
                 isCorrect={isAnswerCorrect()}
@@ -747,7 +763,7 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
             currentQuestionState.answerResult && (
               <ExplanationBox>
                 <ExplanationSummary>해설 요약</ExplanationSummary>
-                <ExplanationContent>
+                <ExplanationContent isExplanation={true}>
                     {currentQuestionState.answerResult.explanation}
                 </ExplanationContent>
                 <ExplanationContent>
@@ -839,12 +855,12 @@ const ExplanationSummary = styled.div`
   margin-bottom: 13px;
 `;
 
-const ExplanationContent = styled.div`
+const ExplanationContent = styled.div<{ isExplanation?: boolean }>`
   font-family: "Pretendard", sans-serif;
   font-weight: 500;
   font-size: 18px;
   line-height: 1.5;
-  color: #777777;
+  color: ${(props) => props.isExplanation ? "#222222" : "#777777"};
 `;
 
 const NextButtonContainer = styled.div`
