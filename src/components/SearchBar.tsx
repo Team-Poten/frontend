@@ -1,93 +1,68 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 
-interface SearchBarProps {
-  onGenerateQuestions: (text: string) => void;
-  isLoading?: boolean;
-}
-
 const SearchContainer = styled.div`
+  width: 100%;
+  max-width: 600px;
   position: relative;
-  width: 976px;
-  height: 72px;
-  background-color: #ffffff;
-  border: 1px solid #dedede;
-  border-radius: 100px;
-  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.04);
-  display: flex;
-  align-items: center;
-  padding: 20px 32px;
-  box-sizing: border-box;
 `;
 
 const SearchInput = styled.input`
-  flex: 1;
-  background: none;
-  border: none;
+  width: 100%;
+  height: 48px;
+  padding: 0 20px 0 50px;
+  border: 2px solid #dedede;
+  border-radius: 24px;
   font-family: "Pretendard", sans-serif;
-  font-weight: 400;
-  font-size: 18px;
-  line-height: 1.3999999364217122em;
-  color: #777777;
-  outline: none;
-  margin-left: 12px;
-
-  &::placeholder {
-    color: #777777;
-  }
+  font-size: 16px;
+  line-height: 1.4em;
+  color: #222222;
+  background-color: #ffffff;
+  transition: border-color 0.3s ease;
 
   &:focus {
-    color: #222222;
+    outline: none;
+    border-color: #30a10e;
+  }
+
+  &::placeholder {
+    color: #999999;
   }
 `;
 
-const SearchIcon = styled.div`
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  &::before {
-    content: "";
-    width: 32px;
-    height: 32px;
-    background-image: url("/images/input.png");
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-  }
+const SearchIcon = styled.img`
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
 `;
 
-const SearchBar: React.FC<SearchBarProps> = ({
-  onGenerateQuestions,
-  isLoading = false,
-}) => {
-  const [inputText, setInputText] = useState("");
+const SearchBar: React.FC<{
+  onSearch: (query: string) => void;
+  placeholder?: string;
+}> = ({ onSearch, placeholder = "문제를 검색해보세요" }) => {
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const handleGenerate = () => {
-    if (inputText.trim()) {
-      onGenerateQuestions(inputText.trim());
-    }
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      handleGenerate();
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      onSearch(searchQuery.trim());
     }
   };
 
   return (
     <SearchContainer>
-      <SearchIcon />
-      <SearchInput
-        type="text"
-        placeholder="텍스트를 입력하거나 파일을 업로드 해주세요."
-        value={inputText}
-        onChange={(e) => setInputText(e.target.value)}
-        onKeyPress={handleKeyPress}
-        disabled={isLoading}
-      />
+      <form onSubmit={handleSubmit}>
+        <SearchInput
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder={placeholder}
+        />
+        <SearchIcon src="/images/input.png" alt="Search" />
+      </form>
     </SearchContainer>
   );
 };

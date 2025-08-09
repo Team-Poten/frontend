@@ -24,12 +24,6 @@ const DisplayContainer = styled.div`
   box-sizing: border-box;
 `;
 
-// 로고 컨테이너
-const LogoContainer = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
 // 로고 이미지
 const LogoImage = styled.img`
   width: 120px;
@@ -157,13 +151,11 @@ const Header: React.FC = () => {
     <>
       <HeaderContainer>
         <DisplayContainer>
-          <LogoContainer>
-            <LogoImage
-              src="/images/quizly_logo.png"
-              alt="Quizly Logo"
-              onClick={() => handleNavigation("/")}
-            />
-          </LogoContainer>
+          <LogoImage
+            src="/images/quizly_logo.png"
+            alt="Quizly Logo"
+            onClick={() => handleNavigation("/")}
+          />
           <Navigation>
             <NavTab
               active={isActive("/")}
