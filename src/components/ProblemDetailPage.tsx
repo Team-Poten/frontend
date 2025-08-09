@@ -24,9 +24,10 @@ interface GroupedProblems {
 
 const PageContainer = styled.div`
   width: 100%;
-  min-height: calc(100vh - 180px);
+  min-height: calc(100vh - 170px); /* Header(90px) + Footer(80px) 제외 */
   background-color: #f8f9fa;
   padding: 80px;
+  padding-bottom: 100px; /* Footer와의 간격 확보 */
 `;
 
 const ContentContainer = styled.div`
