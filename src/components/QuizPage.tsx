@@ -873,7 +873,6 @@ const ExplanationBox = styled.div`
   margin-top: 20px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
 `;
 
 const ExplanationSummary = styled.div`
@@ -882,7 +881,7 @@ const ExplanationSummary = styled.div`
   font-size: 20px;
   line-height: 1.4;
   color: #30a10e;
-  margin-bottom: 0;
+  margin-bottom: 18px;
 `;
 
 const ExplanationContent = styled.div<{ isExplanation?: boolean }>`
@@ -891,6 +890,7 @@ const ExplanationContent = styled.div<{ isExplanation?: boolean }>`
   font-size: 18px;
   line-height: 1.5;
   color: ${(props) => props.isExplanation ? "#222222" : "#777777"};
+  margin-bottom: ${(props) => props.isExplanation ? "2px" : "0"};
 `;
 
 const NextButtonContainer = styled.div`
