@@ -6,28 +6,28 @@ import LoginModal from "./LoginModal";
 
 const HeaderContainer = styled.header`
   width: 100%;
-  background-color: #f8f9fa;
+  height: 90px;
+  background-color: #F8F9FA;
 `;
 
 // 전체 디스플레이 컨테이너 (1920px 기준)
 const DisplayContainer = styled.div`
-  max-width: 1920px;
-  margin: 0 auto;
   width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-top: 26px;
-  padding-bottom: 26px;
-  padding-left: 360px;
-  padding-right: 300px;
+  padding: 0;
   box-sizing: border-box;
+  position: relative;
 `;
 
 // 로고 컨테이너
 const LogoContainer = styled.div`
   display: flex;
   align-items: center;
+  position: absolute;
+  left: 360px;
 `;
 
 // 로고 이미지
@@ -43,6 +43,8 @@ const Navigation = styled.nav`
   display: flex;
   align-items: center;
   gap: 40px;
+  position: absolute;
+  right: 300px;
 `;
 
 const NavTab = styled.button<{ active?: boolean }>`
@@ -53,7 +55,7 @@ const NavTab = styled.button<{ active?: boolean }>`
   font-weight: 500;
   font-size: 16px;
   line-height: 1.4em;
-  color: ${(props) => (props.active ? "#222222" : "#777777")};
+  color: ${(props) => (props.active ? "#222222" : "#222222")};
   cursor: pointer;
   white-space: nowrap;
 
@@ -77,7 +79,6 @@ const AuthButton = styled.button`
   line-height: 1.19em;
   cursor: pointer;
   white-space: nowrap;
-  margin-left: 32px;
 
   &:hover {
     background-color: #2a8f0c;

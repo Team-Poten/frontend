@@ -5,6 +5,7 @@ import {
   Routes,
   Route,
   Navigate,
+  useLocation,
 } from "react-router-dom";
 import Header from "./components/Header";
 import MainContent from "./components/MainContent";
@@ -19,8 +20,8 @@ import SignUpPage from "./components/SignUpPage";
 import { Question, isLoggedIn } from "./services/api";
 
 const AppContainer = styled.div`
-  width: 100%;
-  min-height: 100vh;
+  width: 100vw;
+  height: 100vh;
   background-color: #f8f9fa;
   font-family:
     "Pretendard",
@@ -29,133 +30,213 @@ const AppContainer = styled.div`
     "Segoe UI",
     "Roboto",
     sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 0;
+`;
+
+// 16:9 비율 고정 컨테이너 (1920x1080 기준)
+const FixedRatioContainer = styled.div`
+  width: 1920px;
+  height: 1080px;
+  aspect-ratio: 16 / 9;
+  background-color: #f8f9fa;
+  position: relative;
+  transform-origin: center;
+  flex-shrink: 0;
+  transform: scale(var(--scale-ratio, 1));
+
+  /* 화면이 1920x1080보다 작을 때 자동으로 축소 */
+  @media (max-width: 1920px), (max-height: 1080px) {
+    transform: scale(var(--scale-ratio, 1));
+  }
 `;
 
 // 전체 디스플레이 컨테이너 (1920px 기준)
 const DisplayContainer = styled.div`
-  max-width: 1920px;
-  margin: 0 auto;
   width: 100%;
-  min-height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 `;
 
-// 콘텐츠 영역 컨테이너 (1024px 기준)
-const ContentContainer = styled.div`
-  max-width: 1024px;
-  margin: 0 auto;
+// 콘텐츠 영역 컨테이너 (조건부 스크롤)
+const ContentContainer = styled.div<{ allowScroll: boolean }>`
   width: 100%;
   flex: 1;
   display: flex;
   flex-direction: column;
+  overflow: ${(props) => (props.allowScroll ? "auto" : "hidden")};
+
+  /* 스크롤바 스타일링 (스크롤이 허용된 경우에만) */
+  ${(props) =>
+    props.allowScroll &&
+    `
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+  `}
 `;
+
+// 라우트별 콘텐츠 래퍼
+const RouteContent: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const location = useLocation();
+  const isHistoryPage = location.pathname === "/history";
+  const isHistoryDetailPage = location.pathname.startsWith("/history/");
+
+  return (
+    <>
+      <Header />
+      <ContentContainer allowScroll={isHistoryPage || isHistoryDetailPage}>
+        {children}
+      </ContentContainer>
+      <Footer />
+    </>
+  );
+};
 
 const App: React.FC = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [isQuizStarted, setIsQuizStarted] = useState(false);
+  const [isQuizStarted] = useState(false);
+
+  // 화면 크기에 따른 스케일 비율 계산
+  React.useEffect(() => {
+    const calculateScale = () => {
+      const container = document.documentElement;
+      const windowWidth = window.innerWidth;
+      const windowHeight = window.innerHeight;
+
+      // 16:9 비율을 유지하면서 화면에 맞는 스케일 계산
+      const scaleX = windowWidth / 1920;
+      const scaleY = windowHeight / 1080;
+
+      // 더 작은 스케일을 사용하여 화면에 완전히 맞춤
+      let scale = Math.min(scaleX, scaleY);
+
+      // 최소 스케일 제한 (너무 작아지지 않도록)
+      scale = Math.max(scale, 0.4);
+
+      // 최대 스케일 제한 (1배를 넘지 않도록)
+      scale = Math.min(scale, 1);
+
+      container.style.setProperty("--scale-ratio", scale.toString());
+    };
+
+    // 초기 계산
+    calculateScale();
+
+    // 리사이즈 이벤트 리스너
+    window.addEventListener("resize", calculateScale);
+
+    return () => {
+      window.removeEventListener("resize", calculateScale);
+    };
+  }, []);
 
   const handleQuestionsGenerated = (newQuestions: Question[]) => {
     setQuestions(newQuestions);
-    setIsQuizStarted(true);
   };
 
   const handleBackToHome = () => {
     setQuestions([]);
-    setIsQuizStarted(false);
   };
 
   return (
     <Router>
       <AppContainer>
-        <DisplayContainer>
-          <Routes>
-            <Route
-              path="/"
-              element={
-                isQuizStarted ? (
-                  <Navigate to="/quiz" replace />
-                ) : (
-                  <>
-                    <Header />
-                    <ContentContainer>
-                      <MainContent
-                        onQuestionsGenerated={handleQuestionsGenerated}
-                      />
-                    </ContentContainer>
-                    <Footer />
-                  </>
-                )
-              }
-            />
-            <Route
-              path="/quiz"
-              element={
-                questions.length > 0 ? (
-                  <QuizPage questions={questions} onBack={handleBackToHome} />
-                ) : (
-                  <Navigate to="/" replace />
-                )
-              }
-            />
-            <Route
-              path="/history"
-              element={
-                <>
-                  <Header />
-                  <ContentContainer>
+        <FixedRatioContainer>
+          <DisplayContainer>
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  isQuizStarted ? (
+                    <Navigate to="/quiz" replace />
+                  ) : (
+                    <>
+                      <Header />
+                      <ContentContainer allowScroll={false}>
+                        <MainContent
+                          onQuestionsGenerated={handleQuestionsGenerated}
+                        />
+                      </ContentContainer>
+                      <Footer />
+                    </>
+                  )
+                }
+              />
+              <Route
+                path="/quiz"
+                element={
+                  questions.length > 0 ? (
+                    <QuizPage questions={questions} onBack={handleBackToHome} />
+                  ) : (
+                    <Navigate to="/" replace />
+                  )
+                }
+              />
+              <Route
+                path="/history"
+                element={
+                  <RouteContent>
                     {isLoggedIn() ? (
                       <ProblemHistoryPage />
                     ) : (
                       <ProblemHistoryGuestPage />
                     )}
-                  </ContentContainer>
-                  <Footer />
-                </>
-              }
-            />
-            <Route
-              path="/history/:date"
-              element={
-                <>
-                  <Header />
-                  <ContentContainer>
+                  </RouteContent>
+                }
+              />
+              <Route
+                path="/history/:date"
+                element={
+                  <RouteContent>
                     <ProblemDetailPage />
-                  </ContentContainer>
-                  <Footer />
-                </>
-              }
-            />
-            <Route
-              path="/wrong-problems"
-              element={
-                <>
-                  <Header />
-                  <ContentContainer>
+                  </RouteContent>
+                }
+              />
+              <Route
+                path="/wrong-problems"
+                element={
+                  <RouteContent>
                     {isLoggedIn() ? (
                       <WrongProblemPage />
                     ) : (
                       <WrongProblemGuestPage />
                     )}
-                  </ContentContainer>
-                  <Footer />
-                </>
-              }
-            />
-            <Route
-              path="/signup"
-              element={
-                <>
-                  <Header />
-                  <ContentContainer>
+                  </RouteContent>
+                }
+              />
+              <Route
+                path="/signup"
+                element={
+                  <RouteContent>
                     <SignUpPage />
-                  </ContentContainer>
-                  <Footer />
-                </>
-              }
-            />
-          </Routes>
-        </DisplayContainer>
+                  </RouteContent>
+                }
+              />
+            </Routes>
+          </DisplayContainer>
+        </FixedRatioContainer>
       </AppContainer>
     </Router>
   );
