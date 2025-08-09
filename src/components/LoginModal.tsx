@@ -157,7 +157,7 @@ const ErrorMessage = styled.div`
   color: #ff4444;
   font-family: "Pretendard", sans-serif;
   font-size: 14px;
-  margin-bottom: 36px;
+  margin-bottom: 18px;
   text-align: left;
   min-height: 20px;
   display: flex;
