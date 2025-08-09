@@ -99,10 +99,15 @@ const FormTitle = styled.h2`
 
 const InputGroup = styled.div`
   width: 350px;
+  display: grid;
+  grid-template-rows: auto auto 20px; /* label, input, message */
+  margin-bottom: 8px;
+`;
+
+const MessageRow = styled.div`
+  height: 20px;
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin-bottom: 16px;
+  align-items: flex-start;
 `;
 
 const InputLabel = styled.label`
@@ -121,7 +126,7 @@ const InputContainer = styled.div`
 
 const Input = styled.input<{ disabled?: boolean }>`
   flex: 1;
-  padding: 12px 0;
+  padding: 10px 0;
   border: none;
   border-bottom: 1px solid #dedede;
   background: transparent;
@@ -166,6 +171,9 @@ const MessageText = styled.p<{ type: "error" | "success" | "info" }>`
   font-weight: 400;
   font-size: 14px;
   line-height: 1.4000000272478377em;
+  margin: 0; /* ← 여기! margin-top 제거 */
+  text-align: left;
+  width: 100%;
   color: ${(props) => {
     switch (props.type) {
       case "error":
@@ -173,13 +181,16 @@ const MessageText = styled.p<{ type: "error" | "success" | "info" }>`
       case "success":
         return "#2473FC";
       case "info":
-        return "#777777";
       default:
         return "#777777";
     }
   }};
-  margin: 4px 0 0 0;
-  text-align: left;
+  transition: opacity 0.15s ease; /* 부드럽게 */
+`;
+
+/** 메시지 영역 고정(항상 렌더링, 필요 없으면 visibility로만 숨김) */
+const MessageWrapper = styled.div`
+  min-height: 20px; /* 14px 글자 + line-height 대비 안정 높이 */
   width: 100%;
 `;
 
@@ -217,16 +228,16 @@ const Modal = styled.div<{ isOpen: boolean }>`
 `;
 
 const ModalContent = styled.div`
-  width: 440px;
-  height: 356px;
+  width: 420px;
+  height: 314px;
   background-color: #ffffff;
-  border: 1px solid #b7b7b7;
   border-radius: 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   position: relative;
+  padding: 40px 50px;
 `;
 
 const CloseButton = styled.button`
@@ -257,40 +268,68 @@ const CloseButton = styled.button`
   }
 `;
 
+const SuccessIcon = styled.div`
+  width: 60px;
+  height: 60px;
+  background-color: #f6fbf4;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    width: 32px;
+    height: 24px;
+    background: url("data:image/svg+xml,%3Csvg width='32' height='24' viewBox='0 0 32 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 12L12 22L30 2' stroke='%2330A10E' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+      no-repeat center;
+    background-size: contain;
+  }
+`;
+
 const ModalTitle = styled.h3`
   font-family: "Pretendard", sans-serif;
   font-weight: 700;
   font-size: 24px;
-  line-height: 1.4;
+  line-height: 1.3999999364217122em;
   color: #222222;
   text-align: center;
-  margin: 0 0 20px 0;
-  width: 206px;
-  height: 34px;
-`;
-
-const ModalSubtitle = styled.p`
-  font-family: "Pretendard", sans-serif;
-  font-weight: 500;
-  font-size: 18px;
-  line-height: 1.4;
-  color: #777777;
-  text-align: center;
-  margin: 0 0 20px 0;
-  width: 83px;
-  height: 25px;
+  margin: 0 0 12px 0;
 `;
 
 const ModalDescription = styled.p`
   font-family: "Pretendard", sans-serif;
   font-weight: 400;
   font-size: 16px;
-  line-height: 1.4;
+  line-height: 1.399999976158142em;
   color: #777777;
   text-align: center;
-  margin: 0;
-  width: 266px;
-  height: 25px;
+  margin: 0 0 24px 0;
+  white-space: pre-line;
+`;
+
+const ActionButton = styled.button`
+  width: 160px;
+  padding: 12px 16px;
+  background-color: #30a10e;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-family: "Pretendard", sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.399999976158142em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background-color: #2a8f0c;
+  }
 `;
 
 const SignUpPage: React.FC = () => {
@@ -308,7 +347,6 @@ const SignUpPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // 비밀번호 조건 검증 함수
   const validatePassword = (password: string) => {
     const hasEnglish = /[a-zA-Z]/.test(password);
     const hasNumber = /\d/.test(password);
@@ -324,12 +362,12 @@ const SignUpPage: React.FC = () => {
     };
   };
 
-  // 각 단계별 활성화 상태 확인
   const isNicknameEnabled = formData.nickname.trim() !== "";
-  const isPasswordEnabled = isNicknameEnabled && idDuplicateStatus === "available";
+  const isPasswordEnabled =
+    isNicknameEnabled && idDuplicateStatus === "available";
   const isPasswordConfirmEnabled =
     isPasswordEnabled && validatePassword(formData.password).isValid;
-  const isSignUpEnabled = 
+  const isSignUpEnabled =
     isPasswordConfirmEnabled &&
     formData.passwordConfirm &&
     formData.password === formData.passwordConfirm &&
@@ -342,12 +380,10 @@ const SignUpPage: React.FC = () => {
       [name]: value,
     }));
 
-    // ID 변경 시 중복 확인 상태 초기화
     if (name === "loginId") {
       setIdDuplicateStatus("none");
     }
 
-    // 비밀번호 확인 검증
     if (name === "password" || name === "passwordConfirm") {
       if (name === "password") {
         const passwordValidation = validatePassword(value);
@@ -362,6 +398,8 @@ const SignUpPage: React.FC = () => {
           formData.passwordConfirm &&
           value === formData.passwordConfirm
         ) {
+          setPasswordError("");
+        } else {
           setPasswordError("");
         }
       } else if (name === "passwordConfirm") {
@@ -393,9 +431,7 @@ const SignUpPage: React.FC = () => {
   };
 
   const handleSignUp = async () => {
-    if (!isSignUpEnabled) {
-      return;
-    }
+    if (!isSignUpEnabled) return;
 
     if (formData.password !== formData.passwordConfirm) {
       setPasswordError("비밀번호가 일치하지 않습니다.");
@@ -430,10 +466,8 @@ const SignUpPage: React.FC = () => {
       const response = await signUp(signUpRequest);
 
       if (response.code) {
-        // 에러 응답
         alert(response.message || "회원가입에 실패했습니다.");
       } else {
-        // 성공 응답
         setIsModalOpen(true);
       }
     } catch (error) {
@@ -448,6 +482,29 @@ const SignUpPage: React.FC = () => {
     setIsModalOpen(false);
     navigate("/");
   };
+
+  // 표시 여부 계산(가독성용)
+  const showIdMsg =
+    idDuplicateStatus === "duplicate" || idDuplicateStatus === "available";
+  const idMsgText =
+    idDuplicateStatus === "duplicate"
+      ? "중복된 아이디 입니다."
+      : "아이디 사용이 가능합니다.";
+  const idMsgType =
+    idDuplicateStatus === "duplicate"
+      ? ("error" as const)
+      : ("success" as const);
+
+  const showPwError =
+    !!passwordError &&
+    !!formData.password &&
+    !validatePassword(formData.password).isValid;
+
+  const showConfirmError = !!passwordError && !!formData.passwordConfirm;
+  const showConfirmSuccess =
+    !!formData.passwordConfirm &&
+    !passwordError &&
+    formData.password === formData.passwordConfirm;
 
   return (
     <Container>
@@ -467,9 +524,11 @@ const SignUpPage: React.FC = () => {
             <SignUpImage src="/images/signupGroup.png" alt="회원가입 그룹" />
           </CharacterGroup>
         </LeftSection>
+
         <RightSection>
           <FormTitle>회원가입</FormTitle>
 
+          {/* 닉네임 */}
           <InputGroup>
             <InputLabel>닉네임</InputLabel>
             <Input
@@ -479,10 +538,13 @@ const SignUpPage: React.FC = () => {
               onChange={handleInputChange}
               placeholder="닉네임을 입력하세요"
             />
+            {/* 닉네임은 메시지 없음 → 공간 유지 불필요 */}
           </InputGroup>
 
+          {/* 아이디 + 중복 확인 메시지 (고정 영역) */}
           <InputGroup>
             <InputLabel>아이디</InputLabel>
+
             <InputContainer>
               <Input
                 type="text"
@@ -496,16 +558,18 @@ const SignUpPage: React.FC = () => {
                 {idDuplicateStatus === "checking" ? "확인중..." : "중복확인"}
               </DuplicateCheckButton>
             </InputContainer>
-            {idDuplicateStatus === "duplicate" && (
-              <MessageText type="error">중복된 아이디 입니다.</MessageText>
-            )}
-            {idDuplicateStatus === "available" && (
-              <MessageText type="success">
-                아이디 사용이 가능합니다.
+
+            <MessageRow>
+              <MessageText
+                type={showIdMsg ? idMsgType : "info"}
+                style={{ opacity: showIdMsg ? 1 : 0 }}
+              >
+                {showIdMsg ? idMsgText : ""}
               </MessageText>
-            )}
+            </MessageRow>
           </InputGroup>
 
+          {/* 비밀번호 메시지 (고정 영역) */}
           <InputGroup>
             <InputLabel>비밀번호</InputLabel>
             <Input
@@ -516,11 +580,14 @@ const SignUpPage: React.FC = () => {
               placeholder="비밀번호를 입력해주세요"
               disabled={!isPasswordEnabled}
             />
-            {passwordError &&
-              formData.password &&
-              !validatePassword(formData.password).isValid && (
-                <MessageText type="error">{passwordError}</MessageText>
-              )}
+            <MessageRow>
+              <MessageText
+                type="error"
+                style={{ opacity: showPwError ? 1 : 0 }}
+              >
+                {showPwError ? passwordError : ""}
+              </MessageText>
+            </MessageRow>
           </InputGroup>
 
           <InputGroup>
@@ -533,14 +600,20 @@ const SignUpPage: React.FC = () => {
               placeholder="비밀번호를 다시 입력해주세요"
               disabled={!isPasswordConfirmEnabled}
             />
-            {passwordError && formData.passwordConfirm && (
-              <MessageText type="error">{passwordError}</MessageText>
-            )}
-            {formData.passwordConfirm &&
-              !passwordError &&
-              formData.password === formData.passwordConfirm && (
-                <MessageText type="success">비밀번호가 일치합니다.</MessageText>
-              )}
+            <MessageRow>
+              <MessageText
+                type={showConfirmError ? "error" : "success"}
+                style={{
+                  opacity: showConfirmError || showConfirmSuccess ? 1 : 0,
+                }}
+              >
+                {showConfirmError
+                  ? passwordError
+                  : showConfirmSuccess
+                    ? "비밀번호가 일치합니다."
+                    : ""}
+              </MessageText>
+            </MessageRow>
           </InputGroup>
 
           <SignUpButton
@@ -555,11 +628,16 @@ const SignUpPage: React.FC = () => {
       <Modal isOpen={isModalOpen}>
         <ModalContent>
           <CloseButton onClick={handleCloseModal} />
-          <ModalTitle>아이디가 생성됐어요 !</ModalTitle>
-          <ModalSubtitle>{formData.loginId}</ModalSubtitle>
+          <SuccessIcon />
+          <ModalTitle>회원가입 완료</ModalTitle>
           <ModalDescription>
-            더 많은 문제를 생성해보러 가볼까요 ?
+            {
+              "당신만의 학습 도우미가 준비됐어요!\n오늘은 어떤 걸 공부해 볼까요?"
+            }
           </ModalDescription>
+          <ActionButton onClick={handleCloseModal}>
+            문제 만들러 가기
+          </ActionButton>
         </ModalContent>
       </Modal>
     </Container>

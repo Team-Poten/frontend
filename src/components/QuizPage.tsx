@@ -457,6 +457,36 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
   }>({});
   const [showResultModal, setShowResultModal] = useState(false);
 
+  // questions 배열이 비어있거나 undefined인 경우 처리
+  if (!questions || questions.length === 0) {
+    return (
+      <QuizContainer>
+        <Header />
+        <MainContent>
+          <div style={{ textAlign: 'center', padding: '40px' }}>
+            <h2>문제를 불러오는 중...</h2>
+            <p>문제 데이터가 없습니다. 메인 페이지로 돌아가서 다시 시도해주세요.</p>
+            <button 
+              onClick={onBack}
+              style={{
+                padding: '12px 24px',
+                backgroundColor: '#30a10e',
+                color: 'white',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontSize: '16px'
+              }}
+            >
+              메인으로 돌아가기
+            </button>
+          </div>
+        </MainContent>
+        <Footer />
+      </QuizContainer>
+    );
+  }
+
   const currentQuestion = questions[currentQuestionIndex];
   // questionId가 없으면 인덱스를 사용하여 고유한 ID 생성
   const currentQuestionId = currentQuestion.questionId || currentQuestionIndex;
@@ -834,7 +864,7 @@ export default QuizPage;
 
 const ExplanationBox = styled.div`
   width: 976px;
-  height: 174px;
+  min-height: 174px;
   background-color: #ffffff;
   border: 1px solid #dedede;
   border-radius: 16px;
@@ -843,7 +873,6 @@ const ExplanationBox = styled.div`
   margin-top: 20px;
   display: flex;
   flex-direction: column;
-  gap: 3px;
 `;
 
 const ExplanationSummary = styled.div`
@@ -852,7 +881,7 @@ const ExplanationSummary = styled.div`
   font-size: 20px;
   line-height: 1.4;
   color: #30a10e;
-  margin-bottom: 13px;
+  margin-bottom: 18px;
 `;
 
 const ExplanationContent = styled.div<{ isExplanation?: boolean }>`
@@ -861,6 +890,7 @@ const ExplanationContent = styled.div<{ isExplanation?: boolean }>`
   font-size: 18px;
   line-height: 1.5;
   color: ${(props) => props.isExplanation ? "#222222" : "#777777"};
+  margin-bottom: ${(props) => props.isExplanation ? "2px" : "0"};
 `;
 
 const NextButtonContainer = styled.div`
