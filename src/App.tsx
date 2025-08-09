@@ -20,7 +20,7 @@ import { Question, isLoggedIn } from "./services/api";
 
 const AppContainer = styled.div`
   width: 100%;
-  min-height: 100vh;
+  height: 100vh;
   background-color: #f8f9fa;
   font-family:
     "Pretendard",
@@ -29,14 +29,31 @@ const AppContainer = styled.div`
     "Segoe UI",
     "Roboto",
     sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+// 16:9 비율 고정 컨테이너 (1920x1080 기준)
+const FixedRatioContainer = styled.div`
+  width: 1920px;
+  height: 1080px;
+  aspect-ratio: 16 / 9;
+  background-color: #f8f9fa;
+  position: relative;
+  transform-origin: center center;
+  overflow: hidden;
+
+  /* 화면이 1920x1080보다 작을 때 자동으로 축소 */
+  @media (max-width: 1920px), (max-height: 1080px) {
+    transform: scale(var(--scale-ratio, 1));
+  }
 `;
 
 // 전체 디스플레이 컨테이너 (1920px 기준)
 const DisplayContainer = styled.div`
-  max-width: 1920px;
-  margin: 0 auto;
   width: 100%;
-  min-height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
 `;
@@ -55,6 +72,32 @@ const App: React.FC = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [isQuizStarted, setIsQuizStarted] = useState(false);
 
+  // 화면 크기에 따른 스케일 비율 계산
+  React.useEffect(() => {
+    const calculateScale = () => {
+      const container = document.documentElement;
+      const windowWidth = window.innerWidth;
+      const windowHeight = window.innerHeight;
+
+      // 16:9 비율을 유지하면서 화면에 맞는 스케일 계산
+      const scaleX = windowWidth / 1920;
+      const scaleY = windowHeight / 1080;
+      const scale = Math.min(scaleX, scaleY);
+
+      container.style.setProperty("--scale-ratio", scale.toString());
+    };
+
+    // 초기 계산
+    calculateScale();
+
+    // 리사이즈 이벤트 리스너
+    window.addEventListener("resize", calculateScale);
+
+    return () => {
+      window.removeEventListener("resize", calculateScale);
+    };
+  }, []);
+
   const handleQuestionsGenerated = (newQuestions: Question[]) => {
     setQuestions(newQuestions);
     setIsQuizStarted(true);
@@ -68,94 +111,96 @@ const App: React.FC = () => {
   return (
     <Router>
       <AppContainer>
-        <DisplayContainer>
-          <Routes>
-            <Route
-              path="/"
-              element={
-                isQuizStarted ? (
-                  <Navigate to="/quiz" replace />
-                ) : (
+        <FixedRatioContainer>
+          <DisplayContainer>
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  isQuizStarted ? (
+                    <Navigate to="/quiz" replace />
+                  ) : (
+                    <>
+                      <Header />
+                      <ContentContainer>
+                        <MainContent
+                          onQuestionsGenerated={handleQuestionsGenerated}
+                        />
+                      </ContentContainer>
+                      <Footer />
+                    </>
+                  )
+                }
+              />
+              <Route
+                path="/quiz"
+                element={
+                  questions.length > 0 ? (
+                    <QuizPage questions={questions} onBack={handleBackToHome} />
+                  ) : (
+                    <Navigate to="/" replace />
+                  )
+                }
+              />
+              <Route
+                path="/history"
+                element={
                   <>
                     <Header />
                     <ContentContainer>
-                      <MainContent
-                        onQuestionsGenerated={handleQuestionsGenerated}
-                      />
+                      {isLoggedIn() ? (
+                        <ProblemHistoryPage />
+                      ) : (
+                        <ProblemHistoryGuestPage />
+                      )}
                     </ContentContainer>
                     <Footer />
                   </>
-                )
-              }
-            />
-            <Route
-              path="/quiz"
-              element={
-                questions.length > 0 ? (
-                  <QuizPage questions={questions} onBack={handleBackToHome} />
-                ) : (
-                  <Navigate to="/" replace />
-                )
-              }
-            />
-            <Route
-              path="/history"
-              element={
-                <>
-                  <Header />
-                  <ContentContainer>
-                    {isLoggedIn() ? (
-                      <ProblemHistoryPage />
-                    ) : (
-                      <ProblemHistoryGuestPage />
-                    )}
-                  </ContentContainer>
-                  <Footer />
-                </>
-              }
-            />
-            <Route
-              path="/history/:date"
-              element={
-                <>
-                  <Header />
-                  <ContentContainer>
-                    <ProblemDetailPage />
-                  </ContentContainer>
-                  <Footer />
-                </>
-              }
-            />
-            <Route
-              path="/wrong-problems"
-              element={
-                <>
-                  <Header />
-                  <ContentContainer>
-                    {isLoggedIn() ? (
-                      <WrongProblemPage />
-                    ) : (
-                      <WrongProblemGuestPage />
-                    )}
-                  </ContentContainer>
-                  <Footer />
-                </>
-              }
-            />
-            <Route
-              path="/signup"
-              element={
-                <>
-                  <Header />
-                  <ContentContainer>
-                    <SignUpPage />
-                  </ContentContainer>
-                  <Footer />
-                </>
-              }
-            />
-          </Routes>
-        </DisplayContainer>
+                }
+              />
+              <Route
+                path="/history/:date"
+                element={
+                  <>
+                    <Header />
+                    <ContentContainer>
+                      <ProblemDetailPage />
+                    </ContentContainer>
+                    <Footer />
+                  </>
+                }
+              />
+              <Route
+                path="/wrong-problems"
+                element={
+                  <>
+                    <Header />
+                    <ContentContainer>
+                      {isLoggedIn() ? (
+                        <WrongProblemPage />
+                      ) : (
+                        <WrongProblemGuestPage />
+                      )}
+                    </ContentContainer>
+                    <Footer />
+                  </>
+                }
+              />
+              <Route
+                path="/signup"
+                element={
+                  <>
+                    <Header />
+                    <ContentContainer>
+                      <SignUpPage />
+                    </ContentContainer>
+                    <Footer />
+                  </>
+                }
+              />
+            </Routes>
+          </DisplayContainer>
+        </FixedRatioContainer>
       </AppContainer>
     </Router>
   );
