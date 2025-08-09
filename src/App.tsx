@@ -35,6 +35,12 @@ const AppContainer = styled.div`
   justify-content: center;
   overflow: hidden;
   padding: 0;
+
+  /* 세로 화면에서는 상단 정렬 */
+  @media (orientation: portrait) {
+    align-items: flex-start;
+    padding-top: 10px;
+  }
 `;
 
 // 16:9 비율 고정 컨테이너 (1920x1080 기준)
@@ -51,6 +57,11 @@ const FixedRatioContainer = styled.div`
   /* 화면이 1920x1080보다 작을 때 자동으로 축소 */
   @media (max-width: 1920px), (max-height: 1080px) {
     transform: scale(var(--scale-ratio, 1));
+  }
+
+  /* 세로 화면에서는 상단 정렬 */
+  @media (orientation: portrait) {
+    transform-origin: top center;
   }
 `;
 
@@ -125,20 +136,20 @@ const App: React.FC = () => {
       const windowWidth = window.innerWidth;
       const windowHeight = window.innerHeight;
 
-      // 16:9 비율을 유지하면서 화면에 맞는 스케일 계산
-      const scaleX = windowWidth / 1920;
-      const scaleY = windowHeight / 1080;
-
-      // 더 작은 스케일을 사용하여 화면에 완전히 맞춤
-      let scale = Math.min(scaleX, scaleY);
-
-      // 최소 스케일 제한 (너무 작아지지 않도록)
-      scale = Math.max(scale, 0.4);
-
-      // 최대 스케일 제한 (1배를 넘지 않도록)
-      scale = Math.min(scale, 1);
-
-      container.style.setProperty("--scale-ratio", scale.toString());
+      // 세로 화면(스마트폰)에서는 너비 기준으로 스케일 계산
+      if (windowHeight > windowWidth) {
+        // 세로 화면: 너비에 맞춰 스케일링 (390px 기준)
+        const scale = windowWidth / 1920;
+        container.style.setProperty("--scale-ratio", scale.toString());
+      } else {
+        // 가로 화면: 기존 로직 유지
+        const scaleX = windowWidth / 1920;
+        const scaleY = windowHeight / 1080;
+        let scale = Math.min(scaleX, scaleY);
+        scale = Math.max(scale, 0.4);
+        scale = Math.min(scale, 1);
+        container.style.setProperty("--scale-ratio", scale.toString());
+      }
     };
 
     // 초기 계산
