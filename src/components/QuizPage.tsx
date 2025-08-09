@@ -864,7 +864,7 @@ export default QuizPage;
 
 const ExplanationBox = styled.div`
   width: 976px;
-  height: 174px;
+  min-height: 174px;
   background-color: #ffffff;
   border: 1px solid #dedede;
   border-radius: 16px;
@@ -873,7 +873,7 @@ const ExplanationBox = styled.div`
   margin-top: 20px;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 20px;
 `;
 
 const ExplanationSummary = styled.div`
@@ -882,7 +882,7 @@ const ExplanationSummary = styled.div`
   font-size: 20px;
   line-height: 1.4;
   color: #30a10e;
-  margin-bottom: 13px;
+  margin-bottom: 0;
 `;
 
 const ExplanationContent = styled.div<{ isExplanation?: boolean }>`
