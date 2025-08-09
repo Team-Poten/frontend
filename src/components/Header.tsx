@@ -7,7 +7,7 @@ import LoginModal from "./LoginModal";
 const HeaderContainer = styled.header`
   width: 100%;
   height: 90px;
-  background-color: #F8F9FA;
+  background-color: #f8f9fa;
 `;
 
 // 전체 디스플레이 컨테이너 (1920px 기준)
