@@ -457,6 +457,36 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
   }>({});
   const [showResultModal, setShowResultModal] = useState(false);
 
+  // questions 배열이 비어있거나 undefined인 경우 처리
+  if (!questions || questions.length === 0) {
+    return (
+      <QuizContainer>
+        <Header />
+        <MainContent>
+          <div style={{ textAlign: 'center', padding: '40px' }}>
+            <h2>문제를 불러오는 중...</h2>
+            <p>문제 데이터가 없습니다. 메인 페이지로 돌아가서 다시 시도해주세요.</p>
+            <button 
+              onClick={onBack}
+              style={{
+                padding: '12px 24px',
+                backgroundColor: '#30a10e',
+                color: 'white',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontSize: '16px'
+              }}
+            >
+              메인으로 돌아가기
+            </button>
+          </div>
+        </MainContent>
+        <Footer />
+      </QuizContainer>
+    );
+  }
+
   const currentQuestion = questions[currentQuestionIndex];
   // questionId가 없으면 인덱스를 사용하여 고유한 ID 생성
   const currentQuestionId = currentQuestion.questionId || currentQuestionIndex;

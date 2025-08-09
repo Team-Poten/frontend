@@ -127,7 +127,6 @@ const RouteContent: React.FC<{ children: React.ReactNode }> = ({
 
 const App: React.FC = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [isQuizStarted] = useState(false);
 
   // 화면 크기에 따른 스케일 비율 계산
   React.useEffect(() => {
@@ -164,6 +163,8 @@ const App: React.FC = () => {
   }, []);
 
   const handleQuestionsGenerated = (newQuestions: Question[]) => {
+    console.log("App.tsx - 문제 생성 완료:", newQuestions);
+    console.log("문제 개수:", newQuestions.length);
     setQuestions(newQuestions);
   };
 
@@ -180,7 +181,7 @@ const App: React.FC = () => {
               <Route
                 path="/"
                 element={
-                  isQuizStarted ? (
+                  questions.length > 0 ? (
                     <Navigate to="/quiz" replace />
                   ) : (
                     <>
