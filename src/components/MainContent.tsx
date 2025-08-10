@@ -102,12 +102,6 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
       setApiPromise(questionsPromise);
 
       const questions = await questionsPromise;
-      console.log("API 응답 데이터:", questions);
-      console.log("첫 번째 문제 데이터:", questions[0]);
-      console.log("첫 번째 문제의 questionId 필드:", questions[0]?.questionId);
-      console.log("첫 번째 문제의 모든 키:", Object.keys(questions[0] || {}));
-      console.log("API 응답 타입:", typeof questions);
-      console.log("API 응답이 배열인가?", Array.isArray(questions));
       
       // API 응답이 객체이고 questions 필드를 가지고 있는 경우 처리
       let questionData: any = questions;
@@ -115,10 +109,8 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
         const response = questions as any;
         if (response.questions && Array.isArray(response.questions)) {
           questionData = response.questions;
-          console.log("API 응답에서 questions 필드 추출:", questionData);
         } else if (response.data && Array.isArray(response.data)) {
           questionData = response.data;
-          console.log("API 응답에서 data 필드 추출:", questionData);
         }
       }
       
@@ -137,12 +129,11 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
         throw new Error("문제 데이터의 필수 필드가 누락되었습니다.");
       }
       
-      console.log("검증된 문제 개수:", validQuestions.length);
+
       setPendingQuestions(validQuestions);
       // 로딩 모달에서 완료 콜백을 통해 처리됨
     } catch (err) {
       setError("문제 생성 중 오류가 발생했습니다. 다시 시도해주세요.");
-      console.error("Error generating questions:", err);
       setIsLoadingModalOpen(false);
       setApiPromise(null);
     } finally {
@@ -151,17 +142,13 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
   };
 
   const handleLoadingComplete = () => {
-    console.log("LoadingModal 완료 - 문제 데이터:", pendingQuestions);
-    console.log("문제 개수:", pendingQuestions.length);
     setIsLoadingModalOpen(false);
     setApiPromise(null);
     onQuestionsGenerated(pendingQuestions);
     // 문제 생성 완료 후 자동으로 퀴즈 페이지로 이동
-    console.log("퀴즈 페이지로 이동 시도...");
     try {
       navigate("/quiz");
     } catch (error) {
-      console.error("navigate 실패, window.location.href 사용:", error);
       // navigate 실패 시 fallback으로 window.location.href 사용
       window.location.href = "/quiz";
     }

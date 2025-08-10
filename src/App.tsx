@@ -163,8 +163,6 @@ const App: React.FC = () => {
   }, []);
 
   const handleQuestionsGenerated = (newQuestions: Question[]) => {
-    console.log("App.tsx - 문제 생성 완료:", newQuestions);
-    console.log("문제 개수:", newQuestions.length);
     setQuestions(newQuestions);
   };
 

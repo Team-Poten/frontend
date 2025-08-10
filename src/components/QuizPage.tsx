@@ -551,11 +551,6 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
     // questionId가 없으면 인덱스를 사용하여 고유한 ID 생성
     const questionId: number =
       currentQuestion.questionId || currentQuestionIndex;
-    console.log("현재 문제 ID:", questionId, "타입:", typeof questionId); // 디버깅용 로그
-    console.log("현재 문제 전체 데이터:", currentQuestion); // 현재 문제의 전체 데이터 확인
-    console.log("currentQuestion.questionId 값:", currentQuestion.questionId); // questionId 필드 값 확인
-    console.log("currentQuestionIndex 값:", currentQuestionIndex); // 인덱스 값 확인
-    console.log("회원 여부:", isLoggedIn()); // 회원 여부 확인
 
     // questionId가 유효하지 않은 경우 처리
     if (isNaN(questionId)) {
@@ -577,17 +572,11 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
 
         if (isLoggedIn()) {
           // 회원인 경우 회원용 API 호출
-          console.log(`회원 API 호출: /api/questions/${questionId}/answer`);
           result = await submitAnswer(questionId, answer);
         } else {
           // 비회원인 경우 게스트 API 호출
-          console.log(
-            `게스트 API 호출: /api/questions/${questionId}/guest-answer`
-          );
           result = await submitGuestAnswer(questionId, answer);
         }
-
-        console.log("API 응답 결과:", result); // API 응답 결과 확인
         updateQuestionState(questionId, {
           answerResult: result,
           showResult: true,
@@ -598,7 +587,6 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
           error: "채점 중 오류가 발생했습니다. 다시 시도해주세요.",
           isLoading: false,
         });
-        console.error("Error submitting answer:", err);
       }
     }
   };
