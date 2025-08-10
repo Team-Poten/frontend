@@ -162,11 +162,8 @@ const LoadingModal: React.FC<LoadingModalProps> = ({
 
         // Step 2 - API 응답 대기
         if (apiPromise) {
-          console.log("LoadingModal - API 응답 대기 시작");
           await apiPromise;
-          console.log("LoadingModal - API 응답 완료");
         } else {
-          console.log("LoadingModal - API Promise 없음, 타임아웃 대기");
           await new Promise((resolve) => {
             const timer = setTimeout(resolve, 8000);
             timers.push(timer);
@@ -186,7 +183,6 @@ const LoadingModal: React.FC<LoadingModalProps> = ({
 
         if (!isCancelled) {
           // 문제 생성 완료 후 즉시 onComplete 호출
-          console.log("LoadingModal - 모든 단계 완료, onComplete 호출");
           // 약간의 지연을 두어 UI가 안정적으로 업데이트되도록 함
           setTimeout(() => {
             if (!isCancelled) {
@@ -195,7 +191,6 @@ const LoadingModal: React.FC<LoadingModalProps> = ({
           }, 500);
         }
       } catch (error) {
-        console.error("API Error:", error);
 
         setStep2Completed(true);
 
@@ -209,7 +204,6 @@ const LoadingModal: React.FC<LoadingModalProps> = ({
 
         if (!isCancelled) {
           // 에러 발생 시에도 onComplete 호출
-          console.log("LoadingModal - 에러 발생, onComplete 호출");
           setTimeout(() => {
             if (!isCancelled) {
               onComplete();
