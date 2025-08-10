@@ -899,3 +899,4 @@ const NextButtonContainer = styled.div`
   margin-top: 20px;
   width: 976px;
 `;
+
