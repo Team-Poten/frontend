@@ -9,8 +9,8 @@ const Container = styled.div`
   background-color: #f8f9fa;
   display: flex;
   justify-content: center;
-  align-items: center;
-  padding: 0 20px;
+  align-items: flex-start;
+  padding: 60px 20px 20px 20px;
 `;
 
 const SignUpCard = styled.div`
