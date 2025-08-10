@@ -7,8 +7,7 @@ import {
   GuestAnswerResponse,
   AnswerResponse,
 } from "../services/api";
-import Header from "./Header";
-import Footer from "./Footer";
+
 
 interface QuizPageProps {
   questions: Question[];
@@ -461,7 +460,6 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
   if (!questions || questions.length === 0) {
     return (
       <QuizContainer>
-        <Header />
         <MainContent>
           <div style={{ textAlign: 'center', padding: '40px' }}>
             <h2>문제를 불러오는 중...</h2>
@@ -482,7 +480,6 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
             </button>
           </div>
         </MainContent>
-        <Footer />
       </QuizContainer>
     );
   }
@@ -676,7 +673,6 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
 
   return (
     <QuizContainer>
-      <Header />
       <MainContent>
         <Title>
           지금부터 본격 <span style={{ color: "#30a10e" }}>문제 타임!</span>{" "}
@@ -791,7 +787,6 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
             )}
         </div>
       </MainContent>
-      <Footer />
 
       {/* 결과 모달 */}
       {showResultModal && (
