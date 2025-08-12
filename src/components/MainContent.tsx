@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import styled, { keyframes } from "styled-components";
 import { useNavigate } from "react-router-dom";
-import { createQuestions, Question } from "../services/api";
+import { createQuestions, Question, isLoggedIn } from "../services/api";
 import CharacterGroup from "./CharacterGroup";
 import SearchBar from "./SearchBar";
 import MenuCard from "./MenuCard";
 import LoadingModal from "./LoadingModal";
+import QuestionTypeModal from "./QuestionTypeModal";
 
 interface MainContentProps {
   onQuestionsGenerated: (questions: Question[]) => void;
@@ -64,41 +65,62 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoadingModalOpen, setIsLoadingModalOpen] = useState(false);
+  const [isQuestionTypeModalOpen, setIsQuestionTypeModalOpen] = useState(false);
   const [pendingQuestions, setPendingQuestions] = useState<Question[]>([]);
-  const [apiPromise, setApiPromise] = useState<Promise<Question[]> | null>(
-    null
-  );
+  const [pendingText, setPendingText] = useState<string>("");
+  const [apiPromise, setApiPromise] = useState<Promise<Question[]> | null>(null);
+  const [userLoginStatus, setUserLoginStatus] = useState<boolean>(false);
   const navigate = useNavigate();
 
   const menuItems = [
     {
       id: 1,
-      title: "문제 만들기",
-      description: "정리한 내용으로 문제 만들어요",
-      icon: "light",
-    },
-    {
-      id: 2,
       title: "문제 모아보기",
       description: "만든 문제들 모아봤어요",
       icon: "book",
     },
     {
-      id: 3,
+      id: 2,
       title: "틀린문제 풀어보기",
       description: "틀린문제만 골라서 풀어요",
       icon: "write",
     },
   ];
 
+  useEffect(() => {
+    // 컴포넌트 마운트 시 로그인 상태 확인
+    const checkLoginStatus = async () => {
+      try {
+        const status = await isLoggedIn();
+        setUserLoginStatus(status);
+      } catch (error) {
+        setUserLoginStatus(false);
+      }
+    };
+    checkLoginStatus();
+  }, []);
+
   const handleGenerateQuestions = async (text: string) => {
+    setPendingText(text);
+    setIsQuestionTypeModalOpen(true);
+  };
+
+  const handleQuestionTypeSelect = async (type: "ox" | "multiple") => {
+    setIsQuestionTypeModalOpen(false);
     setIsLoading(true);
     setError(null);
     setIsLoadingModalOpen(true);
 
     try {
-      // API 호출을 Promise로 생성하여 LoadingModal에 전달
-      const questionsPromise = createQuestions(text);
+      // 문제 유형에 따라 API 호출
+      let apiType: "TRUE_FALSE" | "MULTIPLE_CHOICE";
+      if (type === "ox") {
+        apiType = "TRUE_FALSE";
+      } else {
+        apiType = "MULTIPLE_CHOICE";
+      }
+
+      const questionsPromise = createQuestions(pendingText, apiType);
       setApiPromise(questionsPromise);
 
       const questions = await questionsPromise;
@@ -106,37 +128,32 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
       // API 응답이 객체이고 questions 필드를 가지고 있는 경우 처리
       let questionData: any = questions;
       if (questions && typeof questions === 'object' && !Array.isArray(questions)) {
-        const response = questions as any;
-        if (response.questions && Array.isArray(response.questions)) {
-          questionData = response.questions;
-        } else if (response.data && Array.isArray(response.data)) {
-          questionData = response.data;
+        const questionsObj = questions as any; // 타입 단언으로 any로 변환
+        if (questionsObj.questions && Array.isArray(questionsObj.questions)) {
+          questionData = questionsObj.questions;
+        } else if (questionsObj.data && Array.isArray(questionsObj.data)) {
+          questionData = questionsObj.data;
         }
       }
-      
-      // API 응답 데이터 검증
-      if (!questionData || !Array.isArray(questionData) || questionData.length === 0) {
-        throw new Error("API에서 유효한 문제 데이터를 받지 못했습니다.");
-      }
-      
-      // 각 문제의 필수 필드 검증
-      const validQuestions = questionData.filter(q => 
-        q && typeof q === 'object' && 
-        q.question && q.answer && q.explanation
-      );
-      
-      if (validQuestions.length === 0) {
-        throw new Error("문제 데이터의 필수 필드가 누락되었습니다.");
-      }
-      
 
-      setPendingQuestions(validQuestions);
-      // 로딩 모달에서 완료 콜백을 통해 처리됨
-    } catch (err) {
+      // 문제 데이터가 배열인지 확인
+      if (Array.isArray(questionData) && questionData.length > 0) {
+        // 문제 유형 정보를 각 문제에 추가
+        const questionsWithType = questionData.map((question: any) => ({
+          ...question,
+          type: apiType // API에서 받은 문제 유형을 각 문제에 추가
+        }));
+
+        onQuestionsGenerated(questionsWithType);
+        setIsLoadingModalOpen(false);
+        setIsLoading(false);
+      } else {
+        throw new Error("문제 데이터를 찾을 수 없습니다.");
+      }
+    } catch (error) {
+      console.error("문제 생성 에러:", error);
       setError("문제 생성 중 오류가 발생했습니다. 다시 시도해주세요.");
       setIsLoadingModalOpen(false);
-      setApiPromise(null);
-    } finally {
       setIsLoading(false);
     }
   };
@@ -162,8 +179,7 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
         </CharacterSection>
 
         <MainTitle>
-          <span style={{ color: "#30a10e" }}>퀴즐리</span>로 문제 생성부터 오답
-          정리까지 한 번에!
+          <span style={{ color: "#30a10e" }}>퀴즐리</span>로 문제 생성부터 오답정리까지 한 번에!
         </MainTitle>
 
         <SearchSection>
@@ -181,6 +197,13 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
         </MenuSection>
       </MainContainer>
 
+      <QuestionTypeModal
+        isOpen={isQuestionTypeModalOpen}
+        onClose={() => setIsQuestionTypeModalOpen(false)}
+        onSelectType={handleQuestionTypeSelect}
+        isLoggedIn={userLoginStatus}
+      />
+
       <LoadingModal
         isOpen={isLoadingModalOpen}
         onComplete={handleLoadingComplete}
@@ -191,3 +214,4 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
 };
 
 export default MainContent;
+
