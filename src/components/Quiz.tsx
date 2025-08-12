@@ -558,7 +558,7 @@ const Quiz: React.FC<QuizProps> = ({ questions, onBack }) => {
 
     if (!currentState?.showResult && !currentState?.isLoading) {
       updateQuestionState(questionId, {
-        selectedAnswer: answer,
+        selectedAnswer: answer, // UI 표시용으로는 O/X 유지
         isLoading: true,
         error: null,
       });
@@ -566,12 +566,21 @@ const Quiz: React.FC<QuizProps> = ({ questions, onBack }) => {
       try {
         let result: GuestAnswerResponse | AnswerResponse;
 
+        // O/X를 TRUE/FALSE로 변환하여 API에 전송
+        const answerMapping: { [key: string]: string } = {
+          O: "TRUE",
+          X: "FALSE",
+        };
+        const mappedAnswer = answerMapping[answer];
+
+        console.log("사용자 선택:", answer, "→ API 전송:", mappedAnswer); // 디버깅용
+
         if (isLoggedIn()) {
           // 회원인 경우 회원용 API 호출
-          result = await submitAnswer(questionId, answer);
+          result = await submitAnswer(questionId, mappedAnswer);
         } else {
           // 비회원인 경우 게스트 API 호출
-          result = await submitGuestAnswer(questionId, answer);
+          result = await submitGuestAnswer(questionId, mappedAnswer);
         }
         updateQuestionState(questionId, {
           answerResult: result,
