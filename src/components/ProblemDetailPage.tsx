@@ -15,6 +15,7 @@ interface Problem {
   answer: string;
   explanation: string;
   createdAt: string;
+  latestSolveStatus: string;
 }
 
 interface GroupedProblems {
@@ -78,10 +79,10 @@ const Column = styled.div`
   width: 478px;
 `;
 
-const ProblemCard = styled.div`
+const ProblemCard = styled.div<{ isIncorrect?: boolean }>`
   width: 478px;
   background-color: #ffffff;
-  border: 1px solid #dedede;
+  border: 1px solid ${(props) => (props.isIncorrect ? "#FF243E" : "#dedede")};
   border-radius: 12px;
   box-shadow: 4px 4px 12px 0px rgba(0, 0, 0, 0.04);
   padding: 32px;
@@ -97,28 +98,28 @@ const QuestionSection = styled.div`
   gap: 4px;
 `;
 
-const QuestionNumber = styled.span`
-  color: #30a10e;
+const QuestionNumber = styled.span<{ isIncorrect?: boolean }>`
+  color: ${(props) => (props.isIncorrect ? "#30A10E" : "#30A10E")};
   font-weight: 500;
 `;
 
-const QuestionText = styled.div`
+const QuestionText = styled.div<{ isIncorrect?: boolean }>`
   font-family: "Pretendard", sans-serif;
   font-weight: 500;
   font-size: 18px;
   line-height: 1.3999999364217122em;
-  color: #222222;
+  color: ${(props) => (props.isIncorrect ? "#30A10E" : "#30A10E")};
   width: 414px;
   word-wrap: break-word;
   overflow-wrap: break-word;
 `;
 
-const AnswerText = styled.div`
+const AnswerText = styled.div<{ isIncorrect?: boolean }>`
   font-family: "Pretendard", sans-serif;
   font-weight: 500;
   font-size: 18px;
   line-height: 1.3999999364217122em;
-  color: #777777;
+  color: ${(props) => (props.isIncorrect ? "#777777" : "#222222")};
   height: 26px;
 `;
 
@@ -136,12 +137,12 @@ const ExplanationTitle = styled.div`
   width: 100%;
 `;
 
-const ExplanationText = styled.div`
+const ExplanationText = styled.div<{ isIncorrect?: boolean }>`
   font-family: "Pretendard", sans-serif;
   font-weight: 400;
   font-size: 16px;
   line-height: 1.399999976158142em;
-  color: #222222;
+  color: ${(props) => (props.isIncorrect ? "#222222" : "#777777")};
   width: 414px;
   word-wrap: break-word;
   overflow-wrap: break-word;
@@ -197,6 +198,7 @@ const ProblemDetailPage: React.FC = () => {
             answer: answer,
             explanation: question.explanation,
             createdAt: question.createdAt,
+            latestSolveStatus: question.latestSolveStatus,
           };
         }),
       }));
@@ -280,40 +282,62 @@ const ProblemDetailPage: React.FC = () => {
               <Column>
                 {group.problems
                   .filter((_, index) => index % 2 === 0)
-                  .map((problem, index) => (
-                    <ProblemCard key={problem.id}>
-                      <QuestionSection>
-                        <QuestionText>
-                          <QuestionNumber>Q{index * 2 + 1}.</QuestionNumber>{" "}
-                          {problem.question}
-                        </QuestionText>
-                        <AnswerText>정답 : {problem.answer}</AnswerText>
-                      </QuestionSection>
-                      <ExplanationSection>
-                        <ExplanationTitle>해설 요약</ExplanationTitle>
-                        <ExplanationText>{problem.explanation}</ExplanationText>
-                      </ExplanationSection>
-                    </ProblemCard>
-                  ))}
+                  .map((problem, index) => {
+                    const isIncorrect =
+                      problem.latestSolveStatus === "INCORRECT";
+                    const questionNumber = index * 2 + 1;
+                    return (
+                      <ProblemCard key={problem.id} isIncorrect={isIncorrect}>
+                        <QuestionSection>
+                          <QuestionText isIncorrect={isIncorrect}>
+                            <QuestionNumber isIncorrect={isIncorrect}>
+                              Q{questionNumber}.
+                            </QuestionNumber>{" "}
+                            {problem.question}
+                          </QuestionText>
+                          <AnswerText isIncorrect={isIncorrect}>
+                            정답 : {problem.answer}
+                          </AnswerText>
+                        </QuestionSection>
+                        <ExplanationSection>
+                          <ExplanationTitle>해설 요약</ExplanationTitle>
+                          <ExplanationText isIncorrect={isIncorrect}>
+                            {problem.explanation}
+                          </ExplanationText>
+                        </ExplanationSection>
+                      </ProblemCard>
+                    );
+                  })}
               </Column>
               <Column>
                 {group.problems
                   .filter((_, index) => index % 2 === 1)
-                  .map((problem, index) => (
-                    <ProblemCard key={problem.id}>
-                      <QuestionSection>
-                        <QuestionText>
-                          <QuestionNumber>Q{index * 2 + 2}.</QuestionNumber>{" "}
-                          {problem.question}
-                        </QuestionText>
-                        <AnswerText>정답 : {problem.answer}</AnswerText>
-                      </QuestionSection>
-                      <ExplanationSection>
-                        <ExplanationTitle>해설 요약</ExplanationTitle>
-                        <ExplanationText>{problem.explanation}</ExplanationText>
-                      </ExplanationSection>
-                    </ProblemCard>
-                  ))}
+                  .map((problem, index) => {
+                    const isIncorrect =
+                      problem.latestSolveStatus === "INCORRECT";
+                    const questionNumber = index * 2 + 2;
+                    return (
+                      <ProblemCard key={problem.id} isIncorrect={isIncorrect}>
+                        <QuestionSection>
+                          <QuestionText isIncorrect={isIncorrect}>
+                            <QuestionNumber isIncorrect={isIncorrect}>
+                              Q{questionNumber}.
+                            </QuestionNumber>{" "}
+                            {problem.question}
+                          </QuestionText>
+                          <AnswerText isIncorrect={isIncorrect}>
+                            정답 : {problem.answer}
+                          </AnswerText>
+                        </QuestionSection>
+                        <ExplanationSection>
+                          <ExplanationTitle>해설 요약</ExplanationTitle>
+                          <ExplanationText isIncorrect={isIncorrect}>
+                            {problem.explanation}
+                          </ExplanationText>
+                        </ExplanationSection>
+                      </ProblemCard>
+                    );
+                  })}
               </Column>
             </ProblemGrid>
             {groupIndex < groupedProblems.length - 1 && <Divider />}
