@@ -21,12 +21,15 @@ export interface ProblemHistory {
 }
 
 export interface QuestionDetail {
+  questionId: number;
   question: string;
+  type: string;
+  options: string[];
   answer: string;
-  questionType: string;
   explanation: string;
   createdAt: string;
   updatedAt: string;
+  latestSolveStatus: string; // "CORRECT" | "INCORRECT"
 }
 
 export interface ProblemHistoryResponse {
