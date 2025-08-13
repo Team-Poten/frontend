@@ -87,6 +87,7 @@ export interface LoginResponse {
 
 const API_BASE_URL = "https://api.quicklyapp.store/api";
 //const API_BASE_URL = "http://localhost:8080/api";
+//
 
 // 403 에러를 위한 커스텀 에러 클래스
 export class UnauthorizedError extends Error {
@@ -176,11 +177,16 @@ export const createQuestions = async (text: string, type?: "TRUE_FALSE" | "MULTI
       headers.Authorization = `Bearer ${token}`;
     }
 
+    console.log("최종 API 요청 헤더:", headers);
+
     const response = await fetch(`${API_BASE_URL}/v1/clova/question`, {
       method: "POST",
       headers,
       body: JSON.stringify(requestBody),
     });
+
+    console.log("API 응답 상태:", response.status);
+    console.log("API 응답 헤더:", Object.fromEntries(response.headers.entries()));
 
     if (!response.ok) {
       let errorText = "";
@@ -195,6 +201,7 @@ export const createQuestions = async (text: string, type?: "TRUE_FALSE" | "MULTI
     }
 
     const data = await response.json();
+
     
     let questionData: any = data;
     if (data && typeof data === 'object' && !Array.isArray(data)) {

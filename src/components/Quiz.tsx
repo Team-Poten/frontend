@@ -573,7 +573,6 @@ const Quiz: React.FC<QuizProps> = ({ questions, onBack }) => {
         };
         const mappedAnswer = answerMapping[answer];
 
-      
 
         if (isLoggedIn()) {
           // 회원인 경우 회원용 API 호출
