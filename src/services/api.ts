@@ -87,7 +87,6 @@ export interface LoginResponse {
 
 const API_BASE_URL = "https://api.quicklyapp.store/api";
 //const API_BASE_URL = "http://localhost:8080/api";
-//
 
 // 403 에러를 위한 커스텀 에러 클래스
 export class UnauthorizedError extends Error {
@@ -297,6 +296,38 @@ export const getProblemHistory = async (): Promise<
     return data;
   } catch (error) {
     console.error("Error fetching problem history:", error);
+    throw error;
+  }
+};
+
+// 틀린 문제 조회 API
+export const getWrongProblemHistory = async (): Promise<ProblemHistoryResponse[]> => {
+  try {
+    const token = getAccessToken();
+    if (!token) {
+      throw new Error("로그인이 필요합니다");
+    }
+
+    const response = await fetch(`${API_BASE_URL}/v1/question/wrong`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      if (response.status === 403) {
+        throw new UnauthorizedError();
+      }
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching wrong problem history:", error);
     throw error;
   }
 };

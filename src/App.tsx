@@ -16,6 +16,8 @@ import ProblemHistoryGuestPage from "./components/ProblemHistoryGuestPage";
 import ProblemDetailPage from "./components/ProblemDetailPage";
 import WrongProblemPage from "./components/WrongProblemPage";
 import WrongProblemGuestPage from "./components/WrongProblemGuestPage";
+import WrongQuizPage from "./components/WrongQuizPage";
+import DynamicQuiz from "./components/DynamicQuiz";
 import SignUpPage from "./components/SignUpPage";
 import { Question, isLoggedIn } from "./services/api";
 
@@ -235,6 +237,14 @@ const App: React.FC = () => {
                     ) : (
                       <WrongProblemGuestPage />
                     )}
+                  </RouteContent>
+                }
+              />
+              <Route
+                path="/wrong-quiz"
+                element={
+                  <RouteContent>
+                    <WrongQuizPage />
                   </RouteContent>
                 }
               />

@@ -11,6 +11,8 @@ import {
 interface MultipleChoiceQuizProps {
   questions: Question[];
   onBack: () => void;
+  onQuestionChange?: (newIndex: number) => void;
+  currentQuestionIndex?: number;
 }
 
 const QuizContainer = styled.div`
@@ -459,8 +461,11 @@ interface QuestionState {
   answerResult: GuestAnswerResponse | AnswerResponse | null;
 }
 
-const MultipleChoiceQuiz: React.FC<MultipleChoiceQuizProps> = ({ questions, onBack }) => {
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+const MultipleChoiceQuiz: React.FC<MultipleChoiceQuizProps> = ({ questions, onBack, onQuestionChange, currentQuestionIndex: externalIndex }) => {
+  const [internalQuestionIndex, setInternalQuestionIndex] = useState(0);
+  
+  // 외부에서 전달된 인덱스가 있으면 사용, 없으면 내부 상태 사용
+  const currentQuestionIndex = externalIndex !== undefined ? externalIndex : internalQuestionIndex;
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [questionStates, setQuestionStates] = useState<{
     [key: number]: QuestionState;
@@ -588,7 +593,14 @@ const MultipleChoiceQuiz: React.FC<MultipleChoiceQuizProps> = ({ questions, onBa
     }
 
     if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
+      const newIndex = currentQuestionIndex + 1;
+      if (onQuestionChange) {
+        // 외부에서 인덱스를 관리하는 경우
+        onQuestionChange(newIndex);
+      } else {
+        // 내부에서 인덱스를 관리하는 경우
+        setInternalQuestionIndex(newIndex);
+      }
     } else {
       setShowResultModal(true);
     }
