@@ -159,7 +159,10 @@ export const login = async (request: LoginRequest): Promise<LoginResponse> => {
   }
 };
 
-export const createQuestions = async (text: string, type?: "TRUE_FALSE" | "MULTIPLE_CHOICE"): Promise<Question[]> => {
+export const createQuestions = async (
+  text: string,
+  type?: "TRUE_FALSE" | "MULTIPLE_CHOICE"
+): Promise<Question[]> => {
   try {
     const requestBody = {
       plainText: text,
@@ -186,7 +189,10 @@ export const createQuestions = async (text: string, type?: "TRUE_FALSE" | "MULTI
     });
 
     console.log("API 응답 상태:", response.status);
-    console.log("API 응답 헤더:", Object.fromEntries(response.headers.entries()));
+    console.log(
+      "API 응답 헤더:",
+      Object.fromEntries(response.headers.entries())
+    );
 
     if (!response.ok) {
       let errorText = "";
@@ -196,25 +202,81 @@ export const createQuestions = async (text: string, type?: "TRUE_FALSE" | "MULTI
       } catch (e) {
         console.error("API 에러 응답 본문 읽기 실패:", e);
       }
-      
-      throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+
+      throw new Error(
+        `HTTP error! status: ${response.status}, message: ${errorText}`
+      );
     }
 
     const data = await response.json();
 
-    
     let questionData: any = data;
-    if (data && typeof data === 'object' && !Array.isArray(data)) {
+    if (data && typeof data === "object" && !Array.isArray(data)) {
       if (data.questions && Array.isArray(data.questions)) {
         questionData = data.questions;
       } else if (data.data && Array.isArray(data.data)) {
         questionData = data.data;
       }
     }
-    
+
     return questionData || data;
   } catch (error) {
     console.error("Error creating questions:", error);
+    throw error;
+  }
+};
+
+// 파일 업로드를 통한 문제 생성 API
+export const createQuestionsFromFile = async (
+  file: File,
+  type: "TRUE_FALSE" | "MULTIPLE_CHOICE"
+): Promise<Question[]> => {
+  try {
+    const formData = new FormData();
+    formData.append("image", file);
+    formData.append("type", type);
+
+    // 기본 헤더만 설정 (Content-Type은 FormData가 자동으로 설정)
+    const headers: Record<string, string> = {};
+
+    // 로그인된 사용자만 Authorization 헤더 추가
+    const token = getAccessToken();
+    if (token && token.trim() !== "") {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
+    console.log("파일 업로드 API 요청 헤더:", headers);
+
+    const response = await fetch(`${API_BASE_URL}/v1/clova/question/ocr`, {
+      method: "POST",
+      headers,
+      body: formData,
+    });
+
+    console.log("파일 업로드 API 응답 상태:", response.status);
+    console.log(
+      "파일 업로드 API 응답 헤더:",
+      Object.fromEntries(response.headers.entries())
+    );
+
+    if (!response.ok) {
+      let errorText = "";
+      try {
+        errorText = await response.text();
+        console.error("파일 업로드 API 에러 응답 본문:", errorText);
+      } catch (e) {
+        console.error("파일 업로드 API 에러 응답 본문 읽기 실패:", e);
+      }
+
+      throw new Error(
+        `HTTP error! status: ${response.status}, message: ${errorText}`
+      );
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error creating questions from file:", error);
     throw error;
   }
 };

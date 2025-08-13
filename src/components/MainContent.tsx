@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from "react";
 import styled, { keyframes } from "styled-components";
 import { useNavigate } from "react-router-dom";
-import { createQuestions, Question, isLoggedIn } from "../services/api";
+import {
+  createQuestions,
+  createQuestionsFromFile,
+  Question,
+  isLoggedIn,
+} from "../services/api";
 import CharacterGroup from "./CharacterGroup";
 import SearchBar from "./SearchBar";
 import MenuCard from "./MenuCard";
@@ -68,7 +73,10 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
   const [isQuestionTypeModalOpen, setIsQuestionTypeModalOpen] = useState(false);
   const [pendingQuestions, setPendingQuestions] = useState<Question[]>([]);
   const [pendingText, setPendingText] = useState<string>("");
-  const [apiPromise, setApiPromise] = useState<Promise<Question[]> | null>(null);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [apiPromise, setApiPromise] = useState<Promise<Question[]> | null>(
+    null
+  );
   const [userLoginStatus, setUserLoginStatus] = useState<boolean>(false);
   const navigate = useNavigate();
 
@@ -100,8 +108,9 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
     checkLoginStatus();
   }, []);
 
-  const handleGenerateQuestions = async (text: string) => {
+  const handleGenerateQuestions = async (text: string, file?: File) => {
     setPendingText(text);
+    setPendingFile(file || null);
     setIsQuestionTypeModalOpen(true);
   };
 
@@ -120,14 +129,26 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
         apiType = "MULTIPLE_CHOICE";
       }
 
-      const questionsPromise = createQuestions(pendingText, apiType);
+      let questionsPromise: Promise<Question[]>;
+
+      // 파일이 있는 경우 파일 업로드 API 호출, 없는 경우 텍스트 API 호출
+      if (pendingFile) {
+        questionsPromise = createQuestionsFromFile(pendingFile, apiType);
+      } else {
+        questionsPromise = createQuestions(pendingText, apiType);
+      }
+
       setApiPromise(questionsPromise);
 
       const questions = await questionsPromise;
-      
+
       // API 응답이 객체이고 questions 필드를 가지고 있는 경우 처리
       let questionData: any = questions;
-      if (questions && typeof questions === 'object' && !Array.isArray(questions)) {
+      if (
+        questions &&
+        typeof questions === "object" &&
+        !Array.isArray(questions)
+      ) {
         const questionsObj = questions as any; // 타입 단언으로 any로 변환
         if (questionsObj.questions && Array.isArray(questionsObj.questions)) {
           questionData = questionsObj.questions;
@@ -141,7 +162,7 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
         // 문제 유형 정보를 각 문제에 추가
         const questionsWithType = questionData.map((question: any) => ({
           ...question,
-          type: apiType // API에서 받은 문제 유형을 각 문제에 추가
+          type: apiType, // API에서 받은 문제 유형을 각 문제에 추가
         }));
 
         onQuestionsGenerated(questionsWithType);
@@ -179,7 +200,8 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
         </CharacterSection>
 
         <MainTitle>
-          <span style={{ color: "#30a10e" }}>퀴즐리</span>로 문제 생성부터 오답정리까지 한 번에!
+          <span style={{ color: "#30a10e" }}>퀴즐리</span>로 문제 생성부터
+          오답정리까지 한 번에!
         </MainTitle>
 
         <SearchSection>
@@ -214,4 +236,3 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
 };
 
 export default MainContent;
-
