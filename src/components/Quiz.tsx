@@ -573,7 +573,6 @@ const Quiz: React.FC<QuizProps> = ({ questions, onBack }) => {
         };
         const mappedAnswer = answerMapping[answer];
 
-        console.log("사용자 선택:", answer, "→ API 전송:", mappedAnswer); // 디버깅용
 
         if (isLoggedIn()) {
           // 회원인 경우 회원용 API 호출
