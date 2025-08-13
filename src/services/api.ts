@@ -180,7 +180,6 @@ export const createQuestions = async (
       headers.Authorization = `Bearer ${token}`;
     }
 
-    console.log("최종 API 요청 헤더:", headers);
 
     const response = await fetch(`${API_BASE_URL}/v1/clova/question`, {
       method: "POST",
@@ -188,11 +187,6 @@ export const createQuestions = async (
       body: JSON.stringify(requestBody),
     });
 
-    console.log("API 응답 상태:", response.status);
-    console.log(
-      "API 응답 헤더:",
-      Object.fromEntries(response.headers.entries())
-    );
 
     if (!response.ok) {
       let errorText = "";
@@ -245,19 +239,11 @@ export const createQuestionsFromFile = async (
       headers.Authorization = `Bearer ${token}`;
     }
 
-    console.log("파일 업로드 API 요청 헤더:", headers);
-
     const response = await fetch(`${API_BASE_URL}/v1/clova/question/ocr`, {
       method: "POST",
       headers,
       body: formData,
     });
-
-    console.log("파일 업로드 API 응답 상태:", response.status);
-    console.log(
-      "파일 업로드 API 응답 헤더:",
-      Object.fromEntries(response.headers.entries())
-    );
 
     if (!response.ok) {
       let errorText = "";
