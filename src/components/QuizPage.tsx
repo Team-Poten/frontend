@@ -15,7 +15,6 @@ const QuizPage: React.FC<QuizPageProps> = ({ questions, onBack }) => {
     // 첫 번째 문제를 확인하여 문제 유형 판단
     if (questions && questions.length > 0) {
       const firstQuestion = questions[0];
-      console.log("첫 번째 문제:", firstQuestion);
       
       // API 응답에서 문제 유형을 확인
       if (firstQuestion.type === "MULTIPLE_CHOICE") {

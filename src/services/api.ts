@@ -164,9 +164,6 @@ export const createQuestions = async (text: string, type?: "TRUE_FALSE" | "MULTI
       plainText: text,
       type: type || "TRUE_FALSE",
     };
-    
-    console.log("API 요청 URL:", `${API_BASE_URL}/v1/clova/question`);
-    console.log("API 요청 본문:", requestBody);
 
     // 기본 헤더만 설정
     const headers: Record<string, string> = {
@@ -177,21 +174,13 @@ export const createQuestions = async (text: string, type?: "TRUE_FALSE" | "MULTI
     const token = getAccessToken();
     if (token && token.trim() !== "") {
       headers.Authorization = `Bearer ${token}`;
-      console.log("Authorization 헤더 포함됨:", `Bearer ${token}`);
-    } else {
-      console.log("비회원 요청 - Authorization 헤더 없음");
     }
-
-    console.log("최종 API 요청 헤더:", headers);
 
     const response = await fetch(`${API_BASE_URL}/v1/clova/question`, {
       method: "POST",
       headers,
       body: JSON.stringify(requestBody),
     });
-
-    console.log("API 응답 상태:", response.status);
-    console.log("API 응답 헤더:", Object.fromEntries(response.headers.entries()));
 
     if (!response.ok) {
       let errorText = "";
@@ -206,7 +195,6 @@ export const createQuestions = async (text: string, type?: "TRUE_FALSE" | "MULTI
     }
 
     const data = await response.json();
-    console.log("API 성공 응답:", data);
     
     let questionData: any = data;
     if (data && typeof data === 'object' && !Array.isArray(data)) {
