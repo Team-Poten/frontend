@@ -1,8 +1,8 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
 
 interface SearchBarProps {
-  onGenerateQuestions: (text: string) => void;
+  onGenerateQuestions: (text: string, file?: File) => void;
   isLoading?: boolean;
 }
 
@@ -54,17 +54,11 @@ const FileLink = styled.span`
   font-weight: 400;
   font-size: 18px;
   line-height: 1.3999999364217122em;
-  color: #777777;
-  cursor: pointer;
-  text-decoration: underline;
+  color: #222222;
   width: 768px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-
-  &:hover {
-    color: #555555;
-  }
 `;
 
 const SearchIcon = styled.div`
@@ -190,15 +184,24 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const [inputText, setInputText] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileLinkRef = useRef<HTMLSpanElement>(null);
+
+  // 파일이 선택되면 자동으로 FileLink에 포커스 이동
+  useEffect(() => {
+    if (selectedFile && fileLinkRef.current) {
+      fileLinkRef.current.focus();
+    }
+  }, [selectedFile]);
 
   const handleGenerate = () => {
-    if (inputText.trim()) {
-      onGenerateQuestions(inputText.trim());
+    if (inputText.trim() || selectedFile) {
+      onGenerateQuestions(inputText.trim(), selectedFile || undefined);
     }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
+      e.preventDefault(); // 기본 동작 방지
       handleGenerate();
     }
   };
@@ -223,25 +226,17 @@ const SearchBar: React.FC<SearchBarProps> = ({
     }
   };
 
-  const handleFileDownload = () => {
-    if (selectedFile) {
-      const url = URL.createObjectURL(selectedFile);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = selectedFile.name;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    }
-  };
-
   return (
     <SearchContainer>
       <SearchContent>
         <SearchIcon />
         {selectedFile ? (
-          <FileLink onClick={handleFileDownload} title={selectedFile.name}>
+          <FileLink
+            ref={fileLinkRef}
+            onKeyPress={handleKeyPress}
+            title={selectedFile.name}
+            tabIndex={0}
+          >
             {selectedFile.name}
           </FileLink>
         ) : (
