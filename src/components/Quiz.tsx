@@ -13,6 +13,9 @@ interface QuizProps {
   onBack: () => void;
   onQuestionChange?: (newIndex: number) => void;
   currentQuestionIndex?: number;
+  allQuestionStates?: { [key: number]: any };
+  updateAllQuestionStates?: (questionId: number, updates: any) => void;
+  calculateTotalCorrect?: () => number;
 }
 
 const QuizContainer = styled.div`
@@ -454,7 +457,15 @@ interface QuestionState {
   answerResult: GuestAnswerResponse | AnswerResponse | null;
 }
 
-const Quiz: React.FC<QuizProps> = ({ questions, onBack, onQuestionChange, currentQuestionIndex: externalIndex }) => {
+const Quiz: React.FC<QuizProps> = ({ 
+  questions, 
+  onBack, 
+  onQuestionChange, 
+  currentQuestionIndex: externalIndex,
+  allQuestionStates,
+  updateAllQuestionStates,
+  calculateTotalCorrect
+}) => {
   const [internalQuestionIndex, setInternalQuestionIndex] = useState(0);
   
   // 외부에서 전달된 인덱스가 있으면 사용, 없으면 내부 상태 사용
@@ -512,6 +523,7 @@ const Quiz: React.FC<QuizProps> = ({ questions, onBack, onQuestionChange, curren
     questionId: number,
     updates: Partial<QuestionState>
   ) => {
+    // 로컬 상태 업데이트
     setQuestionStates((prev) => ({
       ...prev,
       [questionId]: {
@@ -519,6 +531,11 @@ const Quiz: React.FC<QuizProps> = ({ questions, onBack, onQuestionChange, curren
         ...updates,
       },
     }));
+    
+    // 전역 상태도 업데이트
+    if (updateAllQuestionStates) {
+      updateAllQuestionStates(questionId, updates);
+    }
   };
 
   // 회원 여부 확인 함수
@@ -648,33 +665,41 @@ const Quiz: React.FC<QuizProps> = ({ questions, onBack, onQuestionChange, curren
     onBack(); // 메인 홈으로 이동
   };
 
-  // 정답 개수 계산
-  const totalCorrect = Object.values(questionStates).filter((state) => {
-    if (!state.answerResult) return false;
-
-    // API 응답의 correct 필드 사용
-    const apiCorrect = state.answerResult.correct;
-
-    // 선택한 답변과 문제 정답을 직접 비교
-    const selectedAnswer = state.selectedAnswer;
-    const questionIndex = Object.keys(questionStates).find(
-      (key) => questionStates[parseInt(key)] === state
-    );
-    const question = questions[parseInt(questionIndex || "0")];
-    const correctAnswer = question?.answer;
-
-    // 답변 매핑 (O/X -> TRUE/FALSE)
-    const answerMapping: { [key: string]: string } = {
-      O: "TRUE",
-      X: "FALSE",
-    };
-
-    const mappedSelectedAnswer = answerMapping[selectedAnswer || ""];
-    const isCorrectByComparison = mappedSelectedAnswer === correctAnswer;
-
-    // API의 correct 필드가 있으면 사용, 없으면 직접 비교 결과 사용
-    return apiCorrect !== undefined ? apiCorrect : isCorrectByComparison;
-  }).length;
+  // 정답 개수 계산 로직 수정
+  const totalCorrect = calculateTotalCorrect ? calculateTotalCorrect() : (() => {
+    // calculateTotalCorrect가 없을 때는 로컬 상태로 계산
+    return questions.reduce((count, question, index) => {
+      const questionId = question.questionId || index;
+      const state = questionStates[questionId];
+      
+      if (!state?.answerResult) return count;
+      
+      // API 응답의 correct 필드 사용
+      const apiCorrect = state.answerResult.correct;
+      
+      if (apiCorrect !== undefined) {
+        return count + (apiCorrect ? 1 : 0);
+      }
+      
+      // API 응답이 없는 경우 직접 비교
+      const selectedAnswer = state.selectedAnswer;
+      const correctAnswer = question.answer;
+      
+      if (question.type === "MULTIPLE_CHOICE") {
+        return count + (selectedAnswer === correctAnswer ? 1 : 0);
+      } else {
+        // O/X 퀴즈의 경우
+        const answerMapping: { [key: string]: string } = {
+          O: "TRUE",
+          X: "FALSE",
+        };
+        
+        const mappedSelectedAnswer = answerMapping[selectedAnswer || ""];
+        const isCorrect = mappedSelectedAnswer === correctAnswer;
+        return count + (isCorrect ? 1 : 0);
+      }
+    }, 0);
+  })();
 
   const totalWrong = questions.length - totalCorrect;
 
