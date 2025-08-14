@@ -8,8 +8,7 @@ interface SearchBarProps {
 
 const SearchContainer = styled.div`
   position: relative;
-  width: 976px;
-  height: 72px;
+  width: 100%;
   background-color: #ffffff;
   border: 1px solid #dedede;
   border-radius: 100px;
@@ -18,6 +17,7 @@ const SearchContainer = styled.div`
   align-items: center;
   padding: 20px 32px;
   box-sizing: border-box;
+  min-height: 72px;
 `;
 
 const SearchContent = styled.div`
@@ -34,10 +34,10 @@ const SearchInput = styled.input`
   font-family: "Pretendard", sans-serif;
   font-weight: 400;
   font-size: 18px;
-  line-height: 1.3999999364217122em;
+  line-height: 1.4em;
   color: #222222;
   outline: none;
-  width: 768px;
+  min-width: 0;
 
   &::placeholder {
     color: #777777;
@@ -53,9 +53,9 @@ const FileLink = styled.span`
   font-family: "Pretendard", sans-serif;
   font-weight: 400;
   font-size: 18px;
-  line-height: 1.3999999364217122em;
+  line-height: 1.4em;
   color: #222222;
-  width: 768px;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

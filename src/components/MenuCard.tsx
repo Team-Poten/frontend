@@ -4,16 +4,14 @@ import { useNavigate } from "react-router-dom";
 
 interface MenuCardProps {
   title: string;
-  description: string;
   icon: string;
 }
 
 const CardContainer = styled.div`
-  display: flex;
-  flex-direction: column;
+  display: inline-flex; /* 변경: flex -> inline-flex */
   align-items: center;
-  gap: 12px;
-  padding: 40px 26px;
+  justify-content: center;
+  padding: 16px 24px;
   background-color: #ffffff;
   border: 1px solid #ededed;
   border-radius: 16px;
@@ -23,7 +21,9 @@ const CardContainer = styled.div`
     transform 0.2s ease,
     box-shadow 0.2s ease,
     border-color 0.2s ease;
-  width: 312px;
+  box-sizing: border-box;
+
+  /* width 속성이 없는 것이 핵심입니다! */
 
   &:hover {
     transform: translateY(-2px);
@@ -35,44 +35,35 @@ const CardContainer = styled.div`
 const IconContainer = styled.div`
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 16px;
 `;
 
 const IconBox = styled.div`
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 `;
 
 const IconImage = styled.img`
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   object-fit: contain;
 `;
 
 const Title = styled.h3`
   font-family: "Pretendard", sans-serif;
-  font-weight: 500;
-  font-size: 20px;
+  font-weight: 600;
+  font-size: 16px;
   line-height: 1.4em;
   color: #222222;
   margin: 0;
+  white-space: nowrap;
 `;
 
-const Description = styled.p`
-  font-family: "Pretendard", sans-serif;
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 1.399999976158142em;
-  color: #777777;
-  text-align: center;
-  margin: 0;
-  width: 260px;
-`;
-
-const MenuCard: React.FC<MenuCardProps> = ({ title, description, icon }) => {
+const MenuCard: React.FC<MenuCardProps> = ({ title, icon }) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -112,7 +103,6 @@ const MenuCard: React.FC<MenuCardProps> = ({ title, description, icon }) => {
         </IconBox>
         <Title>{title}</Title>
       </IconContainer>
-      <Description>{description}</Description>
     </CardContainer>
   );
 };
