@@ -179,13 +179,11 @@ export const createQuestions = async (
       headers.Authorization = `Bearer ${token}`;
     }
 
-
     const response = await fetch(`${API_BASE_URL}/v1/clova/question`, {
       method: "POST",
       headers,
       body: JSON.stringify(requestBody),
     });
-
 
     if (!response.ok) {
       let errorText = "";
