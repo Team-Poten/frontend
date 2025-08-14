@@ -85,8 +85,8 @@ export interface LoginResponse {
   message?: string;
 }
 
-const API_BASE_URL = "https://api.quicklyapp.store/api";
-//const API_BASE_URL = "http://localhost:8080/api";
+//const API_BASE_URL = "https://api.quicklyapp.store/api";
+const API_BASE_URL = "http://localhost:8080/api";
 
 // 403 에러를 위한 커스텀 에러 클래스
 export class UnauthorizedError extends Error {

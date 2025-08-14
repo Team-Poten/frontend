@@ -40,3 +40,4 @@ const DynamicQuiz: React.FC<DynamicQuizProps> = ({ questions, onBack }) => {
 };
 
 export default DynamicQuiz;
+
