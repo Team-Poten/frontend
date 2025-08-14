@@ -13,6 +13,9 @@ interface MultipleChoiceQuizProps {
   onBack: () => void;
   onQuestionChange?: (newIndex: number) => void;
   currentQuestionIndex?: number;
+  allQuestionStates?: { [key: number]: any };
+  updateAllQuestionStates?: (questionId: number, updates: any) => void;
+  calculateTotalCorrect?: () => number;
 }
 
 const QuizContainer = styled.div`
@@ -471,6 +474,9 @@ const MultipleChoiceQuiz: React.FC<MultipleChoiceQuizProps> = ({
   onBack,
   onQuestionChange,
   currentQuestionIndex: externalIndex,
+  allQuestionStates,
+  updateAllQuestionStates,
+  calculateTotalCorrect
 }) => {
   const [internalQuestionIndex, setInternalQuestionIndex] = useState(0);
 
@@ -531,6 +537,7 @@ const MultipleChoiceQuiz: React.FC<MultipleChoiceQuizProps> = ({
     questionId: number,
     updates: Partial<QuestionState>
   ) => {
+    // 로컬 상태 업데이트
     setQuestionStates((prev) => ({
       ...prev,
       [questionId]: {
@@ -538,6 +545,11 @@ const MultipleChoiceQuiz: React.FC<MultipleChoiceQuizProps> = ({
         ...updates,
       },
     }));
+    
+    // 전역 상태도 업데이트
+    if (updateAllQuestionStates) {
+      updateAllQuestionStates(questionId, updates);
+    }
   };
 
   // 회원 여부 확인 함수
@@ -637,13 +649,20 @@ const MultipleChoiceQuiz: React.FC<MultipleChoiceQuizProps> = ({
     onBack();
   };
 
-  // 정답 개수 계산
-  const totalCorrect = Object.values(questionStates).filter((state) => {
-    if (!state.answerResult) return false;
-    return state.answerResult.correct;
-  }).length;
-
-  const totalWrong = questions.length - totalCorrect;
+  // 정답 개수 계산 로직 수정
+  const totalCorrect = calculateTotalCorrect ? calculateTotalCorrect() : (() => {
+    // calculateTotalCorrect가 없을 때는 로컬 상태로 계산
+    return questions.reduce((count, question, index) => {
+      const questionId = question.questionId || index;
+      const state = questionStates[questionId];
+      
+      if (!state?.answerResult) return count;
+      
+      // API 응답의 correct 필드 사용
+      const apiCorrect = state.answerResult.correct;
+      return count + (apiCorrect !== undefined ? (apiCorrect ? 1 : 0) : 0);
+    }, 0);
+  })();
 
   // 객관식 옵션 생성 (4개)
   const getOptions = () => {
@@ -792,7 +811,7 @@ const MultipleChoiceQuiz: React.FC<MultipleChoiceQuizProps> = ({
                 <ResultText>
                   {totalCorrect} / {questions.length}문제{" "}
                   <span style={{ color: "#777777" }}>
-                    (정답{totalCorrect}, 오답{totalWrong})
+                    (정답{totalCorrect}, 오답{questions.length - totalCorrect})
                   </span>
                 </ResultText>
 
@@ -813,7 +832,7 @@ const MultipleChoiceQuiz: React.FC<MultipleChoiceQuizProps> = ({
                 <ResultText>
                   {totalCorrect} / {questions.length}문제{" "}
                   <span style={{ color: "#777777" }}>
-                    (정답{totalCorrect}, 오답{totalWrong})
+                    (정답{totalCorrect}, 오답{questions.length - totalCorrect})
                   </span>
                 </ResultText>
                 <GuestMessage>
