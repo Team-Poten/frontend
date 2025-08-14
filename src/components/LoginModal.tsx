@@ -23,12 +23,12 @@ const ModalOverlay = styled.div<{ isOpen: boolean }>`
 `;
 
 const ModalContainer = styled.div`
-  width: 500px;
-  height: 526px;
+  width: 31.25rem; /* 500px */
+  height: 32.875rem; /* 526px */
   background-color: #ffffff;
-  border: 1px solid #dedede;
-  border-radius: 24px;
-  box-shadow: 4px 4px 12px 0px rgba(0, 0, 0, 0.04);
+  border: 0.0625rem solid #dedede; /* 1px */
+  border-radius: 1.5rem; /* 24px */
+  box-shadow: 0.25rem 0.25rem 0.75rem 0rem rgba(0, 0, 0, 0.04); /* 4px 4px 12px 0px */
   position: relative;
   display: flex;
   flex-direction: column;
@@ -37,10 +37,10 @@ const ModalContainer = styled.div`
 
 const CloseButton = styled.button`
   position: absolute;
-  top: 20px;
-  right: 20px;
-  width: 28px;
-  height: 28px;
+  top: 1.25rem; /* 20px */
+  right: 1.25rem; /* 20px */
+  width: 1.75rem; /* 28px */
+  height: 1.75rem; /* 28px */
   background: none;
   border: none;
   cursor: pointer;
@@ -52,8 +52,8 @@ const CloseButton = styled.button`
   &::after {
     content: "";
     position: absolute;
-    width: 14.77px;
-    height: 2.5px;
+    width: 0.923125rem; /* 14.77px */
+    height: 0.15625rem; /* 2.5px */
     background-color: #494949;
     transform: rotate(45deg);
   }
@@ -66,41 +66,41 @@ const CloseButton = styled.button`
 const ModalTitle = styled.h2`
   font-family: "Pretendard", sans-serif;
   font-weight: 700;
-  font-size: 24px;
+  font-size: 1.5rem; /* 24px */
   line-height: 1.3999999364217122em;
   color: #222222;
-  margin: 70px 0 32px 0;
+  margin: 4.375rem 0 2rem 0; /* 70px 0 32px 0 */
   text-align: center;
 `;
 
 const InputContainer = styled.div`
-  width: 350px;
-  margin-top: 24px;
+  width: 21.875rem; /* 350px */
+  margin-top: 1.5rem; /* 24px */
 `;
 
 const InputLabel = styled.label`
   font-family: "Pretendard", sans-serif;
   font-weight: 500;
-  font-size: 16px;
+  font-size: 1rem; /* 16px */
   line-height: 1.399999976158142em;
   color: #777777;
   display: block;
-  margin-bottom: 0px;
+  margin-bottom: 0rem; /* 0px */
 `;
 
 const InputField = styled.input`
   width: 100%;
-  padding: 8px 0;
+  padding: 0.5rem 0; /* 8px 0 */
   border: none;
-  border-bottom: 1px solid #dedede;
+  border-bottom: 0.0625rem solid #dedede; /* 1px */
   font-family: "Pretendard", sans-serif;
   font-weight: 400;
-  font-size: 16px;
+  font-size: 1rem; /* 16px */
   line-height: 1.399999976158142em;
   color: #222222;
   background: none;
   outline: none;
-  margin-bottom: 4px;
+  margin-bottom: 0.25rem; /* 4px */
 
   &::placeholder {
     color: #9e9e9e;
@@ -112,18 +112,18 @@ const InputField = styled.input`
 `;
 
 const LoginButton = styled.button`
-  width: 350px;
-  padding: 12px 16px;
+  width: 21.875rem; /* 350px */
+  padding: 0.75rem 1rem; /* 12px 16px */
   background-color: #30a10e;
   color: #ffffff;
   border: none;
-  border-radius: 6px;
+  border-radius: 0.375rem; /* 6px */
   font-family: "Pretendard", sans-serif;
   font-weight: 400;
-  font-size: 16px;
+  font-size: 1rem; /* 16px */
   line-height: 1.399999976158142em;
   cursor: pointer;
-  margin-bottom: 20px;
+  margin-bottom: 1.25rem; /* 20px */
 
   &:hover {
     background-color: #2a8f0c;
@@ -136,15 +136,15 @@ const LoginButton = styled.button`
 `;
 
 const SignUpButton = styled.button`
-  width: 350px;
-  padding: 12px 16px;
+  width: 21.875rem; /* 350px */
+  padding: 0.75rem 1rem; /* 12px 16px */
   background-color: #f6fbf4;
   color: #30a10e;
   border: none;
-  border-radius: 6px;
+  border-radius: 0.375rem; /* 6px */
   font-family: "Pretendard", sans-serif;
   font-weight: 400;
-  font-size: 16px;
+  font-size: 1rem; /* 16px */
   line-height: 1.399999976158142em;
   cursor: pointer;
 
@@ -156,10 +156,10 @@ const SignUpButton = styled.button`
 const ErrorMessage = styled.div`
   color: #ff4444;
   font-family: "Pretendard", sans-serif;
-  font-size: 14px;
-  margin-bottom: 18px;
+  font-size: 0.875rem; /* 14px */
+  margin-bottom: 1.125rem; /* 18px */
   text-align: left;
-  min-height: 20px;
+  min-height: 1.25rem; /* 20px */
   display: flex;
   align-items: center;
 `;

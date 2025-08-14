@@ -14,7 +14,7 @@ const ModalOverlay = styled.div<{ isOpen: boolean }>`
   width: 100%;
   height: 100%;
   background-color: rgba(248, 249, 250, 0.8);
-  backdrop-filter: blur(18px);
+  backdrop-filter: blur(1.125rem); /* 18px */
   display: ${(props) => (props.isOpen ? "flex" : "none")};
   align-items: center;
   justify-content: center;
@@ -22,8 +22,8 @@ const ModalOverlay = styled.div<{ isOpen: boolean }>`
 `;
 
 const ModalContainer = styled.div`
-  width: 790px;
-  height: 227px;
+  width: 49.375rem; /* 790px */
+  height: 14.1875rem; /* 227px */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -33,14 +33,14 @@ const TitleSection = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 50px;
+  gap: 0.75rem; /* 12px */
+  margin-bottom: 3.125rem; /* 50px */
 `;
 
 const Title = styled.h2`
   font-family: "Pretendard", sans-serif;
   font-weight: 700;
-  font-size: 28px;
+  font-size: 1.75rem; /* 28px */
   color: #222222;
   margin: 0;
   text-align: center;
@@ -49,7 +49,7 @@ const Title = styled.h2`
 const Subtitle = styled.p`
   font-family: "Pretendard", sans-serif;
   font-weight: 400;
-  font-size: 18px;
+  font-size: 1.125rem; /* 18px */
   color: #777777;
   margin: 0;
   text-align: center;
@@ -59,33 +59,33 @@ const Subtitle = styled.p`
 const CardsContainer = styled.div`
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 1.25rem; /* 20px */
 `;
 
 const Card = styled.div<{ isCompleted: boolean }>`
-  width: 250px;
-  padding: 24px 26px;
+  width: 15.625rem; /* 250px */
+  padding: 1.5rem 1.625rem; /* 24px 26px */
   background-color: #ffffff;
-  border: 1px solid #ededed;
-  border-radius: 12px;
-  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.04);
+  border: 0.0625rem solid #ededed; /* 1px */
+  border-radius: 0.75rem; /* 12px */
+  box-shadow: 0.25rem 0.25rem 0.75rem rgba(0, 0, 0, 0.04); /* 4px 4px 12px */
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 0.75rem; /* 12px */
 `;
 
 const CardContent = styled.div`
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 1rem; /* 16px */
 `;
 
 const LoadingSpinner = styled.div`
-  width: 28px;
-  height: 28px;
-  border: 2px solid #f6fbf4;
-  border-top: 2px solid #30a10e;
+  width: 1.75rem; /* 28px */
+  height: 1.75rem; /* 28px */
+  border: 0.125rem solid #f6fbf4; /* 2px */
+  border-top: 0.125rem solid #30a10e; /* 2px */
   border-radius: 50%;
   animation: spin 1s linear infinite;
 
@@ -100,8 +100,8 @@ const LoadingSpinner = styled.div`
 `;
 
 const CheckIcon = styled.div`
-  width: 28px;
-  height: 28px;
+  width: 1.75rem; /* 28px */
+  height: 1.75rem; /* 28px */
   background-color: #f6fbf4;
   border-radius: 50%;
   position: relative;
@@ -112,18 +112,18 @@ const CheckIcon = styled.div`
   &::before {
     content: "";
     position: absolute;
-    width: 12px;
-    height: 8px;
-    border-left: 2px solid #30a10e;
-    border-bottom: 2px solid #30a10e;
-    transform: rotate(-45deg) translate(1px, -1px);
+    width: 0.75rem; /* 12px */
+    height: 0.5rem; /* 8px */
+    border-left: 0.125rem solid #30a10e; /* 2px */
+    border-bottom: 0.125rem solid #30a10e; /* 2px */
+    transform: rotate(-45deg) translate(0.0625rem, -0.0625rem); /* 1px, -1px */
   }
 `;
 
 const CardText = styled.span`
   font-family: "Pretendard", sans-serif;
   font-weight: 500;
-  font-size: 18px;
+  font-size: 1.125rem; /* 18px */
   color: #222222;
 `;
 
@@ -191,7 +191,6 @@ const LoadingModal: React.FC<LoadingModalProps> = ({
           }, 500);
         }
       } catch (error) {
-
         setStep2Completed(true);
 
         await new Promise((resolve) => {

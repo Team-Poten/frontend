@@ -21,41 +21,43 @@ const MainContainer = styled.main`
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: calc(100vh - 170px);
+  min-height: calc(
+    100vh - 10.625rem - 5rem
+  ); /* Header(90px) + Footer(80px) 제외 */
   background-color: #f8f9fa;
   width: 100%;
-  padding: 0 24px;
+  padding: 0 1.5rem; /* 24px */
   box-sizing: border-box;
   position: relative;
 `;
 
 const CharacterSection = styled.div`
-  margin-top: 200px;
-  margin-bottom: 40px;
+  margin-top: 12.5rem; /* 200px */
+  margin-bottom: 2.5rem; /* 40px */
 `;
 
 const MainTitle = styled.h1`
   font-family: "Pretendard", sans-serif;
   font-weight: 700;
-  font-size: 32px;
+  font-size: 2rem; /* 32px */
   line-height: 1.4em;
   color: #222222;
   text-align: center;
-  max-width: 580px;
+  max-width: 36.25rem; /* 580px */
   margin: 0;
-  margin-bottom: 48px;
+  margin-bottom: 3rem; /* 48px */
 `;
 
 const SearchSection = styled.div`
-  margin-bottom: 48px;
+  margin-bottom: 3rem; /* 48px */
   width: 100%;
-  max-width: 976px;
+  max-width: 61rem; /* 976px */
 `;
 
 const MenuSection = styled.div`
   display: flex;
-  gap: 24px;
-  margin-bottom: 60px;
+  gap: 1.5rem; /* 24px */
+  margin-bottom: 3.75rem; /* 60px */
   justify-content: center;
   flex-wrap: wrap;
 `;
@@ -63,8 +65,8 @@ const MenuSection = styled.div`
 const ErrorMessage = styled.div`
   color: #ff4444;
   font-family: "Pretendard", sans-serif;
-  font-size: 16px;
-  margin-top: 20px;
+  font-size: 1rem; /* 16px */
+  margin-top: 1.25rem; /* 20px */
   text-align: center;
 `;
 
