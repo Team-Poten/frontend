@@ -32,42 +32,42 @@ const MainContent = styled.main`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 40px 0;
-  min-height: calc(100vh - 180px);
+  padding: 2.5rem 0; /* 40px 0 */
+  min-height: calc(100vh - 11.25rem); /* 180px */
 `;
 
 const Title = styled.h1`
   font-family: "Pretendard", sans-serif;
   font-weight: 700;
-  font-size: 32px;
+  font-size: 2rem; /* 32px */
   line-height: 1.4;
   color: #222222;
   text-align: left;
-  margin-bottom: 40px;
-  max-width: 976px;
+  margin-bottom: 2.5rem; /* 40px */
+  max-width: 61rem; /* 976px */
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 0.75rem; /* 12px */
 `;
 
 const TitleIcon = styled.img`
-  width: 40px;
-  height: 40px;
+  width: 2.5rem; /* 40px */
+  height: 2.5rem; /* 40px */
   object-fit: contain;
 `;
 
 const ProgressContainer = styled.div`
-  width: 976px;
-  margin-bottom: 40px;
+  width: 61rem; /* 976px */
+  margin-bottom: 2.5rem; /* 40px */
   position: relative;
 `;
 
 const ProgressBar = styled.div`
   width: 100%;
-  height: 16px;
+  height: 1rem; /* 16px */
   background-color: #efefef;
-  border-radius: 16px;
+  border-radius: 1rem; /* 16px */
   overflow: hidden;
 `;
 
@@ -75,37 +75,35 @@ const ProgressFill = styled.div<{ progress: number }>`
   width: ${(props) => props.progress}%;
   height: 100%;
   background-color: #30a10e;
-  border-radius: 16px;
+  border-radius: 1rem; /* 16px */
   transition: width 0.3s ease;
 `;
 
 const ProgressText = styled.div<{ progress: number }>`
   text-align: center;
-  margin-top: 10px;
+  margin-top: 0.625rem; /* 10px */
   font-family: "Pretendard", sans-serif;
   font-weight: 500;
-  font-size: 18px;
+  font-size: 1.125rem; /* 18px */
   color: #30a10e;
   position: absolute;
-  top: 16px;
+  top: 1rem; /* 16px */
   left: ${(props) => props.progress}%;
   transform: translateX(-50%);
   transition: left 0.3s ease;
 `;
 
 const QuestionCard = styled.div<{ isCorrect?: boolean; showResult?: boolean }>`
-  width: 976px;
-  min-height: 180px; // 최소 높이 줄임
-  margin-top: 24px;
+  width: 61rem; /* 976px */
+  min-height: 11.25rem; /* 180px - 최소 높이 줄임 */
+  margin-top: 1.5rem; /* 24px */
   background-color: #ffffff;
-  border: 1px solid ${(props) => 
-    props.showResult 
-      ? (props.isCorrect ? "#2473FC" : "#FF243E")
-      : "#dedede"
-  };
-  border-radius: 16px;
-  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.04);
-  padding: 32px; // 패딩 줄임 (40px -> 32px)
+  border: 0.0625rem solid
+    ${(props /* 1px */) =>
+      props.showResult ? (props.isCorrect ? "#2473FC" : "#FF243E") : "#dedede"};
+  border-radius: 1rem; /* 16px */
+  box-shadow: 0.25rem 0.25rem 0.75rem rgba(0, 0, 0, 0.04); /* 4px 4px 12px */
+  padding: 2rem; /* 32px - 패딩 줄임 (40px -> 32px) */
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -117,27 +115,21 @@ const QuestionNumber = styled.span<{
   showResult?: boolean;
 }>`
   font-weight: 400;
-  color: ${(props) => 
-    props.showResult 
-      ? (props.isCorrect ? "#2473FC" : "#FF243E")
-      : "#30a10e"
-  };
+  color: ${(props) =>
+    props.showResult ? (props.isCorrect ? "#2473FC" : "#FF243E") : "#30a10e"};
   position: relative;
   display: inline-block;
-  margin-right: 8px;
+  margin-right: 0.5rem; /* 8px */
   transition: color 0.3s ease;
 `;
 
 const QuestionText = styled.h2<{ isCorrect?: boolean; showResult?: boolean }>`
   font-family: "Pretendard", sans-serif;
   font-weight: 400;
-  font-size: 18px; // 폰트 크기 줄임 (20px -> 18px)
+  font-size: 1.125rem; /* 18px - 폰트 크기 줄임 (20px -> 18px) */
   line-height: 1.4;
-  color: ${(props) => 
-    props.showResult 
-      ? (props.isCorrect ? "#2473FC" : "#FF243E")
-      : "#222222"
-  };
+  color: ${(props) =>
+    props.showResult ? (props.isCorrect ? "#2473FC" : "#FF243E") : "#222222"};
   margin: 0;
   text-align: left;
   transition: color 0.3s ease;
@@ -146,8 +138,8 @@ const QuestionText = styled.h2<{ isCorrect?: boolean; showResult?: boolean }>`
 const AnswerContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 12px; // 간격 줄임 (16px -> 12px)
-  margin-top: 32px; // 마진 줄임 (40px -> 32px)
+  gap: 0.75rem; /* 12px - 간격 줄임 (16px -> 12px) */
+  margin-top: 2rem; /* 32px - 마진 줄임 (40px -> 32px) */
 `;
 
 const AnswerButton = styled.button<{
@@ -156,10 +148,10 @@ const AnswerButton = styled.button<{
   showResult?: boolean;
 }>`
   width: 100%;
-  min-height: 64px; // 높이 줄임 (80px -> 64px)
+  min-height: 4rem; /* 64px - 높이 줄임 (80px -> 64px) */
   background-color: #ffffff;
-  border: 2px solid #ededed;
-  border-radius: 12px;
+  border: 0.125rem solid #ededed; /* 2px */
+  border-radius: 0.75rem; /* 12px */
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -167,7 +159,7 @@ const AnswerButton = styled.button<{
   transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
-  padding: 16px; // 패딩 줄임 (20px -> 16px)
+  padding: 1rem; /* 16px - 패딩 줄임 (20px -> 16px) */
   text-align: left;
 
   &:hover {
@@ -211,11 +203,11 @@ const CheckboxIcon = styled.div<{
   isCorrect?: boolean;
   showResult?: boolean;
 }>`
-  width: 20px; // 크기 줄임 (24px -> 20px)
-  height: 20px; // 크기 줄임 (24px -> 20px)
-  border: 2px solid #ededed;
-  border-radius: 4px;
-  margin-right: 12px; // 마진 줄임 (16px -> 12px)
+  width: 1.25rem; /* 20px - 크기 줄임 (24px -> 20px) */
+  height: 1.25rem; /* 20px - 크기 줄임 (24px -> 20px) */
+  border: 0.125rem solid #ededed; /* 2px */
+  border-radius: 0.25rem; /* 4px */
+  margin-right: 0.75rem; /* 12px - 마진 줄임 (16px -> 12px) */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -249,8 +241,8 @@ const CheckboxIcon = styled.div<{
 `;
 
 const CheckmarkIcon = styled.div`
-  width: 10px; // 크기 줄임 (12px -> 10px)
-  height: 10px; // 크기 줄임 (12px -> 10px)
+  width: 0.625rem; /* 10px - 크기 줄임 (12px -> 10px) */
+  height: 0.625rem; /* 10px - 크기 줄임 (12px -> 10px) */
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E");
   background-size: contain;
   background-repeat: no-repeat;
@@ -259,38 +251,51 @@ const CheckmarkIcon = styled.div`
 const AnswerText = styled.span`
   font-family: "Pretendard", sans-serif;
   font-weight: 400;
-  font-size: 15px; // 폰트 크기 줄임 (16px -> 15px)
+  font-size: 0.9375rem; /* 15px - 폰트 크기 줄임 (16px -> 15px) */
   line-height: 1.5;
   color: #222222;
 `;
 
-const NextButton = styled.button<{ isSelected?: boolean; isLastQuestion?: boolean }>`
-  background-color: ${(props) => 
-    props.isLastQuestion 
-      ? (props.isSelected ? "#30a10e" : "#b7b7b7")
-      : (props.isSelected ? "#30a10e" : "#b7b7b7")
-  };
+const NextButton = styled.button<{
+  isSelected?: boolean;
+  isLastQuestion?: boolean;
+}>`
+  background-color: ${(props) =>
+    props.isLastQuestion
+      ? props.isSelected
+        ? "#30a10e"
+        : "#b7b7b7"
+      : props.isSelected
+        ? "#30a10e"
+        : "#b7b7b7"};
   color: #ffffff;
-  border: ${(props) => 
-    props.isLastQuestion 
-      ? (props.isSelected ? "1px solid #30a10e" : "none")
-      : (props.isSelected ? "1px solid #30a10e" : "none")
+  border: ${
+    (props) =>
+      props.isLastQuestion
+        ? props.isSelected
+          ? "0.0625rem solid #30a10e"
+          : "none" /* 1px */
+        : props.isSelected
+          ? "0.0625rem solid #30a10e"
+          : "none" /* 1px */
   };
-  border-radius: 6px;
-  padding: 12px 16px;
+  border-radius: 0.375rem; /* 6px */
+  padding: 0.75rem 1rem; /* 12px 16px */
   font-family: "Pretendard", sans-serif;
   font-weight: 400;
-  font-size: 16px;
+  font-size: 1rem; /* 16px */
   cursor: pointer;
   transition: all 0.2s ease;
-  
 
   &:hover {
-    background-color: ${(props) => 
-      props.isLastQuestion 
-        ? (props.isSelected ? "#2a8f0c" : "#a0a0a0")
-        : (props.isSelected ? "#2a8f0c" : "#a0a0a0")
-    };
+    background-color: ${(props) =>
+      props.isLastQuestion
+        ? props.isSelected
+          ? "#2a8f0c"
+          : "#a0a0a0"
+        : props.isSelected
+          ? "#2a8f0c"
+          : "#a0a0a0"};
   }
 
   &:disabled {
@@ -300,12 +305,12 @@ const NextButton = styled.button<{ isSelected?: boolean; isLastQuestion?: boolea
 `;
 
 const CharacterImage = styled.img<{ progress: number }>`
-  width: 40px;
-  height: 36px;
+  width: 2.5rem; /* 40px */
+  height: 2.25rem; /* 36px */
   object-fit: cover;
-  border-radius: 8px;
+  border-radius: 0.5rem; /* 8px */
   position: absolute;
-  top: -10px;
+  top: -0.625rem; /* -10px */
   left: ${(props) => props.progress}%;
   transform: translateX(-50%);
   transition: left 0.3s ease;
@@ -314,19 +319,19 @@ const CharacterImage = styled.img<{ progress: number }>`
 const LoadingText = styled.div`
   font-family: "Pretendard", sans-serif;
   font-weight: 500;
-  font-size: 16px;
+  font-size: 1rem; /* 16px */
   color: #30a10e;
   text-align: center;
-  margin-top: 10px;
+  margin-top: 0.625rem; /* 10px */
 `;
 
 const ErrorText = styled.div`
   font-family: "Pretendard", sans-serif;
   font-weight: 500;
-  font-size: 16px;
+  font-size: 1rem; /* 16px */
   color: #ff4444;
   text-align: center;
-  margin-top: 10px;
+  margin-top: 0.625rem; /* 10px */
 `;
 
 const ResultModal = styled.div`
@@ -344,68 +349,68 @@ const ResultModal = styled.div`
 
 const ModalContent = styled.div`
   background-color: #ffffff;
-  border-radius: 16px;
-  padding: 40px;
-  max-width: 480px;
+  border-radius: 1rem; /* 16px */
+  padding: 2.5rem; /* 40px */
+  max-width: 30rem; /* 480px */
   width: 90%;
   text-align: center;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0.625rem 1.875rem rgba(0, 0, 0, 0.2); /* 0 10px 30px */
   position: relative;
 `;
 
 const ModalImage = styled.img`
-  width: 80px;
+  width: 5rem; /* 80px */
   object-fit: contain;
-  margin: 0 auto 20px;
+  margin: 0 auto 1.25rem; /* 20px */
   display: block;
 `;
 
 const ModalTitle = styled.h2`
   font-family: "Pretendard", sans-serif;
   font-weight: 700;
-  font-size: 24px;
+  font-size: 1.5rem; /* 24px */
   color: #222222;
-  margin-bottom: 8px;
+  margin-bottom: 0.5rem; /* 8px */
 `;
 
 const ModalSubtitle = styled.div`
   font-family: "Pretendard", sans-serif;
   font-weight: 600;
-  font-size: 18px;
+  font-size: 1.125rem; /* 18px */
   color: #30a10e;
-  margin-bottom: 16px;
+  margin-bottom: 1rem; /* 16px */
 `;
 
 const ResultText = styled.div`
   font-family: "Pretendard", sans-serif;
   font-weight: 600;
-  font-size: 18px;
+  font-size: 1.125rem; /* 18px */
   color: #222222e;
-  margin-bottom: 16px;
+  margin-bottom: 1rem; /* 16px */
 `;
 
 const GuestMessage = styled.div`
   font-family: "Pretendard", sans-serif;
   font-weight: 400;
-  font-size: 14px;
+  font-size: 0.875rem; /* 14px */
   color: #777777;
   line-height: 1.5;
-  margin-top: 16px;
+  margin-top: 1rem; /* 16px */
 `;
 
 const ButtonContainer = styled.div`
   display: flex;
-  gap: 12px;
+  gap: 0.75rem; /* 12px */
   justify-content: center;
-  margin-top: 32px;
+  margin-top: 2rem; /* 32px */
 `;
 
 const ModalButton = styled.button<{ primary?: boolean }>`
-  padding: 12px 24px;
-  border-radius: 8px;
+  padding: 0.75rem 1.5rem; /* 12px 24px */
+  border-radius: 0.5rem; /* 8px */
   font-family: "Pretendard", sans-serif;
   font-weight: 500;
-  font-size: 14px;
+  font-size: 0.875rem; /* 14px */
   cursor: pointer;
   transition: all 0.2s ease;
   border: none;
@@ -423,7 +428,7 @@ const ModalButton = styled.button<{ primary?: boolean }>`
       : `
     background-color: #f8f9fa;
     color: #666666;
-    border: 1px solid #e9ecef;
+    border: 0.0625rem solid #e9ecef; /* 1px */
     
     &:hover {
       background-color: #e9ecef;
@@ -433,16 +438,16 @@ const ModalButton = styled.button<{ primary?: boolean }>`
 
 const CloseButton = styled.button`
   position: absolute;
-  top: 16px;
-  right: 16px;
+  top: 1rem; /* 16px */
+  right: 1rem; /* 16px */
   background: none;
   border: none;
-  font-size: 24px;
+  font-size: 1.5rem; /* 24px */
   color: #999999;
   cursor: pointer;
   padding: 0;
-  width: 32px;
-  height: 32px;
+  width: 2rem; /* 32px */
+  height: 2rem; /* 32px */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -461,11 +466,17 @@ interface QuestionState {
   answerResult: GuestAnswerResponse | AnswerResponse | null;
 }
 
-const MultipleChoiceQuiz: React.FC<MultipleChoiceQuizProps> = ({ questions, onBack, onQuestionChange, currentQuestionIndex: externalIndex }) => {
+const MultipleChoiceQuiz: React.FC<MultipleChoiceQuizProps> = ({
+  questions,
+  onBack,
+  onQuestionChange,
+  currentQuestionIndex: externalIndex,
+}) => {
   const [internalQuestionIndex, setInternalQuestionIndex] = useState(0);
-  
+
   // 외부에서 전달된 인덱스가 있으면 사용, 없으면 내부 상태 사용
-  const currentQuestionIndex = externalIndex !== undefined ? externalIndex : internalQuestionIndex;
+  const currentQuestionIndex =
+    externalIndex !== undefined ? externalIndex : internalQuestionIndex;
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [questionStates, setQuestionStates] = useState<{
     [key: number]: QuestionState;
@@ -477,19 +488,23 @@ const MultipleChoiceQuiz: React.FC<MultipleChoiceQuizProps> = ({ questions, onBa
     return (
       <QuizContainer>
         <MainContent>
-          <div style={{ textAlign: 'center', padding: '40px' }}>
+          <div style={{ textAlign: "center", padding: "2.5rem" }}>
+            {" "}
+            {/* 40px */}
             <h2>문제를 불러오는 중...</h2>
-            <p>문제 데이터가 없습니다. 메인 페이지로 돌아가서 다시 시도해주세요.</p>
-            <button 
+            <p>
+              문제 데이터가 없습니다. 메인 페이지로 돌아가서 다시 시도해주세요.
+            </p>
+            <button
               onClick={onBack}
               style={{
-                padding: '12px 24px',
-                backgroundColor: '#30a10e',
-                color: 'white',
-                border: 'none',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontSize: '16px'
+                padding: "0.75rem 1.5rem" /* 12px 24px */,
+                backgroundColor: "#30a10e",
+                color: "white",
+                border: "none",
+                borderRadius: "0.375rem" /* 6px */,
+                cursor: "pointer",
+                fontSize: "1rem" /* 16px */,
               }}
             >
               메인으로 돌아가기
@@ -545,7 +560,8 @@ const MultipleChoiceQuiz: React.FC<MultipleChoiceQuizProps> = ({ questions, onBa
   };
 
   const handleAnswerSelect = async (answer: string) => {
-    const questionId: number = currentQuestion.questionId || currentQuestionIndex;
+    const questionId: number =
+      currentQuestion.questionId || currentQuestionIndex;
 
     if (isNaN(questionId)) {
       console.error("유효하지 않은 questionId:", questionId);
@@ -635,7 +651,7 @@ const MultipleChoiceQuiz: React.FC<MultipleChoiceQuizProps> = ({ questions, onBa
     if (currentQuestion.options && Array.isArray(currentQuestion.options)) {
       return currentQuestion.options;
     }
-    
+
     // 기본 옵션 (A, B, C, D)
     return ["A", "B", "C", "D"];
   };
@@ -668,7 +684,7 @@ const MultipleChoiceQuiz: React.FC<MultipleChoiceQuizProps> = ({ questions, onBa
             display: "flex",
             flexDirection: "column",
             alignItems: "flex-end",
-            width: "976px",
+            width: "61rem" /* 976px */,
           }}
         >
           <QuestionCard
@@ -696,7 +712,8 @@ const MultipleChoiceQuiz: React.FC<MultipleChoiceQuizProps> = ({ questions, onBa
                   key={index}
                   selected={currentQuestionState.selectedAnswer === option}
                   isCorrect={
-                    currentQuestionState.selectedAnswer === option && isAnswerCorrect()
+                    currentQuestionState.selectedAnswer === option &&
+                    isAnswerCorrect()
                   }
                   showResult={currentQuestionState.showResult}
                   onClick={() => handleAnswerSelect(option)}
@@ -708,7 +725,8 @@ const MultipleChoiceQuiz: React.FC<MultipleChoiceQuizProps> = ({ questions, onBa
                   <CheckboxIcon
                     selected={currentQuestionState.selectedAnswer === option}
                     isCorrect={
-                      currentQuestionState.selectedAnswer === option && isAnswerCorrect()
+                      currentQuestionState.selectedAnswer === option &&
+                      isAnswerCorrect()
                     }
                     showResult={currentQuestionState.showResult}
                   >
@@ -799,7 +817,8 @@ const MultipleChoiceQuiz: React.FC<MultipleChoiceQuizProps> = ({ questions, onBa
                   </span>
                 </ResultText>
                 <GuestMessage>
-                  회원가입을 통해 문제를 더 만들고<br />
+                  회원가입을 통해 문제를 더 만들고
+                  <br />
                   복습도 할 수 있어요!
                 </GuestMessage>
               </>
@@ -814,14 +833,14 @@ const MultipleChoiceQuiz: React.FC<MultipleChoiceQuizProps> = ({ questions, onBa
 export default MultipleChoiceQuiz;
 
 const ExplanationBox = styled.div`
-  width: 976px;
-  min-height: 140px; // 높이 줄임 (174px -> 140px)
+  width: 61rem; /* 976px */
+  min-height: 8.75rem; /* 140px - 높이 줄임 (174px -> 140px) */
   background-color: #ffffff;
-  border: 1px solid #dedede;
-  border-radius: 16px;
-  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.04);
-  padding: 32px; // 패딩 줄임 (40px -> 32px)
-  margin-top: 16px; // 마진 줄임 (20px -> 16px)
+  border: 0.0625rem solid #dedede; /* 1px */
+  border-radius: 1rem; /* 16px */
+  box-shadow: 0.25rem 0.25rem 0.75rem rgba(0, 0, 0, 0.04); /* 4px 4px 12px */
+  padding: 2rem; /* 32px - 패딩 줄임 (40px -> 32px) */
+  margin-top: 1rem; /* 16px - 마진 줄임 (20px -> 16px) */
   display: flex;
   flex-direction: column;
 `;
@@ -829,24 +848,25 @@ const ExplanationBox = styled.div`
 const ExplanationSummary = styled.div`
   font-family: "Pretendard", sans-serif;
   font-weight: 500;
-  font-size: 18px; // 폰트 크기 줄임 (20px -> 18px)
+  font-size: 1.125rem; /* 18px - 폰트 크기 줄임 (20px -> 18px) */
   line-height: 1.4;
   color: #30a10e;
-  margin-bottom: 16px; // 마진 줄임 (18px -> 16px)
+  margin-bottom: 1rem; /* 16px - 마진 줄임 (18px -> 16px) */
 `;
 
 const ExplanationContent = styled.div<{ isExplanation?: boolean }>`
   font-family: "Pretendard", sans-serif;
   font-weight: 500;
-  font-size: 16px; // 폰트 크기 줄임 (18px -> 16px)
+  font-size: 1rem; /* 16px - 폰트 크기 줄임 (18px -> 16px) */
   line-height: 1.5;
-  color: ${(props) => props.isExplanation ? "#222222" : "#777777"};
-  margin-bottom: ${(props) => props.isExplanation ? "2px" : "0"};
+  color: ${(props) => (props.isExplanation ? "#222222" : "#777777")};
+  margin-bottom: ${(props) =>
+    props.isExplanation ? "0.125rem" : "0"}; /* 2px */
 `;
 
 const NextButtonContainer = styled.div`
   display: flex;
   justify-content: flex-end;
-  margin-top: 16px; // 마진 줄임 (20px -> 16px)
-  width: 976px;
+  margin-top: 1rem; /* 16px - 마진 줄임 (20px -> 16px) */
+  width: 61rem; /* 976px */
 `;

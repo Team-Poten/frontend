@@ -11,11 +11,11 @@ const CardContainer = styled.div<{ disabled?: boolean }>`
   display: inline-flex; /* 변경: flex -> inline-flex */
   align-items: center;
   justify-content: center;
-  padding: 16px 24px;
+  padding: 1rem 1.5rem; /* 16px 24px */
   background-color: #ffffff;
-  border: 1px solid #ededed;
-  border-radius: 16px;
-  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.04);
+  border: 0.0625rem solid #ededed; /* 1px */
+  border-radius: 1rem; /* 16px */
+  box-shadow: 0.25rem 0.25rem 0.75rem rgba(0, 0, 0, 0.04); /* 4px 4px 12px */
   cursor: ${(props) => (props.disabled ? "default" : "pointer")};
   transition:
     transform 0.2s ease,
@@ -27,11 +27,12 @@ const CardContainer = styled.div<{ disabled?: boolean }>`
   /* width 속성이 없는 것이 핵심입니다! */
 
   &:hover {
-    transform: ${(props) => (props.disabled ? "none" : "translateY(-2px)")};
+    transform: ${(props) =>
+      props.disabled ? "none" : "translateY(-0.125rem)"}; /* -2px */
     box-shadow: ${(props) =>
       props.disabled
-        ? "4px 4px 12px rgba(0, 0, 0, 0.04)"
-        : "6px 6px 16px rgba(0, 0, 0, 0.08)"};
+        ? "0.25rem 0.25rem 0.75rem rgba(0, 0, 0, 0.04)" /* 4px 4px 12px */
+        : "0.375rem 0.375rem 1rem rgba(0, 0, 0, 0.08)"}; /* 6px 6px 16px */
     border-color: ${(props) => (props.disabled ? "#ededed" : "#30a10e")};
   }
 `;
@@ -39,12 +40,12 @@ const CardContainer = styled.div<{ disabled?: boolean }>`
 const IconContainer = styled.div`
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 1rem; /* 16px */
 `;
 
 const IconBox = styled.div`
-  width: 24px;
-  height: 24px;
+  width: 1.5rem; /* 24px */
+  height: 1.5rem; /* 24px */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -52,15 +53,15 @@ const IconBox = styled.div`
 `;
 
 const IconImage = styled.img`
-  width: 24px;
-  height: 24px;
+  width: 1.5rem; /* 24px */
+  height: 1.5rem; /* 24px */
   object-fit: contain;
 `;
 
 const Title = styled.h3<{ disabled?: boolean }>`
   font-family: "Pretendard", sans-serif;
   font-weight: 600;
-  font-size: 16px;
+  font-size: 1rem; /* 16px */
   line-height: 1.4em;
   color: ${(props) => (props.disabled ? "#cccccc" : "#222222")};
   margin: 0;
@@ -69,16 +70,16 @@ const Title = styled.h3<{ disabled?: boolean }>`
 
 const Tooltip = styled.div`
   position: absolute;
-  top: -45px;
+  top: -2.8125rem; /* -45px */
   left: 50%;
   transform: translateX(-50%);
   background-color: #333333;
   color: #ffffff;
-  padding: 8px 12px;
-  border-radius: 4px;
+  padding: 0.5rem 0.75rem; /* 8px 12px */
+  border-radius: 0.25rem; /* 4px */
   font-family: "Pretendard", sans-serif;
   font-weight: 400;
-  font-size: 14px;
+  font-size: 0.875rem; /* 14px */
   line-height: 1.4000000272478377em;
   white-space: nowrap;
   z-index: 1000;
@@ -94,7 +95,7 @@ const Tooltip = styled.div`
     top: 100%;
     left: 50%;
     transform: translateX(-50%);
-    border: 5px solid transparent;
+    border: 0.3125rem solid transparent; /* 5px */
     border-top-color: #333333;
   }
 `;
