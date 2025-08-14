@@ -30,32 +30,34 @@ const MainContainer = styled.main`
 `;
 
 const CharacterSection = styled.div`
-  margin-top: 250px;
-  margin-bottom: 20px;
+  margin-top: 200px;
+  margin-bottom: 40px;
 `;
 
 const MainTitle = styled.h1`
   font-family: "Pretendard", sans-serif;
   font-weight: 700;
   font-size: 32px;
-  line-height: 1.399999976158142em;
+  line-height: 1.4em;
   color: #222222;
   text-align: center;
   max-width: 580px;
   margin: 0;
-  margin-bottom: 44px;
+  margin-bottom: 48px;
 `;
 
 const SearchSection = styled.div`
-  margin-bottom: 60px;
-  width: 976px;
-  height: 72px;
+  margin-bottom: 48px;
+  width: 100%;
+  max-width: 976px;
 `;
 
 const MenuSection = styled.div`
   display: flex;
-  gap: 32px;
-  margin-bottom: 40px;
+  gap: 24px;
+  margin-bottom: 60px;
+  justify-content: center;
+  flex-wrap: wrap;
 `;
 
 const ErrorMessage = styled.div`
@@ -84,13 +86,11 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
     {
       id: 1,
       title: "문제 모아보기",
-      description: "만든 문제들 모아봤어요",
       icon: "book",
     },
     {
       id: 2,
       title: "틀린문제 풀어보기",
-      description: "틀린문제만 골라서 풀어요",
       icon: "write",
     },
   ];
