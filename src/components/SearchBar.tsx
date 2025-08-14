@@ -10,21 +10,21 @@ const SearchContainer = styled.div`
   position: relative;
   width: 100%;
   background-color: #ffffff;
-  border: 1px solid #dedede;
-  border-radius: 100px;
-  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.04);
+  border: 0.0625rem solid #dedede; /* 1px */
+  border-radius: 6.25rem; /* 100px */
+  box-shadow: 0.25rem 0.25rem 0.75rem rgba(0, 0, 0, 0.04); /* 4px 4px 12px */
   display: flex;
   align-items: center;
-  padding: 20px 32px;
+  padding: 1.25rem 2rem; /* 20px 32px */
   box-sizing: border-box;
-  min-height: 72px;
+  min-height: 4.5rem; /* 72px */
 `;
 
 const SearchContent = styled.div`
   display: flex;
   align-items: center;
   width: 100%;
-  gap: 12px;
+  gap: 0.75rem; /* 12px */
 `;
 
 const SearchInput = styled.input`
@@ -33,7 +33,7 @@ const SearchInput = styled.input`
   border: none;
   font-family: "Pretendard", sans-serif;
   font-weight: 400;
-  font-size: 18px;
+  font-size: 1.125rem; /* 18px */
   line-height: 1.4em;
   color: #222222;
   outline: none;
@@ -52,7 +52,7 @@ const FileLink = styled.span`
   flex: 1;
   font-family: "Pretendard", sans-serif;
   font-weight: 400;
-  font-size: 18px;
+  font-size: 1.125rem; /* 18px */
   line-height: 1.4em;
   color: #222222;
   min-width: 0;
@@ -62,8 +62,8 @@ const FileLink = styled.span`
 `;
 
 const SearchIcon = styled.div`
-  width: 32px;
-  height: 32px;
+  width: 2rem; /* 32px */
+  height: 2rem; /* 32px */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -71,8 +71,8 @@ const SearchIcon = styled.div`
 
   &::before {
     content: "";
-    width: 32px;
-    height: 32px;
+    width: 2rem; /* 32px */
+    height: 2rem; /* 32px */
     background-image: url("/images/input.png");
     background-size: contain;
     background-repeat: no-repeat;
@@ -83,12 +83,12 @@ const SearchIcon = styled.div`
 const ButtonContainer = styled.div`
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 1.5rem; /* 24px */
 `;
 
 const DeleteButton = styled.button`
-  width: 32px;
-  height: 32px;
+  width: 2rem; /* 32px */
+  height: 2rem; /* 32px */
   background: none;
   border: none;
   cursor: pointer;
@@ -100,8 +100,8 @@ const DeleteButton = styled.button`
 
   &::before {
     content: "";
-    width: 32px;
-    height: 32px;
+    width: 2rem; /* 32px */
+    height: 2rem; /* 32px */
     background-image: url("/images/icn_delete.svg");
     background-size: contain;
     background-repeat: no-repeat;
@@ -110,8 +110,8 @@ const DeleteButton = styled.button`
 `;
 
 const UploadButton = styled.button`
-  width: 32px;
-  height: 32px;
+  width: 2rem; /* 32px */
+  height: 2rem; /* 32px */
   background: none;
   border: none;
   cursor: pointer;
@@ -123,8 +123,8 @@ const UploadButton = styled.button`
 
   &::before {
     content: "";
-    width: 32px;
-    height: 32px;
+    width: 2rem; /* 32px */
+    height: 2rem; /* 32px */
     background-image: url("/images/icn_upload.svg");
     background-size: contain;
     background-repeat: no-repeat;
@@ -138,16 +138,16 @@ const HiddenFileInput = styled.input`
 
 const Tooltip = styled.div`
   position: absolute;
-  top: -45px;
+  top: -2.8125rem; /* -45px */
   left: 50%;
   transform: translateX(-50%);
   background-color: #333333;
   color: #ffffff;
-  padding: 8px 12px;
-  border-radius: 4px;
+  padding: 0.5rem 0.75rem; /* 8px 12px */
+  border-radius: 0.25rem; /* 4px */
   font-family: "Pretendard", sans-serif;
   font-weight: 400;
-  font-size: 14px;
+  font-size: 0.875rem; /* 14px */
   line-height: 1.4000000272478377em;
   white-space: nowrap;
   z-index: 1000;
@@ -163,7 +163,7 @@ const Tooltip = styled.div`
     top: 100%;
     left: 50%;
     transform: translateX(-50%);
-    border: 5px solid transparent;
+    border: 0.3125rem solid transparent; /* 5px */
     border-top-color: #333333;
   }
 `;

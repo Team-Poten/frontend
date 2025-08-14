@@ -6,7 +6,7 @@ import LoginModal from "./LoginModal";
 
 const HeaderContainer = styled.header`
   width: 100%;
-  height: 90px;
+  height: 5.625rem; /* 90px */
   background-color: #f8f9fa;
 `;
 
@@ -20,20 +20,27 @@ const DisplayContainer = styled.div`
   padding: 0;
   box-sizing: border-box;
   position: relative;
+  min-width: 120rem; /* 1920px - 최소 너비 설정으로 간격 유지 */
+  margin: 0 auto;
+
+  /* 1920px 이상에서는 max-width 제한 */
+  @media (min-width: 120rem) {
+    max-width: 120rem; /* 1920px */
+  }
 `;
 
 // 로고 컨테이너
 const LogoContainer = styled.div`
   display: flex;
   align-items: center;
-  position: absolute;
-  left: 360px;
+  flex-shrink: 0; /* 로고가 줄어들지 않도록 */
+  margin-left: 22.5rem; /* 360px - 피그마 디자인 */
 `;
 
 // 로고 이미지
 const LogoImage = styled.img`
-  width: 120px;
-  height: 32px;
+  width: 7.5rem; /* 120px */
+  height: 2rem; /* 32px */
   cursor: pointer;
   object-fit: contain;
 `;
@@ -42,18 +49,20 @@ const LogoImage = styled.img`
 const Navigation = styled.nav`
   display: flex;
   align-items: center;
-  gap: 40px;
-  position: absolute;
-  right: 300px;
+  gap: 2.5rem; /* 40px - 피그마 디자인 */
+  flex-shrink: 0; /* 네비게이션이 줄어들지 않도록 */
+  flex-wrap: nowrap; /* 줄바꿈 방지 */
+  margin-left: auto;
+  margin-right: 18.75rem; /* 300px - 피그마 디자인 */
 `;
 
 const NavTab = styled.button<{ active?: boolean }>`
   background: none;
   border: none;
-  padding: 8px 12px;
+  padding: 0.5rem 0.75rem; /* 8px 12px */
   font-family: "Pretendard", sans-serif;
   font-weight: 500;
-  font-size: 16px;
+  font-size: 1rem; /* 16px */
   line-height: 1.4em;
   color: ${(props) => (props.active ? "#222222" : "#222222")};
   cursor: pointer;
@@ -69,13 +78,13 @@ const AuthButton = styled.button`
   background-color: #30a10e;
   color: #ffffff;
   border: none;
-  border-radius: 200px;
-  padding: 10px 8px;
-  width: 70px;
-  height: 38px;
+  border-radius: 12.5rem; /* 200px */
+  padding: 0.625rem 0.5rem; /* 10px 8px */
+  width: 4.375rem; /* 70px */
+  height: 2.375rem; /* 38px */
   font-family: "Pretendard", sans-serif;
   font-weight: 400;
-  font-size: 14px;
+  font-size: 0.875rem; /* 14px */
   line-height: 1.19em;
   cursor: pointer;
   white-space: nowrap;
