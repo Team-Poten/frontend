@@ -6,9 +6,14 @@ import MultipleChoiceQuiz from "./MultipleChoiceQuiz";
 interface DynamicQuizProps {
   questions: Question[];
   onBack: () => void;
+  onCreateMoreQuestions?: () => void; // 새로운 prop 추가
 }
 
-const DynamicQuiz: React.FC<DynamicQuizProps> = ({ questions, onBack }) => {
+const DynamicQuiz: React.FC<DynamicQuizProps> = ({ 
+  questions, 
+  onBack, 
+  onCreateMoreQuestions 
+}) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [allQuestionStates, setAllQuestionStates] = useState<{
     [key: number]: any;
@@ -70,6 +75,7 @@ const DynamicQuiz: React.FC<DynamicQuizProps> = ({ questions, onBack }) => {
       <MultipleChoiceQuiz 
         questions={questions} 
         onBack={onBack}
+        onCreateMoreQuestions={onCreateMoreQuestions} // 새로운 prop 전달
         onQuestionChange={(newIndex) => setCurrentQuestionIndex(newIndex)}
         currentQuestionIndex={currentQuestionIndex}
         allQuestionStates={allQuestionStates}
@@ -82,6 +88,7 @@ const DynamicQuiz: React.FC<DynamicQuizProps> = ({ questions, onBack }) => {
       <Quiz 
         questions={questions} 
         onBack={onBack}
+        onCreateMoreQuestions={onCreateMoreQuestions} // 새로운 prop 전달
         onQuestionChange={(newIndex) => setCurrentQuestionIndex(newIndex)}
         currentQuestionIndex={currentQuestionIndex}
         allQuestionStates={allQuestionStates}

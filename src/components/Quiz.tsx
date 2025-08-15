@@ -16,6 +16,7 @@ interface QuizProps {
   allQuestionStates?: { [key: number]: any };
   updateAllQuestionStates?: (questionId: number, updates: any) => void;
   calculateTotalCorrect?: () => number;
+  onCreateMoreQuestions?: () => void; // 새로운 prop 추가
 }
 
 const QuizContainer = styled.div`
@@ -464,7 +465,8 @@ const Quiz: React.FC<QuizProps> = ({
   currentQuestionIndex: externalIndex,
   allQuestionStates,
   updateAllQuestionStates,
-  calculateTotalCorrect
+  calculateTotalCorrect,
+  onCreateMoreQuestions
 }) => {
   const [internalQuestionIndex, setInternalQuestionIndex] = useState(0);
   
@@ -655,9 +657,15 @@ const Quiz: React.FC<QuizProps> = ({
   };
 
   const handleCreateMoreQuestions = () => {
-    // 문제 더 만들기 페이지로 이동 (메인 홈)
-    setShowResultModal(false);
-    onBack();
+    // onCreateMoreQuestions가 있으면 그것을 사용하고, 없으면 onBack 사용
+    if (onCreateMoreQuestions) {
+      setShowResultModal(false);
+      onCreateMoreQuestions();
+    } else {
+      // 기존 로직 유지
+      setShowResultModal(false);
+      onBack();
+    }
   };
 
   const handleCloseModal = () => {
