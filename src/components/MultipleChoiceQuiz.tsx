@@ -16,6 +16,7 @@ interface MultipleChoiceQuizProps {
   allQuestionStates?: { [key: number]: any };
   updateAllQuestionStates?: (questionId: number, updates: any) => void;
   calculateTotalCorrect?: () => number;
+  onCreateMoreQuestions?: () => void; // 새로운 prop 추가
 }
 
 const QuizContainer = styled.div`
@@ -476,7 +477,8 @@ const MultipleChoiceQuiz: React.FC<MultipleChoiceQuizProps> = ({
   currentQuestionIndex: externalIndex,
   allQuestionStates,
   updateAllQuestionStates,
-  calculateTotalCorrect
+  calculateTotalCorrect,
+  onCreateMoreQuestions
 }) => {
   const [internalQuestionIndex, setInternalQuestionIndex] = useState(0);
 
@@ -640,8 +642,15 @@ const MultipleChoiceQuiz: React.FC<MultipleChoiceQuizProps> = ({
   };
 
   const handleCreateMoreQuestions = () => {
-    setShowResultModal(false);
-    onBack();
+    // onCreateMoreQuestions가 있으면 그것을 사용하고, 없으면 onBack 사용
+    if (onCreateMoreQuestions) {
+      setShowResultModal(false);
+      onCreateMoreQuestions();
+    } else {
+      // 기존 로직 유지
+      setShowResultModal(false);
+      onBack();
+    }
   };
 
   const handleCloseModal = () => {

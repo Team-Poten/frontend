@@ -18,6 +18,11 @@ const WrongQuizPage: React.FC = () => {
     navigate("/wrong-problems");
   };
 
+  // 틀린 문제 풀어보기에서 '문제 더 만들기'를 눌렀을 때 메인 화면으로 이동하는 함수
+  const handleCreateMoreQuestions = () => {
+    navigate("/"); // 메인 화면으로 이동
+  };
+
   // 틀린 문제 데이터가 없으면 로딩 표시
   if (!location.state?.questions || location.state.questions.length === 0) {
     return (
@@ -59,7 +64,13 @@ const WrongQuizPage: React.FC = () => {
   }
 
   // DynamicQuiz를 사용하여 각 문제의 유형에 따라 동적으로 렌더링
-  return <DynamicQuiz questions={wrongQuestions} onBack={handleBack} />;
+  return (
+    <DynamicQuiz 
+      questions={wrongQuestions} 
+      onBack={handleBack}
+      onCreateMoreQuestions={handleCreateMoreQuestions} // 새로운 prop 추가
+    />
+  );
 };
 
 export default WrongQuizPage;
