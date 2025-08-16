@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styled, { keyframes } from "styled-components";
 import { useNavigate } from "react-router-dom";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 import {
   createQuestions,
   createQuestionsFromFile,
@@ -70,6 +72,43 @@ const ErrorMessage = styled.div`
   text-align: center;
 `;
 
+const PDFButton = styled.button`
+  background: linear-gradient(135deg, #30a10e 0%, #2d8f0d 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-family: "Pretendard", sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(48, 161, 14, 0.3);
+  margin-top: 2rem;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(48, 161, 14, 0.4);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+  
+  &:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+`;
+
 const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -83,6 +122,8 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
   );
   const [userLoginStatus, setUserLoginStatus] = useState<boolean>(false);
   const navigate = useNavigate();
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const mainContainerRef = useRef<HTMLElement>(null);
 
   const menuItems = [
     {
@@ -194,9 +235,62 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
     }
   };
 
+  const handleSaveAsPDF = async () => {
+    if (!mainContainerRef.current) return;
+    
+    setIsGeneratingPDF(true);
+    
+    try {
+      // 메인 컨테이너를 캡처
+      const canvas = await html2canvas(mainContainerRef.current, {
+        scale: 2, // 고해상도
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: "#f8f9fa",
+        width: mainContainerRef.current.scrollWidth,
+        height: mainContainerRef.current.scrollHeight,
+      });
+
+      // PDF 생성
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      });
+
+      const imgWidth = 210; // A4 너비 (mm)
+      const pageHeight = 295; // A4 높이 (mm)
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+
+      let position = 0;
+
+      // 첫 페이지
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      // 여러 페이지가 필요한 경우
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      // PDF 다운로드
+      pdf.save("quizly-main-page.pdf");
+    } catch (error) {
+      console.error("PDF 생성 오류:", error);
+      setError("PDF 생성 중 오류가 발생했습니다. 다시 시도해주세요.");
+    } finally {
+      setIsGeneratingPDF(false);
+    }
+  };
+
   return (
     <>
-      <MainContainer>
+      <MainContainer ref={mainContainerRef}>
         <CharacterSection>
           <CharacterGroup />
         </CharacterSection>
@@ -219,6 +313,15 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
             <MenuCard key={item.id} {...item} />
           ))}
         </MenuSection>
+
+        <ButtonContainer>
+          <PDFButton 
+            onClick={handleSaveAsPDF} 
+            disabled={isGeneratingPDF}
+          >
+            {isGeneratingPDF ? "PDF 생성 중..." : "메인 화면 PDF로 저장"}
+          </PDFButton>
+        </ButtonContainer>
       </MainContainer>
 
       <QuestionTypeModal
