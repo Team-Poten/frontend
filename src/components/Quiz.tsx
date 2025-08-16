@@ -21,7 +21,6 @@ interface QuizProps {
 
 const QuizContainer = styled.div`
   width: 100%;
-  min-height: 100vh;
   background-color: #f8f9fa;
   font-family:
     "Pretendard",
@@ -37,7 +36,7 @@ const MainContent = styled.main`
   flex-direction: column;
   align-items: center;
   padding: 2.5rem 0; /* 40px 0 */
-  min-height: calc(100vh - 11.25rem); /* 180px */
+  min-height: calc(100vh - 10.625rem); /* 170px - Header(90px) + Footer(80px) */
 `;
 
 const Title = styled.h1`
@@ -458,20 +457,21 @@ interface QuestionState {
   answerResult: GuestAnswerResponse | AnswerResponse | null;
 }
 
-const Quiz: React.FC<QuizProps> = ({ 
-  questions, 
-  onBack, 
-  onQuestionChange, 
+const Quiz: React.FC<QuizProps> = ({
+  questions,
+  onBack,
+  onQuestionChange,
   currentQuestionIndex: externalIndex,
   allQuestionStates,
   updateAllQuestionStates,
   calculateTotalCorrect,
-  onCreateMoreQuestions
+  onCreateMoreQuestions,
 }) => {
   const [internalQuestionIndex, setInternalQuestionIndex] = useState(0);
-  
+
   // 외부에서 전달된 인덱스가 있으면 사용, 없으면 내부 상태 사용
-  const currentQuestionIndex = externalIndex !== undefined ? externalIndex : internalQuestionIndex;
+  const currentQuestionIndex =
+    externalIndex !== undefined ? externalIndex : internalQuestionIndex;
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [questionStates, setQuestionStates] = useState<{
     [key: number]: QuestionState;
@@ -533,7 +533,7 @@ const Quiz: React.FC<QuizProps> = ({
         ...updates,
       },
     }));
-    
+
     // 전역 상태도 업데이트
     if (updateAllQuestionStates) {
       updateAllQuestionStates(questionId, updates);
@@ -674,40 +674,42 @@ const Quiz: React.FC<QuizProps> = ({
   };
 
   // 정답 개수 계산 로직 수정
-  const totalCorrect = calculateTotalCorrect ? calculateTotalCorrect() : (() => {
-    // calculateTotalCorrect가 없을 때는 로컬 상태로 계산
-    return questions.reduce((count, question, index) => {
-      const questionId = question.questionId || index;
-      const state = questionStates[questionId];
-      
-      if (!state?.answerResult) return count;
-      
-      // API 응답의 correct 필드 사용
-      const apiCorrect = state.answerResult.correct;
-      
-      if (apiCorrect !== undefined) {
-        return count + (apiCorrect ? 1 : 0);
-      }
-      
-      // API 응답이 없는 경우 직접 비교
-      const selectedAnswer = state.selectedAnswer;
-      const correctAnswer = question.answer;
-      
-      if (question.type === "MULTIPLE_CHOICE") {
-        return count + (selectedAnswer === correctAnswer ? 1 : 0);
-      } else {
-        // O/X 퀴즈의 경우
-        const answerMapping: { [key: string]: string } = {
-          O: "TRUE",
-          X: "FALSE",
-        };
-        
-        const mappedSelectedAnswer = answerMapping[selectedAnswer || ""];
-        const isCorrect = mappedSelectedAnswer === correctAnswer;
-        return count + (isCorrect ? 1 : 0);
-      }
-    }, 0);
-  })();
+  const totalCorrect = calculateTotalCorrect
+    ? calculateTotalCorrect()
+    : (() => {
+        // calculateTotalCorrect가 없을 때는 로컬 상태로 계산
+        return questions.reduce((count, question, index) => {
+          const questionId = question.questionId || index;
+          const state = questionStates[questionId];
+
+          if (!state?.answerResult) return count;
+
+          // API 응답의 correct 필드 사용
+          const apiCorrect = state.answerResult.correct;
+
+          if (apiCorrect !== undefined) {
+            return count + (apiCorrect ? 1 : 0);
+          }
+
+          // API 응답이 없는 경우 직접 비교
+          const selectedAnswer = state.selectedAnswer;
+          const correctAnswer = question.answer;
+
+          if (question.type === "MULTIPLE_CHOICE") {
+            return count + (selectedAnswer === correctAnswer ? 1 : 0);
+          } else {
+            // O/X 퀴즈의 경우
+            const answerMapping: { [key: string]: string } = {
+              O: "TRUE",
+              X: "FALSE",
+            };
+
+            const mappedSelectedAnswer = answerMapping[selectedAnswer || ""];
+            const isCorrect = mappedSelectedAnswer === correctAnswer;
+            return count + (isCorrect ? 1 : 0);
+          }
+        }, 0);
+      })();
 
   const totalWrong = questions.length - totalCorrect;
 
