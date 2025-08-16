@@ -502,3 +502,39 @@ export const checkIdDuplicate = async (loginId: string): Promise<boolean> => {
     throw error;
   }
 };
+
+// 주제 수정 API
+export const updateTopic = async (
+  topic: string,
+  questionIds: number[]
+): Promise<void> => {
+  try {
+    const token = getAccessToken();
+    if (!token) {
+      throw new Error("로그인이 필요합니다");
+    }
+
+    const response = await fetch(`${API_BASE_URL}/v1/question/topic`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        topic,
+        questionIds,
+      }),
+    });
+
+    if (!response.ok) {
+      if (response.status === 403) {
+        throw new UnauthorizedError();
+      }
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+  } catch (error) {
+    console.error("Error updating topic:", error);
+    throw error;
+  }
+};
