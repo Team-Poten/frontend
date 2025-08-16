@@ -50,11 +50,44 @@ const MainText = styled.h1`
   font-weight: 600;
   font-size: 24px;
   line-height: 1.4;
-  color: #b7b7b7;
+  color: #222222;
   text-align: center;
-  word-break: keep-all;
+  margin: 0 0 8px 0;
+  width: 685px;
+  height: 34px;
 `;
 
+const SubText = styled.p`
+  font-family: "Pretendard", sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 1.4;
+  color: #777777;
+  text-align: center;
+  margin: 0 0 32px 0;
+  width: 374px;
+  height: 25px;
+`;
+
+const SignUpButton = styled.button`
+  background-color: #30a10e;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 16px;
+  width: 128px;
+  height: 44px;
+  font-family: "Pretendard", sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #2a8f0c;
+  }
+`;
 
 const WrongProblemGuestPage: React.FC = () => {
   const navigate = useNavigate();
@@ -67,16 +100,16 @@ const WrongProblemGuestPage: React.FC = () => {
     <Container>
       <ContentWrapper>
         <CharacterGroup>
-          <Character src="/images/black-white-character1.png" alt="캐릭터1" />
-          <Character2 src="/images/black-white-character2.png" alt="캐릭터2" />
-          <Character src="/images/black-white-character3.png" alt="캐릭터3" />
-          <Character src="/images/black-white-character4.png" alt="캐릭터4" />
+          <Character src={"/images/character1.png"} alt="캐릭터1" />
+          <Character2 src={"/images/character2.png"} alt="캐릭터2" />
+          <Character src={"/images/character3.png"} alt="캐릭터3" />
+          <Character src={"/images/character4.png"} alt="캐릭터4" />
         </CharacterGroup>
         <MainText>
-          틀린문제 풀어보기 서비스를 준비중입니다.
-          <br />
-          조금만 기다려주세요!
+          틀린 문제를 풀어보시려면 회원가입 또는 로그인이 필요해요
         </MainText>
+        <SubText>퀴즐리 계정이 없다면 지금 바로 회원가입을 해보세요.</SubText>
+        <SignUpButton onClick={handleSignUp}>지금 가입하기</SignUpButton>
       </ContentWrapper>
     </Container>
   );
