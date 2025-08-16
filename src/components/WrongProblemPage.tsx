@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import {
   getWrongProblemHistory,
   getWrongProblemHistoryByTopic,
+  updateTopic,
   isLoggedIn,
   UnauthorizedError,
   autoLogout,
@@ -173,12 +174,127 @@ const FilterSelect = styled.select`
   }
 `;
 
+const CardActions = styled.div`
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  cursor: pointer;
+  z-index: 10;
+`;
+
+const DotsButton = styled.div`
+  font-size: 20px;
+  color: #777777;
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: #f0f0f0;
+    color: #333333;
+  }
+`;
+
+const EditModal = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+`;
+
+const ModalContent = styled.div`
+  background-color: white;
+  padding: 32px;
+  border-radius: 16px;
+  width: 400px;
+  max-width: 90vw;
+`;
+
+const ModalTitle = styled.h3`
+  font-family: "Pretendard", sans-serif;
+  font-weight: 600;
+  font-size: 20px;
+  color: #222222;
+  margin: 0 0 24px 0;
+  text-align: center;
+`;
+
+const InputGroup = styled.div`
+  margin-bottom: 24px;
+`;
+
+const Label = styled.label`
+  display: block;
+  font-family: "Pretendard", sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: #555555;
+  margin-bottom: 8px;
+`;
+
+const Input = styled.input`
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #ededed;
+  border-radius: 8px;
+  font-family: "Pretendard", sans-serif;
+  font-size: 16px;
+  transition: all 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #30a10e;
+    box-shadow: 0 0 0 2px rgba(48, 161, 14, 0.1);
+  }
+`;
+
+const ButtonGroup = styled.div`
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+`;
+
+const Button = styled.button<{ variant?: 'primary' | 'secondary' }>`
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-family: "Pretendard", sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: ${props => props.variant === 'primary' ? '#30a10e' : '#f0f0f0'};
+  color: ${props => props.variant === 'primary' ? 'white' : '#333333'};
+
+  &:hover {
+    background-color: ${props => props.variant === 'primary' ? '#2a8f0c' : '#e0e0e0'};
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+`;
+
 const WrongProblemPage: React.FC = () => {
   const navigate = useNavigate();
   const [wrongProblemCards, setWrongProblemCards] = useState<WrongProblemCard[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filterType, setFilterType] = useState<'date' | 'topic'>('date');
+  
+  // 주제 수정 관련 상태
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingCard, setEditingCard] = useState<WrongProblemCard | null>(null);
+  const [newTopic, setNewTopic] = useState('');
+  const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
     fetchWrongProblems();
@@ -274,6 +390,62 @@ const WrongProblemPage: React.FC = () => {
     setFilterType(event.target.value as 'date' | 'topic');
   };
 
+  const handleEditTopic = (card: WrongProblemCard) => {
+    setEditingCard(card);
+    setNewTopic(card.date);
+    setShowEditModal(true);
+  };
+
+  const handleUpdateTopic = async () => {
+    if (!editingCard || !newTopic.trim()) return;
+
+    try {
+      setUpdating(true);
+      
+      // 해당 카드의 문제 ID들을 가져오기 위해 API 호출
+      let data: ProblemHistoryResponse[];
+      
+      if (filterType === 'date') {
+        data = await getWrongProblemHistory();
+      } else {
+        data = await getWrongProblemHistoryByTopic();
+      }
+      
+      // 해당 날짜/주제의 문제들을 찾기
+      const targetItem = data.find((item: ProblemHistoryResponse) => {
+        if (filterType === 'topic') {
+          return item.topic === editingCard.date || item.date === editingCard.date;
+        } else {
+          return item.date === editingCard.date;
+        }
+      });
+      
+      if (targetItem && targetItem.questions.length > 0) {
+        const questionIds = targetItem.questions.map(q => q.questionId);
+        
+        // 주제 수정 API 호출
+        await updateTopic(newTopic.trim(), questionIds);
+        
+        // 성공 후 모달 닫고 목록 새로고침
+        setShowEditModal(false);
+        setEditingCard(null);
+        setNewTopic('');
+        fetchWrongProblems(); // 목록 새로고침
+      }
+    } catch (error) {
+      console.error("주제 수정 중 오류:", error);
+      alert("주제 수정에 실패했습니다. 다시 시도해주세요.");
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setShowEditModal(false);
+    setEditingCard(null);
+    setNewTopic('');
+  };
+
   if (loading) {
     return (
       <PageContainer>
@@ -330,6 +502,15 @@ const WrongProblemPage: React.FC = () => {
         <CardGrid>
           {wrongProblemCards.map((card) => (
             <ProblemCard key={card.id} onClick={() => handleCardClick(card.date)}>
+              {/* 주제 수정 버튼 - 주제순일 때만 표시 */}
+              {filterType === 'topic' && (
+                <CardActions onClick={(e) => e.stopPropagation()}>
+                  <DotsButton onClick={() => handleEditTopic(card)}>
+                    ⋯
+                  </DotsButton>
+                </CardActions>
+              )}
+              
               <CardHeader>
                 <CardIcon 
                   src={filterType === 'date' 
@@ -346,6 +527,39 @@ const WrongProblemPage: React.FC = () => {
           ))}
         </CardGrid>
       </ContentContainer>
+
+      {/* 주제 수정 모달 */}
+      {showEditModal && (
+        <EditModal onClick={handleCloseModal}>
+          <ModalContent onClick={(e) => e.stopPropagation()}>
+            <ModalTitle>주제 수정</ModalTitle>
+            
+            <InputGroup>
+              <Label>새로운 주제</Label>
+              <Input
+                type="text"
+                value={newTopic}
+                onChange={(e) => setNewTopic(e.target.value)}
+                placeholder="주제를 입력하세요"
+                maxLength={50}
+              />
+            </InputGroup>
+            
+            <ButtonGroup>
+              <Button variant="secondary" onClick={handleCloseModal}>
+                취소
+              </Button>
+              <Button 
+                variant="primary" 
+                onClick={handleUpdateTopic}
+                disabled={updating || !newTopic.trim()}
+              >
+                {updating ? '수정 중...' : '수정하기'}
+              </Button>
+            </ButtonGroup>
+          </ModalContent>
+        </EditModal>
+      )}
     </PageContainer>
   );
 };
