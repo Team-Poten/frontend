@@ -21,7 +21,6 @@ interface MultipleChoiceQuizProps {
 
 const QuizContainer = styled.div`
   width: 100%;
-  min-height: 100vh;
   background-color: #f8f9fa;
   font-family:
     "Pretendard",
@@ -37,7 +36,7 @@ const MainContent = styled.main`
   flex-direction: column;
   align-items: center;
   padding: 2.5rem 0; /* 40px 0 */
-  min-height: calc(100vh - 11.25rem); /* 180px */
+  min-height: calc(100vh - 10.625rem); /* 170px - Header(90px) + Footer(80px) */
 `;
 
 const Title = styled.h1`
@@ -202,61 +201,37 @@ const AnswerButton = styled.button<{
   `}
 `;
 
-const CheckboxIcon = styled.div<{
+const CheckboxIcon = styled.img<{
   selected?: boolean;
   isCorrect?: boolean;
   showResult?: boolean;
 }>`
-  width: 1.25rem; /* 20px - 크기 줄임 (24px -> 20px) */
-  height: 1.25rem; /* 20px - 크기 줄임 (24px -> 20px) */
-  border: 0.125rem solid #ededed; /* 2px */
-  border-radius: 0.25rem; /* 4px */
-  margin-right: 0.75rem; /* 12px - 마진 줄임 (16px -> 12px) */
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 1.5rem; /* 24px - Figma 디자인에 맞춤 */
+  height: 1.5rem; /* 24px - Figma 디자인에 맞춤 */
+  margin-right: 0.75rem; /* 12px */
   flex-shrink: 0;
   transition: all 0.2s ease;
-
-  ${(props) =>
-    props.selected &&
-    !props.showResult &&
-    `
-    border-color: #30a10e;
-    background-color: #30a10e;
-  `}
-
-  ${(props) =>
-    props.showResult &&
-    props.isCorrect &&
-    `
-    border-color: #2473FC;
-    background-color: #2473FC;
-  `}
-
-  ${(props) =>
-    props.showResult &&
-    !props.isCorrect &&
-    props.selected &&
-    `
-    border-color: #FF243E;
-    background-color: #FF243E;
-  `}
 `;
 
-const CheckmarkIcon = styled.div`
-  width: 0.625rem; /* 10px - 크기 줄임 (12px -> 10px) */
-  height: 0.625rem; /* 10px - 크기 줄임 (12px -> 10px) */
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E");
-  background-size: contain;
-  background-repeat: no-repeat;
-`;
+// 체크박스 아이콘을 반환하는 함수
+const getCheckboxIcon = (
+  selected: boolean,
+  showResult: boolean,
+  isCorrect: boolean
+) => {
+  if (showResult && selected) {
+    return isCorrect
+      ? "/images/checkbox-correct.svg"
+      : "/images/checkbox-incorrect.svg";
+  }
+  return "/images/checkbox-unselected.svg";
+};
 
 const AnswerText = styled.span`
   font-family: "Pretendard", sans-serif;
   font-weight: 400;
-  font-size: 0.9375rem; /* 15px - 폰트 크기 줄임 (16px -> 15px) */
-  line-height: 1.5;
+  font-size: 1rem; /* 16px - Figma에 맞춤 */
+  line-height: 1.4; /* Figma에 맞춤 */
   color: #222222;
 `;
 
@@ -478,7 +453,7 @@ const MultipleChoiceQuiz: React.FC<MultipleChoiceQuizProps> = ({
   allQuestionStates,
   updateAllQuestionStates,
   calculateTotalCorrect,
-  onCreateMoreQuestions
+  onCreateMoreQuestions,
 }) => {
   const [internalQuestionIndex, setInternalQuestionIndex] = useState(0);
 
@@ -547,7 +522,7 @@ const MultipleChoiceQuiz: React.FC<MultipleChoiceQuizProps> = ({
         ...updates,
       },
     }));
-    
+
     // 전역 상태도 업데이트
     if (updateAllQuestionStates) {
       updateAllQuestionStates(questionId, updates);
@@ -659,19 +634,21 @@ const MultipleChoiceQuiz: React.FC<MultipleChoiceQuizProps> = ({
   };
 
   // 정답 개수 계산 로직 수정
-  const totalCorrect = calculateTotalCorrect ? calculateTotalCorrect() : (() => {
-    // calculateTotalCorrect가 없을 때는 로컬 상태로 계산
-    return questions.reduce((count, question, index) => {
-      const questionId = question.questionId || index;
-      const state = questionStates[questionId];
-      
-      if (!state?.answerResult) return count;
-      
-      // API 응답의 correct 필드 사용
-      const apiCorrect = state.answerResult.correct;
-      return count + (apiCorrect !== undefined ? (apiCorrect ? 1 : 0) : 0);
-    }, 0);
-  })();
+  const totalCorrect = calculateTotalCorrect
+    ? calculateTotalCorrect()
+    : (() => {
+        // calculateTotalCorrect가 없을 때는 로컬 상태로 계산
+        return questions.reduce((count, question, index) => {
+          const questionId = question.questionId || index;
+          const state = questionStates[questionId];
+
+          if (!state?.answerResult) return count;
+
+          // API 응답의 correct 필드 사용
+          const apiCorrect = state.answerResult.correct;
+          return count + (apiCorrect !== undefined ? (apiCorrect ? 1 : 0) : 0);
+        }, 0);
+      })();
 
   // 객관식 옵션 생성 (4개)
   const getOptions = () => {
@@ -751,17 +728,20 @@ const MultipleChoiceQuiz: React.FC<MultipleChoiceQuizProps> = ({
                   }
                 >
                   <CheckboxIcon
+                    src={getCheckboxIcon(
+                      currentQuestionState.selectedAnswer === option,
+                      currentQuestionState.showResult,
+                      currentQuestionState.selectedAnswer === option &&
+                        isAnswerCorrect()
+                    )}
+                    alt="checkbox"
                     selected={currentQuestionState.selectedAnswer === option}
                     isCorrect={
                       currentQuestionState.selectedAnswer === option &&
                       isAnswerCorrect()
                     }
                     showResult={currentQuestionState.showResult}
-                  >
-                    {currentQuestionState.selectedAnswer === option && (
-                      <CheckmarkIcon />
-                    )}
-                  </CheckboxIcon>
+                  />
                   <AnswerText>{option}</AnswerText>
                 </AnswerButton>
               ))}
