@@ -96,14 +96,14 @@ const MockExamGuestPage: React.FC = () => {
           <CharacterImage src="/images/character3.png" alt="캐릭터3" />
           <CharacterImage src="/images/character4.png" alt="캐릭터4" />
         </CharacterGroup>
-        
-        <MainTitle>모의고사를 제작하려면 회원가입 또는 로그인이 필요해요</MainTitle>
-        
+
+        <MainTitle>
+          모의고사를 제작하려면 회원가입 또는 로그인이 필요해요
+        </MainTitle>
+
         <SubTitle>퀴즐리 계정이 없다면 지금 바로 회원가입을 해보세요.</SubTitle>
-        
-        <SignUpButton onClick={handleSignUp}>
-          지금 가입하기
-        </SignUpButton>
+
+        <SignUpButton onClick={handleSignUp}>지금 가입하기</SignUpButton>
       </ContentGroup>
     </GuestPageContainer>
   );

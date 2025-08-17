@@ -6,6 +6,7 @@ import SearchBar from "./SearchBar";
 import MenuCard from "./MenuCard";
 import MockExamModal, { MockExamSettings } from "./MockExamModal";
 import MockExamGuestPage from "./MockExamGuestPage";
+import MockExamResultPage from "./MockExamResultPage";
 import LoadingModal from "./LoadingModal";
 
 const MockExamContainer = styled.main`
@@ -60,6 +61,7 @@ const MockExamPage: React.FC = () => {
   const [generatedQuestions, setGeneratedQuestions] = useState<
     MockExamQuestion[]
   >([]);
+  const [showResultPage, setShowResultPage] = useState(false);
 
   const menuItems = [
     {
@@ -104,7 +106,12 @@ const MockExamPage: React.FC = () => {
     console.log("생성된 문제들:", questions);
     setGeneratedQuestions(questions);
     setIsModalOpen(false);
-    // TODO: 문제 결과 페이지로 이동 (현재 디자인 중)
+    setShowResultPage(true);
+  };
+
+  const handleBackToMain = () => {
+    setShowResultPage(false);
+    setGeneratedQuestions([]);
   };
 
   const handleModalClose = () => {
@@ -114,6 +121,16 @@ const MockExamPage: React.FC = () => {
   // 비로그인 사용자의 경우 게스트 페이지 표시
   if (!userLoginStatus) {
     return <MockExamGuestPage />;
+  }
+
+  // 결과 페이지 표시
+  if (showResultPage && generatedQuestions.length > 0) {
+    return (
+      <MockExamResultPage
+        questions={generatedQuestions}
+        onBack={handleBackToMain}
+      />
+    );
   }
 
   return (
