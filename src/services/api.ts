@@ -584,7 +584,6 @@ export const createMockExamQuestions = async (
     const response = await fetch(`${API_BASE_URL}/v1/clova/question/similar`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${token}`,
         // FormData 사용 시 Content-Type 헤더를 설정하지 않음 (브라우저가 자동으로 설정)
       },
       body: formData,
