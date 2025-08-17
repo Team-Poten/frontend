@@ -5,6 +5,7 @@ import {
   MockExamRequest,
   MockExamQuestion,
 } from "../services/api";
+import LoadingModal from "./LoadingModal";
 
 interface MockExamModalProps {
   isOpen: boolean;
@@ -447,6 +448,7 @@ const MockExamModal: React.FC<MockExamModalProps> = ({
   const [showTooltip, setShowTooltip] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [apiPromise, setApiPromise] = useState<Promise<any> | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const questionTypes = [
@@ -509,28 +511,41 @@ const MockExamModal: React.FC<MockExamModalProps> = ({
     setIsLoading(true);
     setError(null);
 
+    // 선택된 유형과 특성을 상수값으로 변환
+    const typeConstants = selectedQuestionTypes
+      .map((type) => QUESTION_TYPE_MAP[type])
+      .filter(Boolean);
+    const characteristicConstants = selectedCharacteristics
+      .map((char) => QUESTION_CHARACTERISTIC_MAP[char])
+      .filter(Boolean);
+
+    // example_question_text에 모든 상수값을 쉼표로 연결
+    const exampleQuestionText = [
+      ...typeConstants,
+      ...characteristicConstants,
+    ].join(",");
+
+    const request: MockExamRequest = {
+      exampleQuestionText,
+      userContentText: selectedFile ? undefined : studyContent.trim(),
+      userContentFile: selectedFile || undefined,
+    };
+
+    // API 요청을 Promise로 생성하고 상태에 저장
+    const questionPromise = createMockExamQuestions(request);
+    setApiPromise(questionPromise);
+
+    // LoadingModal이 apiPromise를 처리하고 완료되면 handleLoadingComplete가 호출됨
+  };
+
+  const handleLoadingComplete = async () => {
     try {
-      // 선택된 유형과 특성을 상수값으로 변환
-      const typeConstants = selectedQuestionTypes
-        .map((type) => QUESTION_TYPE_MAP[type])
-        .filter(Boolean);
-      const characteristicConstants = selectedCharacteristics
-        .map((char) => QUESTION_CHARACTERISTIC_MAP[char])
-        .filter(Boolean);
+      if (!apiPromise) {
+        throw new Error("API 요청이 존재하지 않습니다.");
+      }
 
-      // example_question_text에 모든 상수값을 쉼표로 연결
-      const exampleQuestionText = [
-        ...typeConstants,
-        ...characteristicConstants,
-      ].join(",");
-
-      const request: MockExamRequest = {
-        exampleQuestionText,
-        userContentText: selectedFile ? undefined : studyContent.trim(),
-        userContentFile: selectedFile || undefined,
-      };
-
-      const questions = await createMockExamQuestions(request);
+      // 이미 실행된 API 요청의 결과를 가져옴
+      const questions = await apiPromise;
 
       // 성공적으로 문제를 생성한 경우
       onQuestionsGenerated(questions);
@@ -547,6 +562,7 @@ const MockExamModal: React.FC<MockExamModalProps> = ({
       setError("문제 생성 중 오류가 발생했습니다. 다시 시도해주세요.");
     } finally {
       setIsLoading(false);
+      setApiPromise(null);
     }
   };
 
@@ -558,6 +574,7 @@ const MockExamModal: React.FC<MockExamModalProps> = ({
     setShowTooltip(false);
     setIsLoading(false);
     setError(null);
+    setApiPromise(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -572,121 +589,129 @@ const MockExamModal: React.FC<MockExamModalProps> = ({
   }
 
   return (
-    <ModalOverlay isOpen={isOpen} onClick={handleClose}>
-      <ModalContainer
-        className={showCharacteristics ? "expanded" : ""}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <CloseButton onClick={handleClose} />
-        <ModalContent>
-          <MainContent>
-            <ContentSection>
-              <TitleSection>
-                <ModalTitle>실전 모의고사 맞춤 설정</ModalTitle>
-                <ModalSubtitle>
-                  필요한 유형에 맞춰 모의고사 문제를 받으세요
-                </ModalSubtitle>
-              </TitleSection>
+    <>
+      <ModalOverlay isOpen={isOpen} onClick={handleClose}>
+        <ModalContainer
+          className={showCharacteristics ? "expanded" : ""}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <CloseButton onClick={handleClose} />
+          <ModalContent>
+            <MainContent>
+              <ContentSection>
+                <TitleSection>
+                  <ModalTitle>실전 모의고사 맞춤 설정</ModalTitle>
+                  <ModalSubtitle>
+                    필요한 유형에 맞춰 모의고사 문제를 받으세요
+                  </ModalSubtitle>
+                </TitleSection>
 
-              <QuestionSection>
-                <QuestionTitle>
-                  어떤 유형의 문제를 만드시겠어요?(복수 선택 가능)
-                </QuestionTitle>
-                <ButtonGroup>
-                  {questionTypes.map((type) => (
-                    <QuestionTypeButton
-                      key={type.id}
-                      selected={selectedQuestionTypes.includes(type.id)}
-                      isDisabled={type.disabled}
-                      onClick={() => handleQuestionTypeToggle(type.id)}
-                    >
-                      {type.label}
-                    </QuestionTypeButton>
-                  ))}
-                </ButtonGroup>
-              </QuestionSection>
+                <QuestionSection>
+                  <QuestionTitle>
+                    어떤 유형의 문제를 만드시겠어요?(복수 선택 가능)
+                  </QuestionTitle>
+                  <ButtonGroup>
+                    {questionTypes.map((type) => (
+                      <QuestionTypeButton
+                        key={type.id}
+                        selected={selectedQuestionTypes.includes(type.id)}
+                        isDisabled={type.disabled}
+                        onClick={() => handleQuestionTypeToggle(type.id)}
+                      >
+                        {type.label}
+                      </QuestionTypeButton>
+                    ))}
+                  </ButtonGroup>
+                </QuestionSection>
 
-              <CharacteristicSection visible={showCharacteristics}>
-                <QuestionTitle>
-                  문항을 어떤 특성으로 출제할까요?(복수 선택 가능)
-                </QuestionTitle>
-                <CharacteristicButtonGroup>
-                  {characteristics.map((char) => (
-                    <QuestionTypeButton
-                      key={char.id}
-                      selected={selectedCharacteristics.includes(char.id)}
-                      isDisabled={char.disabled}
-                      onClick={() => handleCharacteristicToggle(char.id)}
-                    >
-                      {char.label}
-                    </QuestionTypeButton>
-                  ))}
-                </CharacteristicButtonGroup>
-              </CharacteristicSection>
+                <CharacteristicSection visible={showCharacteristics}>
+                  <QuestionTitle>
+                    문항을 어떤 특성으로 출제할까요?(복수 선택 가능)
+                  </QuestionTitle>
+                  <CharacteristicButtonGroup>
+                    {characteristics.map((char) => (
+                      <QuestionTypeButton
+                        key={char.id}
+                        selected={selectedCharacteristics.includes(char.id)}
+                        isDisabled={char.disabled}
+                        onClick={() => handleCharacteristicToggle(char.id)}
+                      >
+                        {char.label}
+                      </QuestionTypeButton>
+                    ))}
+                  </CharacteristicButtonGroup>
+                </CharacteristicSection>
 
-              <InputSection>
-                <InputHeader>
-                  <InputLabel>정리한 필기 내용을 기재해주세요</InputLabel>
-                  <TooltipContainer>
-                    <InfoIcon
-                      onMouseEnter={() => setShowTooltip(true)}
-                      onMouseLeave={() => setShowTooltip(false)}
-                    />
-                    <Tooltip visible={showTooltip}>
-                      최소 300자 이상의 내용을 작성해주시면{"\n"}
-                      중복 없이 문제를 만들 수 있습니다.{"\n"}
-                      ⚠️ 필기 내용과 파일 업로드는 동시에 사용할 수 없습니다.
-                    </Tooltip>
-                  </TooltipContainer>
-                </InputHeader>
-                <TextArea
-                  placeholder={
-                    selectedFile
-                      ? "파일이 업로드되었습니다"
-                      : "필기 내용을 자유롭게 기재해주세요"
-                  }
-                  value={studyContent}
-                  onChange={(e) => setStudyContent(e.target.value)}
-                  disabled={!!selectedFile}
-                />
-              </InputSection>
+                <InputSection>
+                  <InputHeader>
+                    <InputLabel>정리한 필기 내용을 기재해주세요</InputLabel>
+                    <TooltipContainer>
+                      <InfoIcon
+                        onMouseEnter={() => setShowTooltip(true)}
+                        onMouseLeave={() => setShowTooltip(false)}
+                      />
+                      <Tooltip visible={showTooltip}>
+                        최소 300자 이상의 내용을 작성해주시면{"\n"}
+                        중복 없이 문제를 만들 수 있습니다.{"\n"}
+                        ⚠️ 필기 내용과 파일 업로드는 동시에 사용할 수 없습니다.
+                      </Tooltip>
+                    </TooltipContainer>
+                  </InputHeader>
+                  <TextArea
+                    placeholder={
+                      selectedFile
+                        ? "파일이 업로드되었습니다"
+                        : "필기 내용을 자유롭게 기재해주세요"
+                    }
+                    value={studyContent}
+                    onChange={(e) => setStudyContent(e.target.value)}
+                    disabled={!!selectedFile}
+                  />
+                </InputSection>
 
-              <FileUploadSection>
-                <FileUploadButton
-                  onClick={handleFileUpload}
-                  disabled={!!studyContent.trim()}
-                >
-                  <UploadIcon disabled={!!studyContent.trim()} />
-                  파일 업로드
-                </FileUploadButton>
-                {selectedFile && <FileName>{selectedFile.name}</FileName>}
-              </FileUploadSection>
-            </ContentSection>
-          </MainContent>
+                <FileUploadSection>
+                  <FileUploadButton
+                    onClick={handleFileUpload}
+                    disabled={!!studyContent.trim()}
+                  >
+                    <UploadIcon disabled={!!studyContent.trim()} />
+                    파일 업로드
+                  </FileUploadButton>
+                  {selectedFile && <FileName>{selectedFile.name}</FileName>}
+                </FileUploadSection>
+              </ContentSection>
+            </MainContent>
 
-          <ActionButtonContainer>
-            <SaveButton
-              onClick={handleSave}
-              disabled={
-                isLoading ||
-                selectedQuestionTypes.length === 0 ||
-                (!studyContent.trim() && !selectedFile)
-              }
-            >
-              {isLoading ? "문제 생성 중..." : "저장하기"}
-            </SaveButton>
-          </ActionButtonContainer>
-          {error && <ErrorMessage>{error}</ErrorMessage>}
-        </ModalContent>
+            <ActionButtonContainer>
+              <SaveButton
+                onClick={handleSave}
+                disabled={
+                  isLoading ||
+                  selectedQuestionTypes.length === 0 ||
+                  (!studyContent.trim() && !selectedFile)
+                }
+              >
+                저장하기
+              </SaveButton>
+            </ActionButtonContainer>
+            {error && <ErrorMessage>{error}</ErrorMessage>}
+          </ModalContent>
 
-        <HiddenFileInput
-          ref={fileInputRef}
-          type="file"
-          onChange={handleFileChange}
-          accept=".jpg,.jpeg,.png,.pdf,.tiff,.tif"
-        />
-      </ModalContainer>
-    </ModalOverlay>
+          <HiddenFileInput
+            ref={fileInputRef}
+            type="file"
+            onChange={handleFileChange}
+            accept=".jpg,.jpeg,.png,.pdf,.tiff,.tif"
+          />
+        </ModalContainer>
+      </ModalOverlay>
+
+      <LoadingModal
+        isOpen={isLoading}
+        onComplete={handleLoadingComplete}
+        apiPromise={apiPromise}
+      />
+    </>
   );
 };
 
