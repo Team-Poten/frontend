@@ -158,6 +158,8 @@ const Header: React.FC = () => {
     if (path === "/" && location.pathname === "/") return true;
     if (path === "/history" && location.pathname.startsWith("/history"))
       return true;
+    if (path === "/mock-exam" && location.pathname.startsWith("/mock-exam"))
+      return true;
     if (path === "/wrong-problems" && location.pathname === "/wrong-problems")
       return true;
     return false;
@@ -180,6 +182,12 @@ const Header: React.FC = () => {
               onClick={() => handleNavigation("/")}
             >
               문제 만들기
+            </NavTab>
+            <NavTab
+              active={isActive("/mock-exam")}
+              onClick={() => handleNavigation("/mock-exam")}
+            >
+              실전 모의고사
             </NavTab>
             <NavTab
               active={isActive("/history")}

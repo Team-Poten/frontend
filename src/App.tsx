@@ -19,6 +19,7 @@ import WrongProblemGuestPage from "./components/WrongProblemGuestPage";
 import WrongQuizPage from "./components/WrongQuizPage";
 import DynamicQuiz from "./components/DynamicQuiz";
 import SignUpPage from "./components/SignUpPage";
+import MockExamPage from "./components/MockExamPage";
 import { Question, isLoggedIn } from "./services/api";
 
 // 전체 앱 컨테이너
@@ -170,6 +171,14 @@ const App: React.FC = () => {
               element={
                 <RouteContent>
                   <SignUpPage />
+                </RouteContent>
+              }
+            />
+            <Route
+              path="/mock-exam"
+              element={
+                <RouteContent>
+                  <MockExamPage />
                 </RouteContent>
               }
             />
