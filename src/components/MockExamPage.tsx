@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { isLoggedIn } from "../services/api";
+import { isLoggedIn, MockExamQuestion } from "../services/api";
 import CharacterGroup from "./CharacterGroup";
 import SearchBar from "./SearchBar";
 import MenuCard from "./MenuCard";
 import MockExamModal, { MockExamSettings } from "./MockExamModal";
 import MockExamGuestPage from "./MockExamGuestPage";
+import LoadingModal from "./LoadingModal";
 
 const MockExamContainer = styled.main`
   display: flex;
@@ -55,6 +56,10 @@ const MenuSection = styled.div`
 const MockExamPage: React.FC = () => {
   const [userLoginStatus, setUserLoginStatus] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoadingModalOpen, setIsLoadingModalOpen] = useState(false);
+  const [generatedQuestions, setGeneratedQuestions] = useState<
+    MockExamQuestion[]
+  >([]);
 
   const menuItems = [
     {
@@ -92,8 +97,14 @@ const MockExamPage: React.FC = () => {
 
   const handleModalSave = (settings: MockExamSettings) => {
     console.log("모의고사 설정:", settings);
-    // TODO: API 호출 구현
     setIsModalOpen(false);
+  };
+
+  const handleQuestionsGenerated = (questions: MockExamQuestion[]) => {
+    console.log("생성된 문제들:", questions);
+    setGeneratedQuestions(questions);
+    setIsModalOpen(false);
+    // TODO: 문제 결과 페이지로 이동 (현재 디자인 중)
   };
 
   const handleModalClose = () => {
@@ -135,6 +146,7 @@ const MockExamPage: React.FC = () => {
         isOpen={isModalOpen}
         onClose={handleModalClose}
         onSave={handleModalSave}
+        onQuestionsGenerated={handleQuestionsGenerated}
         isLoggedIn={userLoginStatus}
       />
     </>

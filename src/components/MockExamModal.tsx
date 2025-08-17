@@ -1,10 +1,16 @@
 import React, { useState, useRef } from "react";
 import styled from "styled-components";
+import {
+  createMockExamQuestions,
+  MockExamRequest,
+  MockExamQuestion,
+} from "../services/api";
 
 interface MockExamModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (data: MockExamSettings) => void;
+  onQuestionsGenerated: (questions: MockExamQuestion[]) => void;
   isLoggedIn: boolean;
 }
 
@@ -399,10 +405,35 @@ const SaveButton = styled.button`
   }
 `;
 
+const ErrorMessage = styled.div`
+  color: #ff4444;
+  font-family: "Pretendard", sans-serif;
+  font-size: 0.875rem; /* 14px */
+  margin-top: 0.5rem; /* 8px */
+  text-align: center;
+  max-width: 27.5rem; /* 440px */
+`;
+
+// 문제 유형 및 특성 상수 매핑
+const QUESTION_TYPE_MAP: Record<string, string> = {
+  ox: "TRUE_FALSE",
+  multiple: "MULTIPLE_CHOICE",
+  subjective: "SHORT_ANSWER",
+  essay: "ESSAY",
+};
+
+const QUESTION_CHARACTERISTIC_MAP: Record<string, string> = {
+  "find-answer": "FIND_CORRECT",
+  "find-wrong": "FIND_INCORRECT",
+  "find-exception": "FIND_EXCEPTION",
+  "find-option": "FIND_MATCH",
+};
+
 const MockExamModal: React.FC<MockExamModalProps> = ({
   isOpen,
   onClose,
   onSave,
+  onQuestionsGenerated,
   isLoggedIn,
 }) => {
   const [selectedQuestionTypes, setSelectedQuestionTypes] = useState<string[]>(
@@ -414,6 +445,8 @@ const MockExamModal: React.FC<MockExamModalProps> = ({
   const [studyContent, setStudyContent] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [showTooltip, setShowTooltip] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const questionTypes = [
@@ -465,7 +498,7 @@ const MockExamModal: React.FC<MockExamModalProps> = ({
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (
       selectedQuestionTypes.length === 0 ||
       (!studyContent.trim() && !selectedFile)
@@ -473,14 +506,48 @@ const MockExamModal: React.FC<MockExamModalProps> = ({
       return;
     }
 
-    const settings: MockExamSettings = {
-      questionTypes: selectedQuestionTypes,
-      questionCharacteristics: selectedCharacteristics,
-      studyContent: selectedFile ? "" : studyContent.trim(),
-      // TODO: 파일 정보 추가 필요 시
-    };
+    setIsLoading(true);
+    setError(null);
 
-    onSave(settings);
+    try {
+      // 선택된 유형과 특성을 상수값으로 변환
+      const typeConstants = selectedQuestionTypes
+        .map((type) => QUESTION_TYPE_MAP[type])
+        .filter(Boolean);
+      const characteristicConstants = selectedCharacteristics
+        .map((char) => QUESTION_CHARACTERISTIC_MAP[char])
+        .filter(Boolean);
+
+      // example_question_text에 모든 상수값을 쉼표로 연결
+      const exampleQuestionText = [
+        ...typeConstants,
+        ...characteristicConstants,
+      ].join(",");
+
+      const request: MockExamRequest = {
+        exampleQuestionText,
+        userContentText: selectedFile ? undefined : studyContent.trim(),
+        userContentFile: selectedFile || undefined,
+      };
+
+      const questions = await createMockExamQuestions(request);
+
+      // 성공적으로 문제를 생성한 경우
+      onQuestionsGenerated(questions);
+
+      // 설정 정보도 저장 (기존 로직 유지)
+      const settings: MockExamSettings = {
+        questionTypes: selectedQuestionTypes,
+        questionCharacteristics: selectedCharacteristics,
+        studyContent: selectedFile ? "" : studyContent.trim(),
+      };
+      onSave(settings);
+    } catch (error) {
+      console.error("모의고사 문제 생성 중 오류:", error);
+      setError("문제 생성 중 오류가 발생했습니다. 다시 시도해주세요.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleClose = () => {
@@ -489,6 +556,8 @@ const MockExamModal: React.FC<MockExamModalProps> = ({
     setStudyContent("");
     setSelectedFile(null);
     setShowTooltip(false);
+    setIsLoading(false);
+    setError(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -599,13 +668,15 @@ const MockExamModal: React.FC<MockExamModalProps> = ({
             <SaveButton
               onClick={handleSave}
               disabled={
+                isLoading ||
                 selectedQuestionTypes.length === 0 ||
                 (!studyContent.trim() && !selectedFile)
               }
             >
-              저장하기
+              {isLoading ? "문제 생성 중..." : "저장하기"}
             </SaveButton>
           </ActionButtonContainer>
+          {error && <ErrorMessage>{error}</ErrorMessage>}
         </ModalContent>
 
         <HiddenFileInput
