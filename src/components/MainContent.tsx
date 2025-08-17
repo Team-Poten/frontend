@@ -14,6 +14,7 @@ import SearchBar from "./SearchBar";
 import MenuCard from "./MenuCard";
 import LoadingModal from "./LoadingModal";
 import QuestionTypeModal from "./QuestionTypeModal";
+import MockExam from "./MockExam";
 
 interface MainContentProps {
   onQuestionsGenerated: (questions: Question[]) => void;
@@ -109,6 +110,21 @@ const ButtonContainer = styled.div`
   margin-top: 2rem;
 `;
 
+const MockExamSection = styled.div`
+  margin-top: 3rem;
+  width: 100%;
+  max-width: 61rem;
+`;
+
+const MockExamTitle = styled.h2`
+  font-family: "Pretendard", sans-serif;
+  font-weight: 600;
+  font-size: 1.5rem;
+  color: #222222;
+  text-align: center;
+  margin-bottom: 2rem;
+`;
+
 const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -124,6 +140,7 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
   const navigate = useNavigate();
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const mainContainerRef = useRef<HTMLElement>(null);
+  const [showMockExam, setShowMockExam] = useState(false);
 
   const menuItems = [
     {
@@ -313,6 +330,19 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
             <MenuCard key={item.id} {...item} />
           ))}
         </MenuSection>
+
+        <MockExamSection>
+          <MockExamTitle>📚 모의고사 체험하기</MockExamTitle>
+          <ButtonContainer>
+            <PDFButton 
+              onClick={() => setShowMockExam(!showMockExam)} 
+            >
+              {showMockExam ? "모의고사 숨기기" : "모의고사 보기"}
+            </PDFButton>
+          </ButtonContainer>
+          
+          {showMockExam && <MockExam />}
+        </MockExamSection>
 
         <ButtonContainer>
           <PDFButton 
