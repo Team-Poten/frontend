@@ -50,6 +50,25 @@ export interface GuestAnswerResponse {
   explanation: string;
 }
 
+export interface MockExamQuestion {
+  questionId: number;
+  question: string;
+  type: string;
+  options: string[];
+  answer: string;
+  explanation: string;
+  createdAt: string;
+  updatedAt: string;
+  latestSolveStatus: string;
+  topic: string;
+}
+
+export interface MockExamRequest {
+  exampleQuestionText: string;
+  userContentText?: string;
+  userContentFile?: File;
+}
+
 // 회원용 채점 API (기존 GuestAnswerResponse와 동일한 응답 구조)
 export interface AnswerRequest {
   userAnswer: string;
@@ -86,8 +105,8 @@ export interface LoginResponse {
   message?: string;
 }
 
-const API_BASE_URL = "https://api.quicklyapp.store/api";
-//const API_BASE_URL = "http://localhost:8080/api";
+//const API_BASE_URL = "https://api.quicklyapp.store/api";
+const API_BASE_URL = "http://localhost:8080/api";
 
 // 403 에러를 위한 커스텀 에러 클래스
 export class UnauthorizedError extends Error {
@@ -300,7 +319,9 @@ export const getProblemHistory = async (): Promise<
 };
 
 // 틀린 문제 조회 API
-export const getWrongProblemHistory = async (): Promise<ProblemHistoryResponse[]> => {
+export const getWrongProblemHistory = async (): Promise<
+  ProblemHistoryResponse[]
+> => {
   try {
     const token = getAccessToken();
     if (!token) {
@@ -332,7 +353,9 @@ export const getWrongProblemHistory = async (): Promise<ProblemHistoryResponse[]
 };
 
 // 주제별 틀린 문제 조회 API
-export const getWrongProblemHistoryByTopic = async (): Promise<ProblemHistoryResponse[]> => {
+export const getWrongProblemHistoryByTopic = async (): Promise<
+  ProblemHistoryResponse[]
+> => {
   try {
     const token = getAccessToken();
     if (!token) {
@@ -535,6 +558,49 @@ export const updateTopic = async (
     }
   } catch (error) {
     console.error("Error updating topic:", error);
+    throw error;
+  }
+};
+
+// 모의고사 문제 생성 API
+export const createMockExamQuestions = async (
+  request: MockExamRequest
+): Promise<MockExamQuestion[]> => {
+  try {
+    const token = getAccessToken();
+    if (!token) {
+      throw new Error("로그인이 필요합니다");
+    }
+
+    const formData = new FormData();
+    formData.append("example_question_text", request.exampleQuestionText);
+
+    if (request.userContentFile) {
+      formData.append("user_content_file", request.userContentFile);
+    } else if (request.userContentText) {
+      formData.append("user_content_text", request.userContentText);
+    }
+
+    const response = await fetch(`${API_BASE_URL}/v1/clova/question/similar`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        // FormData 사용 시 Content-Type 헤더를 설정하지 않음 (브라우저가 자동으로 설정)
+      },
+      body: formData,
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      return data;
+    } else {
+      if (response.status === 403) {
+        throw new UnauthorizedError();
+      }
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+  } catch (error) {
+    console.error("Error creating mock exam questions:", error);
     throw error;
   }
 };
