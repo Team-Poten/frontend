@@ -64,12 +64,13 @@ const NavTab = styled.button<{ active?: boolean }>`
   font-weight: 500;
   font-size: 1rem; /* 16px */
   line-height: 1.4em;
-  color: ${(props) => (props.active ? "#222222" : "#222222")};
+  color: ${(props) => (props.active ? "#30a10e" : "#222222")};
   cursor: pointer;
   white-space: nowrap;
+  transition: color 0.2s ease;
 
   &:hover {
-    color: #222222;
+    color: ${(props) => (props.active ? "#30a10e" : "#30a10e")};
   }
 `;
 
