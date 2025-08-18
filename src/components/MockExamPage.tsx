@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
 import { isLoggedIn, MockExamQuestion } from "../services/api";
 import CharacterGroup from "./CharacterGroup";
 import SearchBar from "./SearchBar";
@@ -55,6 +56,7 @@ const MenuSection = styled.div`
 `;
 
 const MockExamPage: React.FC = () => {
+  const navigate = useNavigate();
   const [userLoginStatus, setUserLoginStatus] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoadingModalOpen, setIsLoadingModalOpen] = useState(false);
@@ -116,6 +118,8 @@ const MockExamPage: React.FC = () => {
 
   const handleModalClose = () => {
     setIsModalOpen(false);
+    // 모달을 닫을 때 메인 페이지로 이동
+    navigate("/");
   };
 
   // 비로그인 사용자의 경우 게스트 페이지 표시
