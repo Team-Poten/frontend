@@ -740,23 +740,23 @@ const MockExamResultPage: React.FC<MockExamResultPageProps> = ({
               .map((question, index) => (
                 <div key={index * 2} style={{ marginBottom: '40px' }}>
                   <div style={{ 
-                    fontSize: '18px', // 16px에서 18px로 증가
-                    fontWeight: 'bold',
+                    fontSize: '18px', // 원래대로 18px
+                    fontWeight: '600', // bold에서 500으로 줄임
                     marginBottom: '8px',
                     color: '#222222'
                   }}>
                     {index * 2 + 1}. {getAnswerDisplay(question)}
                   </div>
                   <div style={{ 
-                    fontSize: '16px', // 14px에서 16px로 증가
+                    fontSize: '16px', // 원래대로 16px
                     color: '#30A10E',
-                    fontWeight: 'bold',
+                    fontWeight: '500', // bold에서 500으로 줄임
                     marginBottom: '8px'
                   }}>
                     해설요약
                   </div>
                   <div style={{ 
-                    fontSize: '16px', // 14px에서 16px로 증가
+                    fontSize: '16px', // 원래대로 16px
                     color: '#666666',
                     lineHeight: '1.6'
                   }}>
@@ -777,23 +777,23 @@ const MockExamResultPage: React.FC<MockExamResultPageProps> = ({
               .map((question, index) => (
                 <div key={index * 2 + 1} style={{ marginBottom: '40px' }}>
                   <div style={{ 
-                    fontSize: '18px', // 16px에서 18px로 증가
-                    fontWeight: 'bold',
+                    fontSize: '18px', // 원래대로 18px
+                    fontWeight: '600', // bold에서 500으로 줄임
                     marginBottom: '8px',
                     color: '#222222'
                   }}>
                     {index * 2 + 2}. {getAnswerDisplay(question)}
                   </div>
                   <div style={{ 
-                    fontSize: '16px', // 14px에서 16px로 증가
+                    fontSize: '16px', // 원래대로 16px
                     color: '#30A10E',
-                    fontWeight: 'bold',
+                    fontWeight: '500', // bold에서 500으로 줄임
                     marginBottom: '8px'
                   }}>
                     해설요약
                   </div>
                   <div style={{ 
-                    fontSize: '16px', // 14px에서 16px로 증가
+                    fontSize: '16px', // 원래대로 16px
                     color: '#666666',
                     lineHeight: '1.6'
                   }}>
