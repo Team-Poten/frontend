@@ -34,13 +34,13 @@ const TitleSection = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 8px; // 4px에서 8px로 증가
   margin-bottom: 40px;
 `;
 
 const Title = styled.h1`
   font-family: "Pretendard", sans-serif;
-  font-weight: 700;
+  font-weight: 700; // 700에서 400으로 변경하여 bold 해제
   font-size: 32px;
   line-height: 1.4;
   color: #222222;
@@ -107,12 +107,12 @@ const CardDate = styled.div`
 
 const QuestionCount = styled.div`
   font-family: "Pretendard", sans-serif;
-  font-weight: 500;
-  font-size: 15px; // 14px에서 15px로 조금 키움
+  font-weight: 400; // 500에서 400으로 변경하여 bold 해제
+  font-size: 15px;
   color: #30a10e;
   background-color: #f0f8f0;
-  padding: 8px 14px; // 6px 12px에서 8px 14px로 조금 키움
-  border-radius: 6px; // 16px에서 6px로 줄임
+  padding: 10px 18px; // 8px 14px에서 10px 18px로 증가하여 간격 늘림
+  border-radius: 6px;
   position: absolute;
   bottom: 16px;
   right: 16px;
@@ -196,6 +196,47 @@ const DotsButton = styled.div`
   }
 `;
 
+// 드롭다운 메뉴 스타일 수정
+const DropdownMenu = styled.div<{ isOpen: boolean }>`
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: #ffffff;
+  border: 1px solid #ededed;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  width: auto; // min-width 제거하고 자동 너비로 설정
+  opacity: ${props => props.isOpen ? 1 : 0};
+  visibility: ${props => props.isOpen ? 'visible' : 'hidden'};
+  transform: ${props => props.isOpen ? 'translateY(0)' : 'translateY(-8px)'};
+  transition: all 0.2s ease;
+  z-index: 20;
+  transform-origin: top right;
+`;
+
+const DropdownItem = styled.div`
+  padding: 10px 12px; // 10px 16px에서 10px 12px로 줄여서 양쪽 여백 최소화
+  font-family: "Pretendard", sans-serif;
+  font-size: 16px;
+  color: #222222;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  text-align: center;
+  white-space: nowrap;
+
+  &:hover {
+    background-color: #f8f9fa;
+  }
+
+  &:first-child {
+    border-radius: 8px 8px 0 0;
+  }
+
+  &:last-child {
+    border-radius: 0 0 8px 8px;
+  }
+`;
+
 const EditModal = styled.div`
   position: fixed;
   top: 0;
@@ -213,8 +254,12 @@ const ModalContent = styled.div`
   background-color: white;
   padding: 32px;
   border-radius: 16px;
-  width: 400px;
+  width: 430px; // 400px에서 430px로 증가
+  height: 324px; // 높이 추가
   max-width: 90vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; // 내용을 위아래로 분산 배치
 `;
 
 const ModalTitle = styled.h3`
@@ -262,7 +307,7 @@ const ButtonGroup = styled.div`
 `;
 
 const Button = styled.button<{ variant?: 'primary' | 'secondary' }>`
-  padding: 12px 24px;
+  padding: 8px 12px; // 12px 12px에서 8px 12px로 줄임
   border: none;
   border-radius: 8px;
   font-family: "Pretendard", sans-serif;
@@ -272,6 +317,9 @@ const Button = styled.button<{ variant?: 'primary' | 'secondary' }>`
   transition: all 0.2s ease;
   background-color: ${props => props.variant === 'primary' ? '#30a10e' : '#f0f0f0'};
   color: ${props => props.variant === 'primary' ? 'white' : '#333333'};
+  min-width: 60px;
+  height: 46px;
+  flex: 1;
 
   &:hover {
     background-color: ${props => props.variant === 'primary' ? '#2a8f0c' : '#e0e0e0'};
@@ -295,6 +343,9 @@ const WrongProblemPage: React.FC = () => {
   const [editingCard, setEditingCard] = useState<WrongProblemCard | null>(null);
   const [newTopic, setNewTopic] = useState('');
   const [updating, setUpdating] = useState(false);
+  
+  // 드롭다운 메뉴 상태 추가
+  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchWrongProblems();
@@ -392,9 +443,28 @@ const WrongProblemPage: React.FC = () => {
 
   const handleEditTopic = (card: WrongProblemCard) => {
     setEditingCard(card);
-    setNewTopic(card.date);
+    setNewTopic(''); // 기존 주제를 초기값으로 설정하지 않고 빈 문자열로 설정
     setShowEditModal(true);
+    setOpenDropdownId(null);
   };
+
+  // 드롭다운 토글 함수 추가
+  const toggleDropdown = (cardId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setOpenDropdownId(openDropdownId === cardId ? null : cardId);
+  };
+
+  // 드롭다운 외부 클릭 시 닫기
+  useEffect(() => {
+    const handleClickOutside = () => {
+      setOpenDropdownId(null);
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
 
   const handleUpdateTopic = async () => {
     if (!editingCard || !newTopic.trim()) return;
@@ -505,9 +575,16 @@ const WrongProblemPage: React.FC = () => {
               {/* 주제 수정 버튼 - 주제순일 때만 표시 */}
               {filterType === 'topic' && (
                 <CardActions onClick={(e) => e.stopPropagation()}>
-                  <DotsButton onClick={() => handleEditTopic(card)}>
+                  <DotsButton onClick={(e) => toggleDropdown(card.id, e)}>
                     ⋯
                   </DotsButton>
+                  
+                  {/* 드롭다운 메뉴 */}
+                  <DropdownMenu isOpen={openDropdownId === card.id}>
+                    <DropdownItem onClick={() => handleEditTopic(card)}>
+                      주제 수정하기
+                    </DropdownItem>
+                  </DropdownMenu>
                 </CardActions>
               )}
               
@@ -532,7 +609,7 @@ const WrongProblemPage: React.FC = () => {
       {showEditModal && (
         <EditModal onClick={handleCloseModal}>
           <ModalContent onClick={(e) => e.stopPropagation()}>
-            <ModalTitle>주제 수정</ModalTitle>
+            <ModalTitle>주제 수정하기</ModalTitle>
             
             <InputGroup>
               <Label>새로운 주제</Label>
@@ -540,7 +617,7 @@ const WrongProblemPage: React.FC = () => {
                 type="text"
                 value={newTopic}
                 onChange={(e) => setNewTopic(e.target.value)}
-                placeholder="주제를 입력하세요"
+                placeholder={editingCard?.date || ''} // 기존 주제를 placeholder로 설정
                 maxLength={50}
               />
             </InputGroup>
