@@ -418,7 +418,7 @@ const ErrorMessage = styled.div`
 // 문제 유형 및 특성 상수 매핑
 const QUESTION_TYPE_MAP: Record<string, string> = {
   ox: "TRUE_FALSE",
-  multiple: "MULTIPLE_CHOICE",
+  multiple: "",
   subjective: "SHORT_ANSWER",
   essay: "ESSAY",
 };
