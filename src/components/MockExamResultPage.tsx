@@ -446,6 +446,7 @@ const MockExamResultPage: React.FC<MockExamResultPageProps> = ({
   onBack,
 }) => {
   const examPaperRef = useRef<HTMLDivElement>(null);
+  const answerSheetRef = useRef<HTMLDivElement>(null);
 
   const handleExportPDF = async () => {
     if (!examPaperRef.current) return;
@@ -489,6 +490,51 @@ const MockExamResultPage: React.FC<MockExamResultPageProps> = ({
     } catch (error) {
       console.error("PDF 생성 중 오류 발생:", error);
       alert("PDF 생성 중 오류가 발생했습니다.");
+    }
+  };
+
+  const handleExportAnswerSheet = async () => {
+    if (!answerSheetRef.current) return;
+
+    try {
+      // PDF 라이브러리를 동적으로 import
+      const html2canvas = (await import("html2canvas")).default;
+      const jsPDF = (await import("jspdf")).default;
+
+      const element = answerSheetRef.current;
+
+      // HTML을 캔버스로 변환
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#ffffff",
+      });
+
+      // PDF 생성
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("p", "mm", "a4");
+      const imgWidth = 210;
+      const pageHeight = 295;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+
+      let position = 0;
+
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      // PDF 다운로드
+      pdf.save("실전모의고사_해설지.pdf");
+    } catch (error) {
+      console.error("해설지 PDF 생성 중 오류 발생:", error);
+      alert("해설지 PDF 생성 중 오류가 발생했습니다.");
     }
   };
 
@@ -598,6 +644,169 @@ const MockExamResultPage: React.FC<MockExamResultPageProps> = ({
     }
   };
 
+  const renderAnswerSheet = () => {
+    const getAnswerDisplay = (question: MockExamQuestion) => {
+      if (question.type === 'MULTIPLE_CHOICE' || question.type === 'COMBINATION' || question.type === 'FIND_EXCEPTION') {
+        // 객관식인 경우 정답 번호 찾기
+        const correctOptionIndex = question.options?.findIndex(option => option === question.answer);
+        if (correctOptionIndex !== -1) {
+          return (
+            <span style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '24px',
+              height: '24px',
+              borderRadius: '50%',
+              border: '2px solid #000000',
+              color: '#000000',
+              fontSize: '14px',
+              fontWeight: 'bold'
+            }}>
+              {correctOptionIndex + 1}
+            </span>
+          );
+        }
+      } else if (question.type === 'TRUE_FALSE') {
+        // OX문제인 경우 TRUE는 O, FALSE는 X로 표시 (동그라미 없이)
+        if (question.answer === 'TRUE') {
+          return 'O';
+        } else if (question.answer === 'FALSE') {
+          return 'X';
+        }
+      }
+      return question.answer;
+    };
+
+    return (
+      <div ref={answerSheetRef} style={{ 
+        backgroundColor: '#ffffff',
+        border: '1px solid #dedede',
+        borderRadius: '12px',
+        padding: '60px',
+        marginTop: '40px',
+        boxShadow: '4px 4px 12px 0px rgba(0, 0, 0, 0.04)',
+        width: '976px'
+      }}>
+        {/* 해설지 헤더 - 크기 더 줄임 */}
+        <div style={{ 
+          textAlign: 'center', 
+          marginBottom: '30px',
+          position: 'relative'
+        }}>
+          <img
+            src="/images/exam-answer-header.png"
+            alt="퀴즐리와 함께하는 시험 준비 - 실전 모의고사 해설 및 답안"
+            style={{
+              width: '80%', // 70%에서 80%로 늘림
+              height: 'auto',
+              maxWidth: '500px' // 400px에서 500px로 늘림
+            }}
+          />
+          {/* 가로선 - 헤더 이미지 아래에 직접 그리기 */}
+          <div style={{
+            width: '100%',
+            height: '2px',
+            backgroundColor: '#222222',
+            marginTop: '20px'
+          }} />
+        </div>
+
+        {/* 해설 내용 */}
+        <div style={{ 
+          position: 'relative',
+          display: 'flex',
+          gap: '0'
+        }}>
+          {/* 세로선 - 가로선과 딱 맞게 닿도록 조정 */}
+          <div style={{
+            position: 'absolute',
+            left: '50%',
+            top: '-30px', // 가로선까지 올라가도록
+            width: '2px',
+            height: 'calc(100% + 50px)', // 가로선까지 포함
+            backgroundColor: '#dedede',
+            transform: 'translateX(-50%)'
+          }} />
+          
+          {/* 왼쪽 열 */}
+          <div style={{ 
+            flex: 1, 
+            paddingRight: '30px',
+            position: 'relative'
+          }}>
+            {questions
+              .filter((_, index) => index % 2 === 0)
+              .map((question, index) => (
+                <div key={index * 2} style={{ marginBottom: '40px' }}>
+                  <div style={{ 
+                    fontSize: '18px', // 16px에서 18px로 증가
+                    fontWeight: 'bold',
+                    marginBottom: '8px',
+                    color: '#222222'
+                  }}>
+                    {index * 2 + 1}. {getAnswerDisplay(question)}
+                  </div>
+                  <div style={{ 
+                    fontSize: '16px', // 14px에서 16px로 증가
+                    color: '#30A10E',
+                    fontWeight: 'bold',
+                    marginBottom: '8px'
+                  }}>
+                    해설요약
+                  </div>
+                  <div style={{ 
+                    fontSize: '16px', // 14px에서 16px로 증가
+                    color: '#666666',
+                    lineHeight: '1.6'
+                  }}>
+                    {question.explanation}
+                  </div>
+                </div>
+              ))}
+          </div>
+
+          {/* 오른쪽 열 */}
+          <div style={{ 
+            flex: 1, 
+            paddingLeft: '30px',
+            position: 'relative'
+          }}>
+            {questions
+              .filter((_, index) => index % 2 === 1)
+              .map((question, index) => (
+                <div key={index * 2 + 1} style={{ marginBottom: '40px' }}>
+                  <div style={{ 
+                    fontSize: '18px', // 16px에서 18px로 증가
+                    fontWeight: 'bold',
+                    marginBottom: '8px',
+                    color: '#222222'
+                  }}>
+                    {index * 2 + 2}. {getAnswerDisplay(question)}
+                  </div>
+                  <div style={{ 
+                    fontSize: '16px', // 14px에서 16px로 증가
+                    color: '#30A10E',
+                    fontWeight: 'bold',
+                    marginBottom: '8px'
+                  }}>
+                    해설요약
+                  </div>
+                  <div style={{ 
+                    fontSize: '16px', // 14px에서 16px로 증가
+                    color: '#666666',
+                    lineHeight: '1.6'
+                  }}>
+                    {question.explanation}
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const getCurrentDate = () => {
     const now = new Date();
     return `${now.getFullYear()}년 ${now.getMonth() + 1}월 ${now.getDate()}일`;
@@ -614,12 +823,13 @@ const MockExamResultPage: React.FC<MockExamResultPageProps> = ({
           <ActionButton variant="primary" onClick={handleExportPDF}>
             문제 내보내기
           </ActionButton>
-          <ActionButton variant="secondary" disabled>
+          <ActionButton variant="primary" onClick={handleExportAnswerSheet}>
             해설 내보내기
           </ActionButton>
         </ButtonGroup>
       </HeaderSection>
 
+      {/* 문제지 */}
       <ExamPaperContainer ref={examPaperRef}>
         <ExamHeader>
           <ExamHeaderImage
@@ -649,6 +859,9 @@ const MockExamResultPage: React.FC<MockExamResultPageProps> = ({
           </QuestionColumn>
         </QuestionsContainer>
       </ExamPaperContainer>
+
+      {/* 해설지 (독립적인 컴포넌트) */}
+      {renderAnswerSheet()}
     </PageContainer>
   );
 };
