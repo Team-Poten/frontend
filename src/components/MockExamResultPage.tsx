@@ -292,13 +292,13 @@ const QuestionColumn = styled.div`
   width: 448px;
 `;
 
-// OX 문제 컴포넌트
+// OX 문제 컴포넌트 - Figma 디자인 기준
 const TrueFalseQuestion = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
   padding: 20px 12px;
-  width: 100%;
+  width: 448px;
 `;
 
 const QuestionText = styled.div`
@@ -319,14 +319,14 @@ const AnswerText = styled.div`
   width: 100%;
 `;
 
-// 객관식 문제 컴포넌트
+// 객관식 문제 컴포넌트 - Figma 디자인 기준
 const MultipleChoiceQuestion = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 12px;
   padding: 20px 12px;
-  width: 100%;
+  width: 448px;
 `;
 
 const OptionsContainer = styled.div`
@@ -382,21 +382,21 @@ const OptionText = styled.div`
   width: 100%;
 `;
 
-// 주관식 문제 컴포넌트
+// 주관식 문제 컴포넌트 - Figma 디자인 기준
 const ShortAnswerQuestion = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 12px;
   padding: 20px 12px;
-  width: 100%;
+  width: 448px;
 `;
 
 const AnswerContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
-  width: 100%;
+  width: 422px;
 `;
 
 const AnswerBox = styled.div`
@@ -418,14 +418,14 @@ const AnswerPlaceholder = styled.div`
   width: 100%;
 `;
 
-// 서술형 문제 컴포넌트
+// 서술형 문제 컴포넌트 - Figma 디자인 기준
 const EssayQuestion = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 12px;
   padding: 20px 12px;
-  width: 100%;
+  width: 448px;
 `;
 
 const EssayAnswerBox = styled.div`
@@ -439,6 +439,77 @@ const EssayAnswerBox = styled.div`
   border: 1px solid #dedede;
   border-radius: 6px;
   min-height: 120px;
+`;
+
+// FIND_CORRECT (정답 찾기) 컴포넌트 - Figma 디자인 기준
+const FindCorrectQuestion = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+  padding: 20px 12px;
+  width: 448px;
+`;
+
+// FIND_INCORRECT (옳지 않은 것) 컴포넌트 - Figma 디자인 기준
+const FindIncorrectQuestion = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+  padding: 20px 12px;
+  width: 448px;
+`;
+
+// FIND_EXCEPTION (예외 찾기) 컴포넌트 - Figma 디자인 기준
+const FindExceptionQuestion = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+  padding: 20px 12px;
+  width: 448px;
+`;
+
+// FIND_MATCH (보기 문항 찾기) 컴포넌트 - Figma 디자인 기준
+const FindMatchQuestion = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+  padding: 20px 12px;
+  width: 448px;
+`;
+
+const ViewSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 15px 0;
+  padding: 12px;
+  background-color: #ffffff;
+  border: 1px solid #222222;
+  border-radius: 6px;
+  width: 424px;
+`;
+
+const ViewTitle = styled.div`
+  font-family: "Pretendard", sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.4em;
+  text-align: center;
+  color: #222222;
+  margin-bottom: 10px;
+`;
+
+const ViewItem = styled.div`
+  font-family: "Pretendard", sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.4em;
+  color: #222222;
+  width: 368px;
 `;
 
 const MockExamResultPage: React.FC<MockExamResultPageProps> = ({
@@ -553,7 +624,6 @@ const MockExamResultPage: React.FC<MockExamResultPageProps> = ({
         );
 
       case "MULTIPLE_CHOICE":
-      case "COMBINATION":
         return (
           <MultipleChoiceQuestion key={question.questionId}>
             <QuestionText>
@@ -573,9 +643,9 @@ const MockExamResultPage: React.FC<MockExamResultPageProps> = ({
           </MultipleChoiceQuestion>
         );
 
-      case "FIND_EXCEPTION":
+      case "FIND_CORRECT":
         return (
-          <MultipleChoiceQuestion key={question.questionId}>
+          <FindCorrectQuestion key={question.questionId}>
             <QuestionText>
               {questionNumber}. {question.question}
             </QuestionText>
@@ -590,7 +660,80 @@ const MockExamResultPage: React.FC<MockExamResultPageProps> = ({
                 </OptionItem>
               ))}
             </OptionsContainer>
-          </MultipleChoiceQuestion>
+          </FindCorrectQuestion>
+        );
+
+      case "FIND_INCORRECT":
+        return (
+          <FindIncorrectQuestion key={question.questionId}>
+            <QuestionText>
+              {questionNumber}. {question.question}
+            </QuestionText>
+            <OptionsContainer>
+              {question.options.map((option, optionIndex) => (
+                <OptionItem key={optionIndex}>
+                  <OptionNumber>
+                    <OptionCircle />
+                    <OptionNumberText>{optionIndex + 1}</OptionNumberText>
+                  </OptionNumber>
+                  <OptionText>{option}</OptionText>
+                </OptionItem>
+              ))}
+            </OptionsContainer>
+          </FindIncorrectQuestion>
+        );
+
+      case "FIND_EXCEPTION":
+        return (
+          <FindExceptionQuestion key={question.questionId}>
+            <QuestionText>
+              {questionNumber}. {question.question}
+            </QuestionText>
+            <OptionsContainer>
+              {question.options.map((option, optionIndex) => (
+                <OptionItem key={optionIndex}>
+                  <OptionNumber>
+                    <OptionCircle />
+                    <OptionNumberText>{optionIndex + 1}</OptionNumberText>
+                  </OptionNumber>
+                  <OptionText>{option}</OptionText>
+                </OptionItem>
+              ))}
+            </OptionsContainer>
+          </FindExceptionQuestion>
+        );
+
+      case "FIND_MATCH":
+        // 문제 텍스트에서 <보기> 부분 분리
+        const [mainQuestion, viewContent] =
+          question.question.split("\n<보기>\n");
+        const viewItems = viewContent
+          ? viewContent.split("\n").filter((item) => item.trim())
+          : [];
+
+        return (
+          <FindMatchQuestion key={question.questionId}>
+            <QuestionText>
+              {questionNumber}. {mainQuestion}
+            </QuestionText>
+            <ViewSection>
+              <ViewTitle>&lt; 보기 &gt;</ViewTitle>
+              {viewItems.map((item: string, itemIndex: number) => (
+                <ViewItem key={itemIndex}>{item}</ViewItem>
+              ))}
+            </ViewSection>
+            <OptionsContainer>
+              {question.options.map((option, optionIndex) => (
+                <OptionItem key={optionIndex}>
+                  <OptionNumber>
+                    <OptionCircle />
+                    <OptionNumberText>{optionIndex + 1}</OptionNumberText>
+                  </OptionNumber>
+                  <OptionText>{option}</OptionText>
+                </OptionItem>
+              ))}
+            </OptionsContainer>
+          </FindMatchQuestion>
         );
 
       case "SHORT_ANSWER":
