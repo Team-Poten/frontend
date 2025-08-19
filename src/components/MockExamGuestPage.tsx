@@ -2,78 +2,87 @@ import React from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 
-const GuestPageContainer = styled.div`
+const Container = styled.div`
+  width: 100%;
+  min-height: calc(100vh - 170px); // Header(90px) + Footer(80px) 제외
+  background-color: #f8f9fa;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 20px;
+`;
+
+const ContentWrapper = styled.div`
+  width: 485px;
+  height: 237px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: calc(100vh - 10.625rem); /* Header(90px) + Footer(80px) 제외 */
-  background-color: #f8f9fa;
-  width: 100%;
-  padding: 0 1.5rem; /* 24px */
-  box-sizing: border-box;
-`;
-
-const ContentGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem; /* 8px */
-  width: 30.3125rem; /* 485px */
+  position: relative;
 `;
 
 const CharacterGroup = styled.div`
+  width: 276px;
+  height: 60px;
   display: flex;
-  gap: 0.625rem; /* 10px */
-  margin-bottom: 2rem; /* 32px */
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 32px;
 `;
 
-const CharacterImage = styled.img`
-  width: 3.75rem; /* 60px */
-  height: 3.75rem; /* 60px */
+const Character = styled.img`
+  width: 60px;
+  height: 60px;
   object-fit: cover;
+  border-radius: 8px;
 `;
 
-const MainTitle = styled.h1`
+const Character2 = styled.img`
+  width: 66px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+`;
+
+const MainText = styled.h1`
   font-family: "Pretendard", sans-serif;
   font-weight: 600;
-  font-size: 1.5rem; /* 24px */
-  line-height: 1.4em;
+  font-size: 24px;
+  line-height: 1.4;
   color: #222222;
   text-align: center;
-  margin: 0;
+  margin: 0 0 8px 0;
   width: 685px;
-  height: 2.125rem; /* 34px */
+  height: 34px;
 `;
 
-const SubTitle = styled.p`
+const SubText = styled.p`
   font-family: "Pretendard", sans-serif;
   font-weight: 400;
-  font-size: 1.125rem; /* 18px */
-  line-height: 1.4em;
+  font-size: 18px;
+  line-height: 1.4;
   color: #777777;
   text-align: center;
-  margin: 0;
-  width: 23.375rem; /* 374px */
-  height: 1.5625rem; /* 25px */
-  margin-bottom: 3.5625rem; /* 57px */
+  margin: 0 0 32px 0;
+  width: 374px;
+  height: 25px;
 `;
 
 const SignUpButton = styled.button`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0.75rem 1rem; /* 12px 16px */
-  width: 8rem; /* 128px */
   background-color: #30a10e;
+  color: #ffffff;
   border: none;
-  border-radius: 0.375rem; /* 6px */
+  border-radius: 6px;
+  padding: 12px 16px;
+  width: 128px;
+  height: 44px;
   font-family: "Pretendard", sans-serif;
   font-weight: 400;
-  font-size: 1rem; /* 16px */
-  line-height: 1.4em;
-  color: #ffffff;
+  font-size: 16px;
+  line-height: 1.4;
   cursor: pointer;
+  transition: background-color 0.2s ease;
 
   &:hover {
     background-color: #2a8f0c;
@@ -88,24 +97,21 @@ const MockExamGuestPage: React.FC = () => {
   };
 
   return (
-    <GuestPageContainer>
-      <ContentGroup>
+    <Container>
+      <ContentWrapper>
         <CharacterGroup>
-          <CharacterImage src="/images/character1.png" alt="캐릭터1" />
-          <CharacterImage src="/images/character2.png" alt="캐릭터2" />
-          <CharacterImage src="/images/character3.png" alt="캐릭터3" />
-          <CharacterImage src="/images/character4.png" alt="캐릭터4" />
+          <Character src={"/images/character1.png"} alt="캐릭터1" />
+          <Character2 src={"/images/character2.png"} alt="캐릭터2" />
+          <Character src={"/images/character3.png"} alt="캐릭터3" />
+          <Character src={"/images/character4.png"} alt="캐릭터4" />
         </CharacterGroup>
-
-        <MainTitle>
+        <MainText>
           모의고사를 제작하려면 회원가입 또는 로그인이 필요해요
-        </MainTitle>
-
-        <SubTitle>퀴즐리 계정이 없다면 지금 바로 회원가입을 해보세요.</SubTitle>
-
+        </MainText>
+        <SubText>퀴즐리 계정이 없다면 지금 바로 회원가입을 해보세요.</SubText>
         <SignUpButton onClick={handleSignUp}>지금 가입하기</SignUpButton>
-      </ContentGroup>
-    </GuestPageContainer>
+      </ContentWrapper>
+    </Container>
   );
 };
 
