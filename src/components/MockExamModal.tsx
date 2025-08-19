@@ -714,6 +714,7 @@ const MockExamModal: React.FC<MockExamModalProps> = ({
         isOpen={isLoading}
         onComplete={handleLoadingComplete}
         apiPromise={apiPromise}
+        variant="mockExam" // 실전 모의고사용 텍스트
       />
     </>
   );

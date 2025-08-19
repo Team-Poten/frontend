@@ -5,6 +5,7 @@ interface LoadingModalProps {
   isOpen: boolean;
   onComplete: () => void;
   apiPromise?: Promise<any> | null;
+  variant?: "default" | "mockExam"; // 새로운 prop 추가
 }
 
 const ModalOverlay = styled.div<{ isOpen: boolean }>`
@@ -141,6 +142,7 @@ const LoadingModal: React.FC<LoadingModalProps> = ({
   isOpen,
   onComplete,
   apiPromise,
+  variant = "default", // 기본값은 "default"
 }) => {
   const [step1Loading, setStep1Loading] = useState(false);
   const [step1Completed, setStep1Completed] = useState(false);
@@ -280,7 +282,10 @@ const LoadingModal: React.FC<LoadingModalProps> = ({
         <TitleSection>
           <Title>AI가 문제를 만드는 중이에요...</Title>
           <Subtitle>
-            {`잠시만 기다려주세요!\n이 작업은 최대 2분까지 소요될 수 있어요.`}
+            {variant === "mockExam" 
+              ? `잠시만 기다려주세요!\n이 작업은 최대 5분까지 소요될 수 있어요.`
+              : `잠시만 기다려주세요!\n이 작업은 최대 2분까지 소요될 수 있어요.`
+            }
           </Subtitle>
         </TitleSection>
 
