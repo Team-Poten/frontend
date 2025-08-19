@@ -167,8 +167,8 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
           type: apiType, // API에서 받은 문제 유형을 각 문제에 추가
         }));
 
-        onQuestionsGenerated(questionsWithType);
-        setIsLoadingModalOpen(false);
+        // 문제 데이터를 저장하되, 로딩 모달은 닫지 않음 (LoadingModal의 onComplete에서 처리)
+        setPendingQuestions(questionsWithType);
         setIsLoading(false);
       } else {
         throw new Error("문제 데이터를 찾을 수 없습니다.");
@@ -184,13 +184,20 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
   const handleLoadingComplete = () => {
     setIsLoadingModalOpen(false);
     setApiPromise(null);
-    onQuestionsGenerated(pendingQuestions);
-    // 문제 생성 완료 후 자동으로 퀴즈 페이지로 이동
-    try {
-      navigate("/quiz");
-    } catch (error) {
-      // navigate 실패 시 fallback으로 window.location.href 사용
-      window.location.href = "/quiz";
+
+    // pendingQuestions가 있으면 사용하고, 없으면 빈 배열로 처리
+    if (pendingQuestions.length > 0) {
+      onQuestionsGenerated(pendingQuestions);
+      // 문제 생성 완료 후 자동으로 퀴즈 페이지로 이동
+      try {
+        navigate("/quiz");
+      } catch (error) {
+        // navigate 실패 시 fallback으로 window.location.href 사용
+        window.location.href = "/quiz";
+      }
+    } else {
+      console.error("생성된 문제가 없습니다.");
+      setError("문제 생성에 실패했습니다. 다시 시도해주세요.");
     }
   };
 
