@@ -215,7 +215,7 @@ const InputSection = styled.div`
 const InputHeader = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.125rem; /* 2px */
+  gap: 0.5rem; /* 8px */
 `;
 
 const InputLabel = styled.label`
@@ -227,15 +227,16 @@ const InputLabel = styled.label`
 `;
 
 const InfoIcon = styled.div`
-  width: 1rem; /* 16px */
-  height: 1rem; /* 16px */
+  width: 1.5rem; /* 24px - 클릭 영역 확대 */
+  height: 1.5rem; /* 24px - 클릭 영역 확대 */
   position: relative;
   cursor: pointer;
-  background-color: #d9d9d9;
+  background-color: transparent;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0.25rem; /* 4px - 추가 패딩으로 클릭 영역 확대 */
 
   &::after {
     content: "";
@@ -244,6 +245,7 @@ const InfoIcon = styled.div`
     border: 0.0625rem solid #777777; /* 1px */
     border-radius: 50%;
     position: absolute;
+    background-color: #ffffff;
   }
 
   &::before {
@@ -253,6 +255,11 @@ const InfoIcon = styled.div`
     font-weight: 400;
     color: #777777;
     z-index: 1;
+  }
+
+  &:hover::after {
+    background-color: #f5f5f5;
+    border-color: #555555;
   }
 `;
 
@@ -264,7 +271,8 @@ const TooltipContainer = styled.div`
 const Tooltip = styled.div<{ visible: boolean }>`
   position: absolute;
   top: -5.3125rem; /* -85px */
-  left: 9.1875rem; /* 147px */
+  left: 50%;
+  transform: translateX(-50%);
   width: 19.375rem; /* 310px */
   background-color: #333333;
   border-radius: 0.25rem; /* 4px */
@@ -280,12 +288,14 @@ const Tooltip = styled.div<{ visible: boolean }>`
   transition:
     opacity 0.2s ease,
     visibility 0.2s ease;
+  white-space: pre-wrap;
+  text-align: center;
 
   &::after {
     content: "";
     position: absolute;
     top: 100%;
-    left: 9.75rem; /* 156px */
+    left: 50%;
     transform: translateX(-50%);
     border: 0.5625rem solid transparent; /* 9px */
     border-top-color: #333333;
@@ -455,13 +465,11 @@ const MockExamModal: React.FC<MockExamModalProps> = ({
     { id: "ox", label: "OX 퀴즈", disabled: false },
     { id: "multiple", label: "객관식 문제", disabled: !isLoggedIn },
     { id: "subjective", label: "주관식 문제", disabled: !isLoggedIn },
-    { id: "essay", label: "서술형 문제", disabled: !isLoggedIn },
   ];
 
   const characteristics = [
     { id: "find-answer", label: "정답 찾기", disabled: false },
     { id: "find-wrong", label: "옳지 않은 것 찾기", disabled: false },
-    { id: "find-exception", label: "예외 찾기", disabled: false },
     { id: "find-option", label: "보기문항 찾기", disabled: false },
   ];
 
@@ -469,18 +477,14 @@ const MockExamModal: React.FC<MockExamModalProps> = ({
     const type = questionTypes.find((t) => t.id === typeId);
     if (type?.disabled) return;
 
-    setSelectedQuestionTypes((prev) =>
-      prev.includes(typeId)
-        ? prev.filter((id) => id !== typeId)
-        : [...prev, typeId]
-    );
+    // 단일 선택만 가능하도록 수정
+    setSelectedQuestionTypes((prev) => (prev.includes(typeId) ? [] : [typeId]));
   };
 
   const handleCharacteristicToggle = (charId: string) => {
+    // 단일 선택만 가능하도록 수정
     setSelectedCharacteristics((prev) =>
-      prev.includes(charId)
-        ? prev.filter((id) => id !== charId)
-        : [...prev, charId]
+      prev.includes(charId) ? [] : [charId]
     );
   };
 
@@ -608,7 +612,7 @@ const MockExamModal: React.FC<MockExamModalProps> = ({
 
                 <QuestionSection>
                   <QuestionTitle>
-                    어떤 유형의 문제를 만드시겠어요?(복수 선택 가능)
+                    어떤 유형의 문제를 만드시겠어요?
                   </QuestionTitle>
                   <ButtonGroup>
                     {questionTypes.map((type) => (
@@ -626,7 +630,7 @@ const MockExamModal: React.FC<MockExamModalProps> = ({
 
                 <CharacteristicSection visible={showCharacteristics}>
                   <QuestionTitle>
-                    문항을 어떤 특성으로 출제할까요?(복수 선택 가능)
+                    문항을 어떤 특성으로 출제할까요?
                   </QuestionTitle>
                   <CharacteristicButtonGroup>
                     {characteristics.map((char) => (
@@ -651,9 +655,9 @@ const MockExamModal: React.FC<MockExamModalProps> = ({
                         onMouseLeave={() => setShowTooltip(false)}
                       />
                       <Tooltip visible={showTooltip}>
-                        최소 300자 이상의 내용을 작성해주시면{"\n"}
-                        중복 없이 문제를 만들 수 있습니다.{"\n"}
-                        ⚠️ 필기 내용과 파일 업로드는 동시에 사용할 수 없습니다.
+                        500자 이상 2,000자 이하의 내용을 넣어주시면{"\n"}
+                        양질의 문제를 생성 할 수 있습니다.{"\n"}
+                        내용 또는 파일 업로드 둘 중 하나만 선택 가능힙니다.
                       </Tooltip>
                     </TooltipContainer>
                   </InputHeader>
