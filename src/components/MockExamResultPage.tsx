@@ -803,16 +803,69 @@ const MockExamResultPage: React.FC<MockExamResultPageProps> = ({
 
   const renderAnswerSheet = () => {
     const getAnswerDisplay = (question: MockExamQuestion) => {
+      // 객관식 문제 유형들 (보기가 있는 문제들)
       if (
         question.type === "MULTIPLE_CHOICE" ||
         question.type === "COMBINATION" ||
-        question.type === "FIND_EXCEPTION"
+        question.type === "FIND_EXCEPTION" ||
+        question.type === "FIND_CORRECT" ||
+        question.type === "FIND_INCORRECT" ||
+        question.type === "FIND_MATCH"
       ) {
         // 객관식인 경우 정답 번호 찾기
-        const correctOptionIndex = question.options?.findIndex(
-          (option) => option === question.answer
-        );
-        if (correctOptionIndex !== -1) {
+        if (question.options && question.options.length > 0) {
+          // 정확한 매칭 시도
+          let correctOptionIndex = question.options.findIndex(
+            (option) => option === question.answer
+          );
+          
+          // 정확한 매칭이 안되면 부분 매칭 시도 (공백, 대소문자 등 차이 고려)
+          if (correctOptionIndex === -1) {
+            correctOptionIndex = question.options.findIndex(
+              (option) => 
+                option.trim() === question.answer.trim() ||
+                option.toLowerCase() === question.answer.toLowerCase() ||
+                option.replace(/\s+/g, '') === question.answer.replace(/\s+/g, '')
+            );
+          }
+          
+          // 여전히 매칭이 안되면 answer가 이미 번호인지 확인
+          if (correctOptionIndex === -1) {
+            const answerNumber = parseInt(question.answer);
+            if (!isNaN(answerNumber) && answerNumber >= 1 && answerNumber <= question.options.length) {
+              // answer가 이미 1부터 시작하는 번호인 경우
+              return (
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: "24px",
+                    height: "24px",
+                    borderRadius: "50%",
+                    border: "2px solid #000000",
+                    color: "#000000",
+                    fontSize: "14px",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {answerNumber}
+                </span>
+              );
+            }
+            
+            // 디버깅을 위한 콘솔 로그
+            console.warn(`문제 ${question.questionId}의 답을 찾을 수 없습니다:`, {
+              answer: question.answer,
+              options: question.options,
+              type: question.type
+            });
+            
+            // 매칭이 안되는 경우 기본적으로 answer 텍스트 반환
+            return question.answer;
+          }
+          
+          // 정답 번호를 원형 프레임으로 표시
           return (
             <span
               style={{
@@ -840,6 +893,8 @@ const MockExamResultPage: React.FC<MockExamResultPageProps> = ({
           return "X";
         }
       }
+      
+      // 기타 문제 유형 (주관식, 서술형 등)
       return question.answer;
     };
 
