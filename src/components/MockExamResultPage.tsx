@@ -11,42 +11,47 @@ const PageContainer = styled.div`
   width: 100%;
   min-height: calc(100vh - 170px); /* Header(90px) + Footer(80px) 제외 */
   background-color: #f8f9fa;
-  padding: 80px;
+  padding: 80px 0;
   padding-bottom: 100px; /* Footer와의 간격 확보 */
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: flex-start;
 `;
 
 const HeaderSection = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: flex-start;
   width: 976px;
-  margin-bottom: 40px;
+  margin: 0 auto 20px auto;
 `;
 
 const TitleSection = styled.div`
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 8px;
+  width: 236px;
 `;
 
 const PageTitle = styled.h1`
   font-family: "Pretendard", sans-serif;
-  font-weight: 700;
-  font-size: 32px;
+  font-weight: 500;
+  font-size: 20px;
   line-height: 1.4em;
+  text-align: center;
   color: #222222;
   margin: 0;
 `;
 
 const PageSubtitle = styled.p`
   font-family: "Pretendard", sans-serif;
-  font-weight: 400;
-  font-size: 18px;
+  font-weight: 700;
+  font-size: 32px;
   line-height: 1.4em;
-  color: #777777;
+  text-align: center;
+  color: #222222;
   margin: 0;
 `;
 
@@ -57,38 +62,40 @@ const ButtonGroup = styled.div`
 
 const ActionButton = styled.button<{ variant: "primary" | "secondary" }>`
   display: flex;
-  align-items: center;
+  flex-direction: column;
   justify-content: center;
-  padding: 12px 20px;
-  border-radius: 8px;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 6px;
   font-family: "Pretendard", sans-serif;
-  font-weight: 500;
-  font-size: 16px;
+  font-weight: 400;
+  font-size: 14px;
   line-height: 1.4em;
   cursor: pointer;
   transition: all 0.2s ease;
+  background-color: #ffffff;
+  color: #222222;
+  border: 1px solid #dedede;
 
-  ${(props) =>
-    props.variant === "primary"
-      ? `
-    background-color: #30a10e;
-    color: #ffffff;
-    border: none;
-    
-    &:hover {
-      background-color: #2a8f0c;
-    }
-  `
-      : `
-    background-color: #ffffff;
-    color: #222222;
-    border: 1px solid #dedede;
-    
-    &:hover {
-      border-color: #30a10e;
-      color: #30a10e;
-    }
-  `}
+  &:hover {
+    border-color: #30a10e;
+    color: #30a10e;
+  }
+`;
+
+const ButtonFrame = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+`;
+
+const IconWrapper = styled.div`
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const ExamPaperContainer = styled.div`
@@ -98,6 +105,7 @@ const ExamPaperContainer = styled.div`
   border-radius: 12px;
   box-shadow: 4px 4px 12px 0px rgba(0, 0, 0, 0.04);
   padding: 60px;
+  margin: 0 auto;
 `;
 
 const ExamHeader = styled.div`
@@ -110,7 +118,7 @@ const ExamHeaderImage = styled.img`
   width: 100%;
   max-width: 500px;
   height: auto;
-  margin-bottom: 40px;
+  margin-bottom: 20px;
   object-fit: contain;
 `;
 
@@ -265,7 +273,11 @@ const DividerLine = styled.div`
   width: 896px;
   height: 2px;
   background-color: #222222;
-  margin-bottom: 40px;
+  margin: 0 auto;
+  margin-bottom: 0;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
 `;
 
 const VerticalLine = styled.div`
@@ -283,12 +295,15 @@ const QuestionsContainer = styled.div`
   flex-direction: row;
   gap: 0;
   width: 896px;
+  margin: 0 auto;
+  left: 50%;
+  transform: translateX(-50%);
 `;
 
 const QuestionColumn = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 0;
   width: 448px;
 `;
 
@@ -407,7 +422,7 @@ const AnswerBox = styled.div`
   align-self: stretch;
   padding: 12px;
   background-color: #ffffff;
-  border: 1px solid #dedede;
+  border: none;
   border-radius: 6px;
   min-height: 60px;
 `;
@@ -475,7 +490,7 @@ const FindExceptionQuestion = styled.div`
 const FindMatchQuestion = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: 12px;
   padding: 20px 12px;
   width: 448px;
@@ -484,32 +499,39 @@ const FindMatchQuestion = styled.div`
 const ViewSection = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin: 15px 0;
-  padding: 12px;
   background-color: #ffffff;
   border: 1px solid #222222;
-  border-radius: 6px;
-  width: 424px;
+  padding: 12px;
+  margin: 0;
+  min-width: 392px;
+  width: fit-content;
 `;
 
 const ViewTitle = styled.div`
   font-family: "Pretendard", sans-serif;
   font-weight: 400;
   font-size: 16px;
-  line-height: 1.4em;
+  line-height: 1.399999976158142em;
   text-align: center;
   color: #222222;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
+`;
+
+const ViewItemsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 `;
 
 const ViewItem = styled.div`
   font-family: "Pretendard", sans-serif;
   font-weight: 400;
   font-size: 16px;
-  line-height: 1.4em;
+  line-height: 1.399999976158142em;
+  text-align: left;
   color: #222222;
-  width: 368px;
+  width: fit-content;
+  min-width: 368px;
 `;
 
 const MockExamResultPage: React.FC<MockExamResultPageProps> = ({
@@ -536,25 +558,20 @@ const MockExamResultPage: React.FC<MockExamResultPageProps> = ({
         backgroundColor: "#ffffff",
       });
 
-      // PDF 생성
+      // PDF 생성 - 컨텐츠 높이에 맞춰 긴 PDF 생성
       const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("p", "mm", "a4");
-      const imgWidth = 210;
-      const pageHeight = 295;
+      const imgWidth = 210; // A4 너비 (mm)
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      let heightLeft = imgHeight;
 
-      let position = 0;
+      // 컨텐츠 높이에 맞춰 PDF 크기 조정
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: [imgWidth, imgHeight], // 너비는 A4, 높이는 컨텐츠에 맞춤
+      });
 
-      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-      }
+      // 이미지를 PDF에 추가 (한 페이지에 전체 컨텐츠)
+      pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
 
       // PDF 다운로드
       pdf.save("실전모의고사.pdf");
@@ -581,25 +598,20 @@ const MockExamResultPage: React.FC<MockExamResultPageProps> = ({
         backgroundColor: "#ffffff",
       });
 
-      // PDF 생성
+      // PDF 생성 - 컨텐츠 높이에 맞춰 긴 PDF 생성
       const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("p", "mm", "a4");
-      const imgWidth = 210;
-      const pageHeight = 295;
+      const imgWidth = 210; // A4 너비 (mm)
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      let heightLeft = imgHeight;
 
-      let position = 0;
+      // 컨텐츠 높이에 맞춰 PDF 크기 조정
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: [imgWidth, imgHeight], // 너비는 A4, 높이는 컨텐츠에 맞춤
+      });
 
-      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-      }
+      // 이미지를 PDF에 추가 (한 페이지에 전체 컨텐츠)
+      pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
 
       // PDF 다운로드
       pdf.save("실전모의고사_해설지.pdf");
@@ -718,9 +730,11 @@ const MockExamResultPage: React.FC<MockExamResultPageProps> = ({
             </QuestionText>
             <ViewSection>
               <ViewTitle>&lt; 보기 &gt;</ViewTitle>
-              {viewItems.map((item: string, itemIndex: number) => (
-                <ViewItem key={itemIndex}>{item}</ViewItem>
-              ))}
+              <ViewItemsContainer>
+                {viewItems.map((item: string, itemIndex: number) => (
+                  <ViewItem key={itemIndex}>{item}</ViewItem>
+                ))}
+              </ViewItemsContainer>
             </ViewSection>
             <OptionsContainer>
               {question.options.map((option, optionIndex) => (
@@ -789,120 +803,147 @@ const MockExamResultPage: React.FC<MockExamResultPageProps> = ({
 
   const renderAnswerSheet = () => {
     const getAnswerDisplay = (question: MockExamQuestion) => {
-      if (question.type === 'MULTIPLE_CHOICE' || question.type === 'COMBINATION' || question.type === 'FIND_EXCEPTION') {
+      if (
+        question.type === "MULTIPLE_CHOICE" ||
+        question.type === "COMBINATION" ||
+        question.type === "FIND_EXCEPTION"
+      ) {
         // 객관식인 경우 정답 번호 찾기
-        const correctOptionIndex = question.options?.findIndex(option => option === question.answer);
+        const correctOptionIndex = question.options?.findIndex(
+          (option) => option === question.answer
+        );
         if (correctOptionIndex !== -1) {
           return (
-            <span style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '24px',
-              height: '24px',
-              borderRadius: '50%',
-              border: '2px solid #000000',
-              color: '#000000',
-              fontSize: '14px',
-              fontWeight: 'bold'
-            }}>
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "24px",
+                height: "24px",
+                borderRadius: "50%",
+                border: "2px solid #000000",
+                color: "#000000",
+                fontSize: "14px",
+                fontWeight: "bold",
+              }}
+            >
               {correctOptionIndex + 1}
             </span>
           );
         }
-      } else if (question.type === 'TRUE_FALSE') {
+      } else if (question.type === "TRUE_FALSE") {
         // OX문제인 경우 TRUE는 O, FALSE는 X로 표시 (동그라미 없이)
-        if (question.answer === 'TRUE') {
-          return 'O';
-        } else if (question.answer === 'FALSE') {
-          return 'X';
+        if (question.answer === "TRUE") {
+          return "O";
+        } else if (question.answer === "FALSE") {
+          return "X";
         }
       }
       return question.answer;
     };
 
     return (
-      <div ref={answerSheetRef} style={{ 
-        backgroundColor: '#ffffff',
-        border: '1px solid #dedede',
-        borderRadius: '12px',
-        padding: '60px',
-        marginTop: '40px',
-        boxShadow: '4px 4px 12px 0px rgba(0, 0, 0, 0.04)',
-        width: '976px'
-      }}>
+      <div
+        ref={answerSheetRef}
+        style={{
+          backgroundColor: "#ffffff",
+          border: "1px solid #dedede",
+          borderRadius: "12px",
+          padding: "60px",
+          marginTop: "40px",
+          boxShadow: "4px 4px 12px 0px rgba(0, 0, 0, 0.04)",
+          width: "976px",
+        }}
+      >
         {/* 해설지 헤더 - 크기 더 줄임 */}
-        <div style={{ 
-          textAlign: 'center', 
-          marginBottom: '30px',
-          position: 'relative'
-        }}>
+        <div
+          style={{
+            textAlign: "center",
+            marginBottom: "30px",
+            position: "relative",
+          }}
+        >
           <img
             src="/images/exam-answer-header.png"
             alt="퀴즐리와 함께하는 시험 준비 - 실전 모의고사 해설 및 답안"
             style={{
-              width: '80%', // 70%에서 80%로 늘림
-              height: 'auto',
-              maxWidth: '500px' // 400px에서 500px로 늘림
+              width: "80%", // 70%에서 80%로 늘림
+              height: "auto",
+              maxWidth: "500px", // 400px에서 500px로 늘림
             }}
           />
           {/* 가로선 - 헤더 이미지 아래에 직접 그리기 */}
-          <div style={{
-            width: '100%',
-            height: '2px',
-            backgroundColor: '#222222',
-            marginTop: '20px'
-          }} />
+          <div
+            style={{
+              width: "100%",
+              height: "2px",
+              backgroundColor: "#222222",
+              marginTop: "20px",
+            }}
+          />
         </div>
 
         {/* 해설 내용 */}
-        <div style={{ 
-          position: 'relative',
-          display: 'flex',
-          gap: '0'
-        }}>
+        <div
+          style={{
+            position: "relative",
+            display: "flex",
+            gap: "0",
+          }}
+        >
           {/* 세로선 - 가로선과 딱 맞게 닿도록 조정 */}
-          <div style={{
-            position: 'absolute',
-            left: '50%',
-            top: '-30px', // 가로선까지 올라가도록
-            width: '2px',
-            height: 'calc(100% + 50px)', // 가로선까지 포함
-            backgroundColor: '#dedede',
-            transform: 'translateX(-50%)'
-          }} />
-          
+          <div
+            style={{
+              position: "absolute",
+              left: "50%",
+              top: "-30px", // 가로선까지 올라가도록
+              width: "2px",
+              height: "calc(100% + 50px)", // 가로선까지 포함
+              backgroundColor: "#dedede",
+              transform: "translateX(-50%)",
+            }}
+          />
+
           {/* 왼쪽 열 */}
-          <div style={{ 
-            flex: 1, 
-            paddingRight: '30px',
-            position: 'relative'
-          }}>
+          <div
+            style={{
+              flex: 1,
+              paddingRight: "30px",
+              position: "relative",
+            }}
+          >
             {questions
-              .filter((_, index) => index % 2 === 0)
+              .slice(0, Math.ceil(questions.length / 2))
               .map((question, index) => (
-                <div key={index * 2} style={{ marginBottom: '40px' }}>
-                  <div style={{ 
-                    fontSize: '18px', // 원래대로 18px
-                    fontWeight: '600', // bold에서 500으로 줄임
-                    marginBottom: '8px',
-                    color: '#222222'
-                  }}>
-                    {index * 2 + 1}. {getAnswerDisplay(question)}
+                <div key={index} style={{ marginBottom: "40px" }}>
+                  <div
+                    style={{
+                      fontSize: "18px", // 원래대로 18px
+                      fontWeight: "600", // bold에서 500으로 줄임
+                      marginBottom: "8px",
+                      color: "#222222",
+                    }}
+                  >
+                    {index + 1}. {getAnswerDisplay(question)}
                   </div>
-                  <div style={{ 
-                    fontSize: '16px', // 원래대로 16px
-                    color: '#30A10E',
-                    fontWeight: '500', // bold에서 500으로 줄임
-                    marginBottom: '8px'
-                  }}>
+                  <div
+                    style={{
+                      fontSize: "16px", // 원래대로 16px
+                      color: "#30A10E",
+                      fontWeight: "500", // bold에서 500으로 줄임
+                      marginBottom: "8px",
+                    }}
+                  >
                     해설요약
                   </div>
-                  <div style={{ 
-                    fontSize: '16px', // 원래대로 16px
-                    color: '#666666',
-                    lineHeight: '1.6'
-                  }}>
+                  <div
+                    style={{
+                      fontSize: "16px", // 원래대로 16px
+                      color: "#666666",
+                      lineHeight: "1.6",
+                    }}
+                  >
                     {question.explanation}
                   </div>
                 </div>
@@ -910,36 +951,48 @@ const MockExamResultPage: React.FC<MockExamResultPageProps> = ({
           </div>
 
           {/* 오른쪽 열 */}
-          <div style={{ 
-            flex: 1, 
-            paddingLeft: '30px',
-            position: 'relative'
-          }}>
+          <div
+            style={{
+              flex: 1,
+              paddingLeft: "30px",
+              position: "relative",
+            }}
+          >
             {questions
-              .filter((_, index) => index % 2 === 1)
+              .slice(Math.ceil(questions.length / 2))
               .map((question, index) => (
-                <div key={index * 2 + 1} style={{ marginBottom: '40px' }}>
-                  <div style={{ 
-                    fontSize: '18px', // 원래대로 18px
-                    fontWeight: '600', // bold에서 500으로 줄임
-                    marginBottom: '8px',
-                    color: '#222222'
-                  }}>
-                    {index * 2 + 2}. {getAnswerDisplay(question)}
+                <div
+                  key={index + Math.ceil(questions.length / 2)}
+                  style={{ marginBottom: "40px" }}
+                >
+                  <div
+                    style={{
+                      fontSize: "18px", // 원래대로 18px
+                      fontWeight: "600", // bold에서 500으로 줄임
+                      marginBottom: "8px",
+                      color: "#222222",
+                    }}
+                  >
+                    {index + Math.ceil(questions.length / 2) + 1}.{" "}
+                    {getAnswerDisplay(question)}
                   </div>
-                  <div style={{ 
-                    fontSize: '16px', // 원래대로 16px
-                    color: '#30A10E',
-                    fontWeight: '500', // bold에서 500으로 줄임
-                    marginBottom: '8px'
-                  }}>
+                  <div
+                    style={{
+                      fontSize: "16px", // 원래대로 16px
+                      color: "#30A10E",
+                      fontWeight: "500", // bold에서 500으로 줄임
+                      marginBottom: "8px",
+                    }}
+                  >
                     해설요약
                   </div>
-                  <div style={{ 
-                    fontSize: '16px', // 원래대로 16px
-                    color: '#666666',
-                    lineHeight: '1.6'
-                  }}>
+                  <div
+                    style={{
+                      fontSize: "16px", // 원래대로 16px
+                      color: "#666666",
+                      lineHeight: "1.6",
+                    }}
+                  >
                     {question.explanation}
                   </div>
                 </div>
@@ -958,16 +1011,32 @@ const MockExamResultPage: React.FC<MockExamResultPageProps> = ({
   return (
     <PageContainer>
       <HeaderSection>
-        <TitleSection></TitleSection>
         <ButtonGroup>
-          <ActionButton variant="secondary" onClick={onBack}>
-            뒤로가기
+          <ActionButton variant="secondary" onClick={handleExportPDF}>
+            <ButtonFrame>
+              <IconWrapper>
+                <img
+                  src="/images/icn_book.png"
+                  alt="문제 내보내기"
+                  width="20"
+                  height="20"
+                />
+              </IconWrapper>
+              문제 내보내기
+            </ButtonFrame>
           </ActionButton>
-          <ActionButton variant="primary" onClick={handleExportPDF}>
-            문제 내보내기
-          </ActionButton>
-          <ActionButton variant="primary" onClick={handleExportAnswerSheet}>
-            해설 내보내기
+          <ActionButton variant="secondary" onClick={handleExportAnswerSheet}>
+            <ButtonFrame>
+              <IconWrapper>
+                <img
+                  src="/images/icn_commentary.png"
+                  alt="해설 내보내기"
+                  width="20"
+                  height="20"
+                />
+              </IconWrapper>
+              해설 내보내기
+            </ButtonFrame>
           </ActionButton>
         </ButtonGroup>
       </HeaderSection>
@@ -990,14 +1059,17 @@ const MockExamResultPage: React.FC<MockExamResultPageProps> = ({
               alt="시험 안내사항 - 문제지에 성명과 수험번호를 작성하세요. 문제가 제대로 생성이 됐는지 확인하세요. 문항에 따라 난이도가 다르니 참고하세요."
             />
             {questions
-              .filter((_, index) => index % 2 === 0)
-              .map((question, index) => renderQuestion(question, index * 2))}
+              .slice(0, Math.ceil(questions.length / 2))
+              .map((question, index) => renderQuestion(question, index))}
           </QuestionColumn>
           <QuestionColumn>
             {questions
-              .filter((_, index) => index % 2 === 1)
+              .slice(Math.ceil(questions.length / 2))
               .map((question, index) =>
-                renderQuestion(question, index * 2 + 1)
+                renderQuestion(
+                  question,
+                  index + Math.ceil(questions.length / 2)
+                )
               )}
           </QuestionColumn>
         </QuestionsContainer>
