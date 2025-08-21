@@ -221,6 +221,13 @@ const ErrorMessage = styled.div`
   }
 `;
 
+// PDF.js CDN에서 로드
+declare global {
+  interface Window {
+    pdfjsLib: any;
+  }
+}
+
 const SearchBar: React.FC<SearchBarProps> = ({
   onGenerateQuestions,
   isLoading = false,
@@ -237,6 +244,19 @@ const SearchBar: React.FC<SearchBarProps> = ({
       fileLinkRef.current.focus();
     }
   }, [selectedFile]);
+
+  // PDF.js가 로드되었는지 확인
+  useEffect(() => {
+    if (!window.pdfjsLib) {
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+      script.onload = () => {
+        // 워커 설정
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      };
+      document.head.appendChild(script);
+    }
+  }, []);
 
   const handleGenerate = () => {
     if (inputText.trim() || selectedFile) {
@@ -264,29 +284,55 @@ const SearchBar: React.FC<SearchBarProps> = ({
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const getPDFPageCount = async (file: File): Promise<number> => {
+    try {
+      if (!window.pdfjsLib) {
+        throw new Error('PDF.js가 아직 로드되지 않았습니다.');
+      }
+      
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      return pdf.numPages;
+    } catch (error) {
+      console.error('PDF 페이지 수 확인 중 오류:', error);
+      throw new Error('PDF 파일을 읽을 수 없습니다.');
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // 파일 크기 체크 (1100KB = 1100 * 1024 bytes)
-      if (file.size > 1100 * 1024) {
-        setError("파일 크기가 1MB를 초과하여 업로드할 수 없습니다.");
+      try {
+        // PDF 파일인 경우 실제 페이지 수 확인
+        if (file.type === 'application/pdf') {
+          const pageCount = await getPDFPageCount(file);
+          if (pageCount > 10) {
+            setError("PDF는 10장까지 가능합니다. 현재 파일은 " + pageCount + "장입니다.");
+            setSelectedFile(null);
+            setInputText("");
+            if (fileInputRef.current) {
+              fileInputRef.current.value = "";
+            }
+            return;
+          }
+        }
+        
+        setError(null);
+        setSelectedFile(file);
+        setInputText(file.name);
+        
+        // 파일 업로드 후 자동으로 문제 생성 모달 열기
+        setTimeout(() => {
+          onGenerateQuestions(file.name, file);
+        }, 100);
+      } catch (error) {
+        setError(error instanceof Error ? error.message : "파일 처리 중 오류가 발생했습니다.");
         setSelectedFile(null);
         setInputText("");
         if (fileInputRef.current) {
           fileInputRef.current.value = "";
         }
-        return;
       }
-      
-      setError(null);
-      setSelectedFile(file);
-      setInputText(file.name);
-
-      
-      // 파일 업로드 후 자동으로 문제 생성 모달 열기
-      setTimeout(() => {
-        onGenerateQuestions(file.name, file);
-      }, 100);
     }
   };
 
@@ -319,7 +365,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           )}
           <UploadButtonWrapper>
             <UploadButton onClick={handleFileUpload} />
-            <Tooltip>파일 업로드(1MB까지 가능합니다.)</Tooltip>
+            <Tooltip>PDF는 10장까지 가능합니다.</Tooltip>
           </UploadButtonWrapper>
         </ButtonContainer>
       </SearchContent>

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
 import {
   createMockExamQuestions,
@@ -456,6 +456,13 @@ const QUESTION_CHARACTERISTIC_MAP: Record<string, string> = {
   "find-option": "FIND_MATCH",
 };
 
+// PDF.js CDN에서 로드
+declare global {
+  interface Window {
+    pdfjsLib: any;
+  }
+}
+
 const MockExamModal: React.FC<MockExamModalProps> = ({
   isOpen,
   onClose,
@@ -476,6 +483,34 @@ const MockExamModal: React.FC<MockExamModalProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [apiPromise, setApiPromise] = useState<Promise<any> | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // PDF.js가 로드되었는지 확인
+  useEffect(() => {
+    if (!window.pdfjsLib) {
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+      script.onload = () => {
+        // 워커 설정
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      };
+      document.head.appendChild(script);
+    }
+  }, []);
+
+  const getPDFPageCount = async (file: File): Promise<number> => {
+    try {
+      if (!window.pdfjsLib) {
+        throw new Error('PDF.js가 아직 로드되지 않았습니다.');
+      }
+      
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      return pdf.numPages;
+    } catch (error) {
+      console.error('PDF 페이지 수 확인 중 오류:', error);
+      throw new Error('PDF 파일을 읽을 수 없습니다.');
+    }
+  };
 
   const questionTypes = [
     { id: "ox", label: "OX 퀴즈", disabled: false },
@@ -512,22 +547,38 @@ const MockExamModal: React.FC<MockExamModalProps> = ({
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // 파일 크기 체크 (1100KB = 1100 * 1024 bytes)
-      if (file.size > 1100 * 1024) {
-        setError("파일 크기가 1MB를 초과하여 업로드할 수 없습니다.");
+      try {
+        // PDF 파일인 경우 실제 페이지 수 확인
+        if (file.type === 'application/pdf') {
+          const pageCount = await getPDFPageCount(file);
+          if (pageCount > 10) {
+            setError("PDF는 10장까지 가능합니다. 현재 파일은 " + pageCount + "장입니다.");
+            setSelectedFile(null);
+            setStudyContent("");
+            if (fileInputRef.current) {
+              fileInputRef.current.value = "";
+            }
+            return;
+          }
+        }
+        
+        setError(null);
+        setSelectedFile(file);
+        setStudyContent(""); // 파일 업로드 시 텍스트 내용 초기화
+        
+        // MockExamModal에서는 파일 업로드 후 자동으로 모달을 열지 않음
+        // 사용자가 직접 문제 유형을 선택하고 저장해야 함
+      } catch (error) {
+        setError(error instanceof Error ? error.message : "파일 처리 중 오류가 발생했습니다.");
         setSelectedFile(null);
+        setStudyContent("");
         if (fileInputRef.current) {
           fileInputRef.current.value = "";
         }
-        return;
       }
-      
-      setError(null);
-      setSelectedFile(file);
-      setStudyContent(""); // 파일 업로드 시 텍스트 내용 초기화
     }
   };
 
@@ -711,7 +762,7 @@ const MockExamModal: React.FC<MockExamModalProps> = ({
                     </FileUploadButton>
                     {selectedFile && <FileName>{selectedFile.name}</FileName>}
                   </FileUploadRow>
-                  <FileUploadInfo>1MB까지 업로드 가능합니다.</FileUploadInfo>
+                  <FileUploadInfo>PDF는 10장까지 가능합니다.</FileUploadInfo>
                 </FileUploadSection>
               </ContentSection>
             </MainContent>
