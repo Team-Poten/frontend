@@ -6,18 +6,45 @@ interface SearchBarProps {
   isLoading?: boolean;
 }
 
+const ErrorTooltip = styled.div`
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #ff4444;
+  color: #ffffff;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.25rem;
+  font-family: "Pretendard", sans-serif;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  z-index: 1000;
+  margin-top: 0.5rem;
+  
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 0.25rem solid transparent;
+    border-bottom-color: #ff4444;
+  }
+`;
+
 const SearchContainer = styled.div`
   position: relative;
   width: 100%;
   background-color: #ffffff;
-  border: 0.0625rem solid #dedede; /* 1px */
-  border-radius: 6.25rem; /* 100px */
-  box-shadow: 0.25rem 0.25rem 0.75rem rgba(0, 0, 0, 0.04); /* 4px 4px 12px */
+  border: 0.0625rem solid #dedede;
+  border-radius: 6.25rem;
+  box-shadow: 0.25rem 0.25rem 0.75rem rgba(0, 0, 0, 0.04);
   display: flex;
+  flex-direction: column;
   align-items: center;
-  padding: 1.25rem 2rem; /* 20px 32px */
+  padding: 1.25rem 2rem;
   box-sizing: border-box;
-  min-height: 4.5rem; /* 72px */
+  min-height: 4.5rem;
 `;
 
 const SearchContent = styled.div`
@@ -177,12 +204,30 @@ const UploadButtonWrapper = styled.div`
   }
 `;
 
+const ErrorMessage = styled.div`
+  color: #ff4444;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+  text-align: center;
+  font-family: 'Pretendard, sans-serif';
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  
+  &::before {
+    content: "⚠️";
+    font-size: 1rem;
+  }
+`;
+
 const SearchBar: React.FC<SearchBarProps> = ({
   onGenerateQuestions,
   isLoading = false,
 }) => {
   const [inputText, setInputText] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const fileLinkRef = useRef<HTMLSpanElement>(null);
 
@@ -209,6 +254,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const handleClearText = () => {
     setInputText("");
     setSelectedFile(null);
+    setError(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -221,8 +267,24 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // PDF 파일인 경우 페이지 수 체크 (대략적인 추정)
+      if (file.type === 'application/pdf') {
+        // PDF 파일 크기로 페이지 수 추정 (1페이지당 약 50KB로 가정)
+        const estimatedPages = Math.ceil(file.size / (50 * 1024));
+        if (estimatedPages > 10) {
+          setError("파일이 너무 커 업로드 할 수 없습니다.");
+          setSelectedFile(null);
+          setInputText("");
+          if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+          }
+          return;
+        }
+      }
+      
+      setError(null);
       setSelectedFile(file);
-      setInputText(file.name); // 파일 이름을 입력창에 표시
+      setInputText(file.name);
     }
   };
 
@@ -259,6 +321,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
           </UploadButtonWrapper>
         </ButtonContainer>
       </SearchContent>
+      {error && (
+        <ErrorMessage>
+          {error}
+        </ErrorMessage>
+      )}
       <HiddenFileInput
         ref={fileInputRef}
         type="file"
