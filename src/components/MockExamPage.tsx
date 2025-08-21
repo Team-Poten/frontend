@@ -100,12 +100,12 @@ const MockExamPage: React.FC = () => {
   };
 
   const handleModalSave = (settings: MockExamSettings) => {
-    console.log("모의고사 설정:", settings);
+    // console.log("모의고사 설정:", settings);
     setIsModalOpen(false);
   };
 
   const handleQuestionsGenerated = (questions: MockExamQuestion[]) => {
-    console.log("생성된 문제들:", questions);
+    // console.log("생성된 문제들:", questions);
     setGeneratedQuestions(questions);
     setIsModalOpen(false);
     setShowResultPage(true);
