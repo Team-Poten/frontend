@@ -36,7 +36,7 @@ const ModalOverlay = styled.div<{ isOpen: boolean }>`
 
 const ModalContainer = styled.div`
   width: 32.5rem; /* 520px */
-  height: 33.375rem; /* 534px - 기본 모달 높이 */
+  height: 35.375rem; /* 566px - 기본 모달 높이 증가 */
   background-color: #ffffff;
   border: 0.0625rem solid #ededed; /* 1px */
   border-radius: 1.5rem; /* 24px */
@@ -47,7 +47,7 @@ const ModalContainer = styled.div`
 
   /* 객관식이 선택되었을 때 높이 조정 */
   &.expanded {
-    height: 39.25rem; /* 628px - 확장된 높이 */
+    height: 41.25rem; /* 660px - 확장된 높이 증가 */
   }
 `;
 
@@ -332,6 +332,13 @@ const TextArea = styled.textarea<{ disabled?: boolean }>`
 
 const FileUploadSection = styled.div`
   display: flex;
+  flex-direction: column;
+  gap: 0.5rem; /* 8px */
+`;
+
+const FileUploadRow = styled.div`
+  display: flex;
+  flex-direction: row;
   align-items: center;
   gap: 0.5rem; /* 8px */
 `;
@@ -351,6 +358,7 @@ const FileUploadButton = styled.button<{ disabled?: boolean }>`
   line-height: 1.4em;
   color: ${(props) => (props.disabled ? "#9e9e9e" : "#222222")};
   opacity: ${(props) => (props.disabled ? 0.6 : 1)};
+  flex-shrink: 0;
 
   &:hover {
     ${(props) =>
@@ -360,6 +368,14 @@ const FileUploadButton = styled.button<{ disabled?: boolean }>`
       color: #30a10e;
     `}
   }
+`;
+
+const FileUploadInfo = styled.span`
+  font-family: "Pretendard", sans-serif;
+  font-weight: 400;
+  font-size: 0.75rem; /* 12px */
+  line-height: 1.4em;
+  color: #777777;
 `;
 
 const UploadIcon = styled.div<{ disabled?: boolean }>`
@@ -674,14 +690,17 @@ const MockExamModal: React.FC<MockExamModalProps> = ({
                 </InputSection>
 
                 <FileUploadSection>
-                  <FileUploadButton
-                    onClick={handleFileUpload}
-                    disabled={!!studyContent.trim()}
-                  >
-                    <UploadIcon disabled={!!studyContent.trim()} />
-                    파일 업로드
-                  </FileUploadButton>
-                  {selectedFile && <FileName>{selectedFile.name}</FileName>}
+                  <FileUploadRow>
+                    <FileUploadButton
+                      onClick={handleFileUpload}
+                      disabled={!!studyContent.trim()}
+                    >
+                      <UploadIcon disabled={!!studyContent.trim()} />
+                      파일 업로드
+                    </FileUploadButton>
+                    {selectedFile && <FileName>{selectedFile.name}</FileName>}
+                  </FileUploadRow>
+                  <FileUploadInfo>PDF는 10장까지 가능합니다.</FileUploadInfo>
                 </FileUploadSection>
               </ContentSection>
             </MainContent>

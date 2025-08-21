@@ -255,7 +255,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           )}
           <UploadButtonWrapper>
             <UploadButton onClick={handleFileUpload} />
-            <Tooltip>파일 업로드</Tooltip>
+            <Tooltip>파일 업로드(PDF는 10장까지 가능합니다.)</Tooltip>
           </UploadButtonWrapper>
         </ButtonContainer>
       </SearchContent>
