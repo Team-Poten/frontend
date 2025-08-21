@@ -285,11 +285,13 @@ const SearchBar: React.FC<SearchBarProps> = ({
       setError(null);
       setSelectedFile(file);
       setInputText(file.name);
+
       
       // 파일 업로드 후 자동으로 문제 생성 모달 열기
       setTimeout(() => {
         onGenerateQuestions(file.name, file);
       }, 100);
+
     }
   };
 
