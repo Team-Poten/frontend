@@ -36,7 +36,7 @@ const ModalOverlay = styled.div<{ isOpen: boolean }>`
 
 const ModalContainer = styled.div`
   width: 32.5rem; /* 520px */
-  height: 33.375rem; /* 534px - 기본 모달 높이 */
+  height: 35.375rem; /* 566px - 기본 모달 높이 증가 (기존 534px에서 32px 증가) */
   background-color: #ffffff;
   border: 0.0625rem solid #ededed; /* 1px */
   border-radius: 1.5rem; /* 24px */
@@ -47,7 +47,7 @@ const ModalContainer = styled.div`
 
   /* 객관식이 선택되었을 때 높이 조정 */
   &.expanded {
-    height: 39.25rem; /* 628px - 확장된 높이 */
+    height: 41.25rem; /* 660px - 확장된 높이도 증가 (기존 628px에서 32px 증가) */
   }
 `;
 
@@ -332,8 +332,10 @@ const TextArea = styled.textarea<{ disabled?: boolean }>`
 
 const FileUploadSection = styled.div`
   display: flex;
-  align-items: center;
+  flex-direction: row; /* column에서 row로 변경 */
+  align-items: center; /* 세로 중앙 정렬 */
   gap: 0.5rem; /* 8px */
+  flex-wrap: wrap; /* 필요시 줄바꿈 */
 `;
 
 const FileUploadButton = styled.button<{ disabled?: boolean }>`
@@ -351,6 +353,9 @@ const FileUploadButton = styled.button<{ disabled?: boolean }>`
   line-height: 1.4em;
   color: ${(props) => (props.disabled ? "#9e9e9e" : "#222222")};
   opacity: ${(props) => (props.disabled ? 0.6 : 1)};
+  width: fit-content; /* 내용에 맞게 너비 조정 */
+  white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+  flex-shrink: 0; /* 버튼 크기 고정 */
 
   &:hover {
     ${(props) =>
@@ -359,6 +364,51 @@ const FileUploadButton = styled.button<{ disabled?: boolean }>`
       border-color: #30a10e;
       color: #30a10e;
     `}
+  }
+`;
+
+const FileUploadInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* 8px */
+  padding: 0.5rem 0.75rem; /* 8px 12px */
+  background-color: #f8f9fa;
+  border: 0.0625rem solid #e9ecef;
+  border-radius: 0.375rem; /* 6px */
+  font-family: "Pretendard", sans-serif;
+  font-weight: 400;
+  font-size: 0.75rem; /* 12px */
+  line-height: 1.4em;
+  color: #6c757d;
+`;
+
+const InfoIconSmall = styled.div`
+  width: 1rem; /* 16px */
+  height: 1rem; /* 16px */
+  position: relative;
+  background-color: transparent;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &::after {
+    content: "";
+    width: 0.75rem; /* 12px */
+    height: 0.75rem; /* 12px */
+    border: 0.0625rem solid #6c757d;
+    border-radius: 50%;
+    position: absolute;
+    background-color: #ffffff;
+  }
+
+  &::before {
+    content: "i";
+    font-family: "Pretendard", sans-serif;
+    font-size: 0.625rem; /* 10px */
+    font-weight: 400;
+    color: #6c757d;
+    z-index: 1;
   }
 `;
 
@@ -378,6 +428,10 @@ const FileName = styled.span`
   font-size: 0.875rem; /* 14px */
   line-height: 1.4em;
   color: #777777;
+  white-space: nowrap; /* 파일명 줄바꿈 방지 */
+  overflow: hidden;
+  text-overflow: ellipsis; /* 긴 파일명은 ...으로 표시 */
+  max-width: 15rem; /* 240px - 최대 너비 제한 */
 `;
 
 const HiddenFileInput = styled.input`
@@ -428,7 +482,7 @@ const ErrorMessage = styled.div`
 // 문제 유형 및 특성 상수 매핑
 const QUESTION_TYPE_MAP: Record<string, string> = {
   ox: "TRUE_FALSE",
-  multiple: "",
+  multiple: "MULTIPLE_CHOICE",
   subjective: "SHORT_ANSWER",
   essay: "ESSAY",
 };
@@ -465,11 +519,13 @@ const MockExamModal: React.FC<MockExamModalProps> = ({
     { id: "ox", label: "OX 퀴즈", disabled: false },
     { id: "multiple", label: "객관식 문제", disabled: !isLoggedIn },
     { id: "subjective", label: "주관식 문제", disabled: !isLoggedIn },
+    { id: "essay", label: "서술형 문제", disabled: !isLoggedIn },
   ];
 
   const characteristics = [
     { id: "find-answer", label: "정답 찾기", disabled: false },
     { id: "find-wrong", label: "옳지 않은 것 찾기", disabled: false },
+    { id: "find-exception", label: "예외 찾기", disabled: false },
     { id: "find-option", label: "보기문항 찾기", disabled: false },
   ];
 
@@ -477,14 +533,18 @@ const MockExamModal: React.FC<MockExamModalProps> = ({
     const type = questionTypes.find((t) => t.id === typeId);
     if (type?.disabled) return;
 
-    // 단일 선택만 가능하도록 수정
-    setSelectedQuestionTypes((prev) => (prev.includes(typeId) ? [] : [typeId]));
+    setSelectedQuestionTypes((prev) =>
+      prev.includes(typeId)
+        ? prev.filter((id) => id !== typeId)
+        : [...prev, typeId]
+    );
   };
 
   const handleCharacteristicToggle = (charId: string) => {
-    // 단일 선택만 가능하도록 수정
     setSelectedCharacteristics((prev) =>
-      prev.includes(charId) ? [] : [charId]
+      prev.includes(charId)
+        ? prev.filter((id) => id !== charId)
+        : [...prev, charId]
     );
   };
 
@@ -612,7 +672,7 @@ const MockExamModal: React.FC<MockExamModalProps> = ({
 
                 <QuestionSection>
                   <QuestionTitle>
-                    어떤 유형의 문제를 만드시겠어요?
+                    어떤 유형의 문제를 만드시겠어요?(복수 선택 가능)
                   </QuestionTitle>
                   <ButtonGroup>
                     {questionTypes.map((type) => (
@@ -630,7 +690,7 @@ const MockExamModal: React.FC<MockExamModalProps> = ({
 
                 <CharacteristicSection visible={showCharacteristics}>
                   <QuestionTitle>
-                    문항을 어떤 특성으로 출제할까요?
+                    문항을 어떤 특성으로 출제할까요?(복수 선택 가능)
                   </QuestionTitle>
                   <CharacteristicButtonGroup>
                     {characteristics.map((char) => (
@@ -655,9 +715,9 @@ const MockExamModal: React.FC<MockExamModalProps> = ({
                         onMouseLeave={() => setShowTooltip(false)}
                       />
                       <Tooltip visible={showTooltip}>
-                        500자 이상 2,000자 이하의 내용을 넣어주시면{"\n"}
-                        양질의 문제를 생성 할 수 있습니다.{"\n"}
-                        내용 또는 파일 업로드 둘 중 하나만 선택 가능힙니다.
+                        최소 300자 이상의 내용을 작성해주시면{"\n"}
+                        중복 없이 문제를 만들 수 있습니다.{"\n"}
+                        ⚠️ 필기 내용과 파일 업로드는 동시에 사용할 수 없습니다.
                       </Tooltip>
                     </TooltipContainer>
                   </InputHeader>
@@ -682,6 +742,10 @@ const MockExamModal: React.FC<MockExamModalProps> = ({
                     파일 업로드
                   </FileUploadButton>
                   {selectedFile && <FileName>{selectedFile.name}</FileName>}
+                  <FileUploadInfo>
+                    <InfoIconSmall />
+                    PDF는 10장까지 업로드 가능합니다.
+                  </FileUploadInfo>
                 </FileUploadSection>
               </ContentSection>
             </MainContent>
@@ -714,7 +778,6 @@ const MockExamModal: React.FC<MockExamModalProps> = ({
         isOpen={isLoading}
         onComplete={handleLoadingComplete}
         apiPromise={apiPromise}
-        variant="mockExam" // 실전 모의고사용 텍스트
       />
     </>
   );
