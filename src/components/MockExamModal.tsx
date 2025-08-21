@@ -515,18 +515,14 @@ const MockExamModal: React.FC<MockExamModalProps> = ({
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // PDF 파일인 경우 페이지 수 체크 (대략적인 추정)
-      if (file.type === 'application/pdf') {
-        // PDF 파일 크기로 페이지 수 추정 (1페이지당 약 50KB로 가정)
-        const estimatedPages = Math.ceil(file.size / (50 * 1024));
-        if (estimatedPages > 10) {
-          setError("PDF는 10장까지 가능합니다. 현재 파일이 너무 큽니다.");
-          setSelectedFile(null);
-          if (fileInputRef.current) {
-            fileInputRef.current.value = "";
-          }
-          return;
+      // 파일 크기 체크 (1100KB = 1100 * 1024 bytes)
+      if (file.size > 1100 * 1024) {
+        setError("파일 크기가 1MB를 초과하여 업로드할 수 없습니다.");
+        setSelectedFile(null);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
         }
+        return;
       }
       
       setError(null);
@@ -715,7 +711,7 @@ const MockExamModal: React.FC<MockExamModalProps> = ({
                     </FileUploadButton>
                     {selectedFile && <FileName>{selectedFile.name}</FileName>}
                   </FileUploadRow>
-                  <FileUploadInfo>PDF는 10장까지 가능합니다.</FileUploadInfo>
+                  <FileUploadInfo>1MB까지 업로드 가능합니다.</FileUploadInfo>
                 </FileUploadSection>
               </ContentSection>
             </MainContent>

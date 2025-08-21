@@ -267,19 +267,15 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // PDF 파일인 경우 페이지 수 체크 (대략적인 추정)
-      if (file.type === 'application/pdf') {
-        // PDF 파일 크기로 페이지 수 추정 (1페이지당 약 50KB로 가정)
-        const estimatedPages = Math.ceil(file.size / (50 * 1024));
-        if (estimatedPages > 10) {
-          setError("파일이 너무 커 업로드 할 수 없습니다.");
-          setSelectedFile(null);
-          setInputText("");
-          if (fileInputRef.current) {
-            fileInputRef.current.value = "";
-          }
-          return;
+      // 파일 크기 체크 (1100KB = 1100 * 1024 bytes)
+      if (file.size > 1100 * 1024) {
+        setError("파일 크기가 1MB를 초과하여 업로드할 수 없습니다.");
+        setSelectedFile(null);
+        setInputText("");
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
         }
+        return;
       }
       
       setError(null);
@@ -323,7 +319,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           )}
           <UploadButtonWrapper>
             <UploadButton onClick={handleFileUpload} />
-            <Tooltip>파일 업로드(PDF는 10장까지 가능합니다.)</Tooltip>
+            <Tooltip>파일 업로드(1MB까지 가능합니다.)</Tooltip>
           </UploadButtonWrapper>
         </ButtonContainer>
       </SearchContent>
