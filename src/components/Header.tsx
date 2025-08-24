@@ -139,7 +139,8 @@ const Header: React.FC = () => {
       if (response.accessToken) {
         // 로그인 성공
         setIsLoginModalOpen(false);
-        window.location.reload();
+        // 홈 페이지로 리다이렉트
+        navigate("/");
       } else {
         // 로그인 실패
         setLoginError(response.message || "로그인에 실패했습니다.");
