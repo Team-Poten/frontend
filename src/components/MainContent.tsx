@@ -43,9 +43,19 @@ const MainTitle = styled.h1`
   line-height: 1.4em;
   color: #222222;
   text-align: center;
-  max-width: 36.25rem; /* 580px */
+  max-width: 50rem; /* 800px로 증가 - 기존 580px에서 확장 */
   margin: 0;
   margin-bottom: 3rem; /* 48px */
+  /* white-space: nowrap 제거 - 긴 텍스트가 자연스럽게 줄바꿈되도록 */
+  overflow: visible; /* hidden에서 visible로 변경 */
+`;
+
+const AnimatedTitle = styled.div<{ isVisible: boolean }>`
+  opacity: ${props => props.isVisible ? 1 : 0};
+  transform: translateY(${props => props.isVisible ? '0' : '20px'});
+  transition: all 0.5s ease-in-out;
+  /* white-space: nowrap 제거 - 긴 텍스트가 자연스럽게 줄바꿈되도록 */
+  overflow: visible; /* hidden에서 visible로 변경 */
 `;
 
 const SearchSection = styled.div`
@@ -82,7 +92,16 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
     null
   );
   const [userLoginStatus, setUserLoginStatus] = useState<boolean>(false);
+  const [mainTitle, setMainTitle] = useState("퀴즐리로 문제 생성부터 오답정리까지 한 번에!");
+  const [isTitleVisible, setIsTitleVisible] = useState(true);
   const navigate = useNavigate();
+
+  const titleMessages = [
+    "퀴즐리로 문제 생성부터 오답정리까지 한 번에!",
+    "자격증 대비 요점 정리를 검색창에 입력해보세요.",
+    "오늘 배운 과목의 필기 내용을 입력해보세요.",
+    "전공 시험 대비를 위한 범위를 입력해보세요."
+  ];
 
   const menuItems = [
     {
@@ -97,6 +116,35 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
     },
   ];
 
+  const renderTitleWithHighlight = (title: string) => {
+    if (title.includes("퀴즐리로")) {
+      return (
+        <>
+          <span style={{ color: "#30a10e" }}>퀴즐리</span>로 문제 생성부터 오답정리까지 한 번에!
+        </>
+      );
+    } else if (title.includes("요점 정리")) {
+      return (
+        <>
+          자격증 대비 <span style={{ color: "#30a10e" }}>요점 정리</span>를 검색창에 입력해보세요.
+        </>
+      );
+    } else if (title.includes("필기 내용")) {
+      return (
+        <>
+          오늘 배운 과목의 <span style={{ color: "#30a10e" }}>필기 내용</span>을 입력해보세요.
+        </>
+      );
+    } else if (title.includes("시험 대비")) {
+      return (
+        <>
+          전공 <span style={{ color: "#30a10e" }}>시험 대비</span>를 위한 범위를 입력해보세요.
+        </>
+      );
+    }
+    return title;
+  };
+
   useEffect(() => {
     // 컴포넌트 마운트 시 로그인 상태 확인
     const checkLoginStatus = async () => {
@@ -108,6 +156,22 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
       }
     };
     checkLoginStatus();
+
+    // 타이틀 순환 애니메이션
+    let currentIndex = 0;
+    const titleInterval = setInterval(() => {
+      // 현재 텍스트를 숨김
+      setIsTitleVisible(false);
+      
+      // 0.3초 후 새 텍스트로 변경하고 다시 보이게 함
+      setTimeout(() => {
+        currentIndex = (currentIndex + 1) % titleMessages.length;
+        setMainTitle(titleMessages[currentIndex]);
+        setIsTitleVisible(true);
+      }, 300);
+    }, 2000); // 2초마다 변경
+
+    return () => clearInterval(titleInterval);
   }, []);
 
   const handleGenerateQuestions = async (text: string, file?: File) => {
@@ -209,8 +273,9 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
         </CharacterSection>
 
         <MainTitle>
-          <span style={{ color: "#30a10e" }}>퀴즐리</span>로 문제 생성부터
-          오답정리까지 한 번에!
+          <AnimatedTitle isVisible={isTitleVisible}>
+            {renderTitleWithHighlight(mainTitle)}
+          </AnimatedTitle>
         </MainTitle>
 
         <SearchSection>
