@@ -12,6 +12,7 @@ import SearchBar from "./SearchBar";
 import MenuCard from "./MenuCard";
 import LoadingModal from "./LoadingModal";
 import QuestionTypeModal from "./QuestionTypeModal";
+import HelpModal from "./HelpModal";
 
 interface MainContentProps {
   onQuestionsGenerated: (questions: Question[]) => void;
@@ -70,6 +71,37 @@ const ErrorMessage = styled.div`
   text-align: center;
 `;
 
+const HelpButton = styled.button`
+  position: fixed;
+  bottom: 2rem; /* 32px */
+  right: 2rem; /* 32px */
+  width: 3rem; /* 48px - 64px에서 줄임 */
+  height: 3rem; /* 48px - 64px에서 줄임 */
+  background: #30a10e;
+  border: none;
+  border-radius: 50%;
+  color: white;
+  font-size: 1.25rem; /* 20px - 24px에서 줄임 */
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 0.25rem 1rem rgba(48, 161, 14, 0.3);
+  transition: all 0.3s ease;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background: #2a8f0c;
+    transform: scale(1.1);
+    box-shadow: 0 0.5rem 1.5rem rgba(48, 161, 14, 0.4);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+`;
+
 const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -83,6 +115,7 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
   );
   const [userLoginStatus, setUserLoginStatus] = useState<boolean>(false);
   const navigate = useNavigate();
+  const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
 
   const menuItems = [
     {
@@ -226,6 +259,10 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
             <MenuCard key={item.id} {...item} />
           ))}
         </MenuSection>
+
+        <HelpButton onClick={() => setIsHelpModalOpen(true)}>
+          ?
+        </HelpButton>
       </MainContainer>
 
       <QuestionTypeModal
@@ -239,6 +276,11 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
         isOpen={isLoadingModalOpen}
         onComplete={handleLoadingComplete}
         apiPromise={apiPromise}
+      />
+
+      <HelpModal
+        isOpen={isHelpModalOpen}
+        onClose={() => setIsHelpModalOpen(false)}
       />
     </>
   );

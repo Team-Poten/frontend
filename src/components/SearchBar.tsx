@@ -337,7 +337,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   };
 
   return (
-    <SearchContainer>
+    <SearchContainer data-testid="search-bar">
       <SearchContent>
         <SearchIcon />
         {selectedFile ? (
