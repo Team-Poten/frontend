@@ -142,7 +142,7 @@ const LoadingModal: React.FC<LoadingModalProps> = ({
   isOpen,
   onComplete,
   apiPromise,
-  variant = "default", // 기본값은 "default"
+  variant = "default",
 }) => {
   const [step1Loading, setStep1Loading] = useState(false);
   const [step1Completed, setStep1Completed] = useState(false);
@@ -152,10 +152,19 @@ const LoadingModal: React.FC<LoadingModalProps> = ({
   const [step3Completed, setStep3Completed] = useState(false);
 
   const apiPromiseRef = useRef(apiPromise);
+  const apiCompletedRef = useRef(false);
 
   // apiPromise가 변경될 때마다 ref 업데이트
   useEffect(() => {
     apiPromiseRef.current = apiPromise;
+    if (apiPromise) {
+      // API Promise가 설정되면 완료 상태를 추적
+      apiPromise.then(() => {
+        apiCompletedRef.current = true;
+      }).catch(() => {
+        apiCompletedRef.current = true;
+      });
+    }
   }, [apiPromise]);
 
   useEffect(() => {
@@ -166,6 +175,7 @@ const LoadingModal: React.FC<LoadingModalProps> = ({
       setStep2Completed(false);
       setStep3Loading(false);
       setStep3Completed(false);
+      apiCompletedRef.current = false;
       return;
     }
 
@@ -174,15 +184,14 @@ const LoadingModal: React.FC<LoadingModalProps> = ({
 
     const executeSequence = async () => {
       try {
-        // Step 1: 왼쪽 카드부터 시작
+        // Step 1: 왼쪽 카드부터 시작 (2초 로딩)
         setStep1Loading(true);
         await new Promise((resolve) => {
           const timer = setTimeout(() => {
             if (!isCancelled) {
               setStep1Loading(false);
               setStep1Completed(true);
-              // 1번 카드 체크표시와 동시에 2번 카드 로딩 시작
-              setStep2Loading(true);
+              setStep2Loading(true); // 2번 카드 로딩 시작
             }
             resolve(void 0);
           }, 2000); // 2초 로딩
@@ -191,24 +200,20 @@ const LoadingModal: React.FC<LoadingModalProps> = ({
 
         if (isCancelled) return;
 
-        // API 응답 대기
-        if (apiPromiseRef.current) {
-          await apiPromiseRef.current;
-        } else {
-          await new Promise((resolve) => {
-            const timer = setTimeout(resolve, 5000);
-            timers.push(timer);
-          });
-        }
-
-        if (!isCancelled) {
-          setStep2Loading(false);
-          setStep2Completed(true);
-          // 2번 카드 체크표시와 동시에 3번 카드 로딩 시작
-          setStep3Loading(true);
+        // Step 2: API 응답 완료까지 대기
+        while (!apiCompletedRef.current && !isCancelled) {
+          await new Promise(resolve => setTimeout(resolve, 100)); // 100ms마다 체크
         }
 
         if (isCancelled) return;
+
+        setStep2Loading(false);
+        setStep2Completed(true);
+        setStep3Loading(true); // 3번 카드 로딩 시작
+
+        if (isCancelled) return;
+        
+        // Step 3: 1초 로딩
         await new Promise((resolve) => {
           const timer = setTimeout(() => {
             if (!isCancelled) {
@@ -237,7 +242,6 @@ const LoadingModal: React.FC<LoadingModalProps> = ({
         if (!isCancelled) {
           setStep2Loading(false);
           setStep2Completed(true);
-          // 2번 카드 체크표시와 동시에 3번 카드 로딩 시작
           setStep3Loading(true);
         }
 
@@ -255,7 +259,6 @@ const LoadingModal: React.FC<LoadingModalProps> = ({
 
         if (isCancelled) return;
 
-        // 1초 체크 표시 후 완료
         await new Promise((resolve) => {
           const timer = setTimeout(() => {
             if (!isCancelled) {
