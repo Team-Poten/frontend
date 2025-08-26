@@ -147,15 +147,41 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
 
   useEffect(() => {
     // 컴포넌트 마운트 시 로그인 상태 확인
-    const checkLoginStatus = async () => {
+    const checkLoginStatus = () => {
       try {
-        const status = await isLoggedIn();
+        const status = isLoggedIn(); // await 제거
         setUserLoginStatus(status);
       } catch (error) {
         setUserLoginStatus(false);
       }
     };
+    
     checkLoginStatus();
+
+    // 로그인 상태 변경 감지를 위한 이벤트 리스너 추가
+    const handleStorageChange = () => {
+      checkLoginStatus();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    
+    // 같은 탭에서의 localStorage 변경 감지
+    const originalSetItem = localStorage.setItem;
+    const originalRemoveItem = localStorage.removeItem;
+    
+    localStorage.setItem = function(key: string, value: string) {
+      originalSetItem.call(this, key, value);
+      if (key === 'accessToken') {
+        checkLoginStatus();
+      }
+    };
+    
+    localStorage.removeItem = function(key: string) {
+      originalRemoveItem.call(this, key);
+      if (key === 'accessToken') {
+        checkLoginStatus();
+      }
+    };
 
     // 타이틀 순환 애니메이션
     let currentIndex = 0;
@@ -171,7 +197,12 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
       }, 300);
     }, 2000); // 2초마다 변경
 
-    return () => clearInterval(titleInterval);
+    return () => {
+      clearInterval(titleInterval);
+      window.removeEventListener('storage', handleStorageChange);
+      localStorage.setItem = originalSetItem;
+      localStorage.removeItem = originalRemoveItem;
+    };
   }, []);
 
   const handleGenerateQuestions = async (text: string, file?: File) => {
