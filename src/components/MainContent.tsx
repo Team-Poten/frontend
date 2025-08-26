@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import styled, { keyframes } from "styled-components";
 import { useNavigate } from "react-router-dom";
 import {
@@ -95,6 +95,7 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
   const [mainTitle, setMainTitle] = useState("퀴즐리로 문제 생성부터 오답정리까지 한 번에!");
   const [isTitleVisible, setIsTitleVisible] = useState(true);
   const navigate = useNavigate();
+  const questionsDataRef = useRef<Question[]>([]);
 
   const titleMessages = [
     "퀴즐리로 문제 생성부터 오답정리까지 한 번에!",
@@ -246,7 +247,7 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
         typeof questions === "object" &&
         !Array.isArray(questions)
       ) {
-        const questionsObj = questions as any; // 타입 단언으로 any로 변환
+        const questionsObj = questions as any;
         if (questionsObj.questions && Array.isArray(questionsObj.questions)) {
           questionData = questionsObj.questions;
         } else if (questionsObj.data && Array.isArray(questionsObj.data)) {
@@ -259,12 +260,21 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
         // 문제 유형 정보를 각 문제에 추가
         const questionsWithType = questionData.map((question: any) => ({
           ...question,
-          type: apiType, // API에서 받은 문제 유형을 각 문제에 추가
+          type: apiType,
         }));
 
-        // 문제 데이터를 저장하되, 로딩 모달은 닫지 않음 (LoadingModal의 onComplete에서 처리)
+        // 문제 데이터를 저장하고 LoadingModal이 자체 시퀀스를 완료하도록 함
         setPendingQuestions(questionsWithType);
         setIsLoading(false);
+        
+        // LoadingModal에 전달할 문제 데이터를 ref로 저장
+        questionsDataRef.current = questionsWithType;
+        
+        // LoadingModal을 닫지 않고 onComplete 콜백을 통해 처리하도록 함
+        // setIsLoadingModalOpen(false) 제거
+        // onQuestionsGenerated(questionsWithType) 제거
+        // navigate("/quiz") 제거
+        
       } else {
         throw new Error("문제 데이터를 찾을 수 없습니다.");
       }
@@ -276,13 +286,14 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
     }
   };
 
-  const handleLoadingComplete = () => {
+  const handleLoadingComplete = useCallback(() => {
     setIsLoadingModalOpen(false);
     setApiPromise(null);
 
-    // pendingQuestions가 있으면 사용하고, 없으면 빈 배열로 처리
-    if (pendingQuestions.length > 0) {
-      onQuestionsGenerated(pendingQuestions);
+    // ref에서 직접 문제 데이터 가져오기
+    const questions = questionsDataRef.current;
+    if (questions && questions.length > 0) {
+      onQuestionsGenerated(questions);
       // 문제 생성 완료 후 자동으로 퀴즈 페이지로 이동
       try {
         navigate("/quiz");
@@ -294,7 +305,7 @@ const MainContent: React.FC<MainContentProps> = ({ onQuestionsGenerated }) => {
       console.error("생성된 문제가 없습니다.");
       setError("문제 생성에 실패했습니다. 다시 시도해주세요.");
     }
-  };
+  }, [onQuestionsGenerated, navigate]); // pendingQuestions 의존성 제거
 
   return (
     <>
