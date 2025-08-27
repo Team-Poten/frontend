@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useLocation, useNavigate } from "react-router-dom";
 import { isLoggedIn, login } from "../services/api";
@@ -95,15 +95,19 @@ const AuthButton = styled.button`
   }
 `;
 
-const Header: React.FC = () => {
+interface HeaderProps {
+  loggedIn: boolean;
+  onLoginStatusChange: (status: boolean) => void;
+}
+
+const Header: React.FC<HeaderProps> = ({ loggedIn, onLoginStatusChange }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const loggedIn = isLoggedIn();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [loginError, setLoginError] = useState<string | undefined>(undefined);
 
   // URL 파라미터 확인해서 로그인 모달 자동 열기 (403 에러 후 새로고침 시)
-  React.useEffect(() => {
+  useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get("showLogin") === "true" && !loggedIn) {
       setIsLoginModalOpen(true);
@@ -125,7 +129,8 @@ const Header: React.FC = () => {
       // 쿠키에서 refreshToken 제거
       document.cookie =
         "refreshToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-      window.location.reload();
+      // 부모 컴포넌트에 상태 변경 알림
+      onLoginStatusChange(false);
     } else {
       setIsLoginModalOpen(true);
       setLoginError(undefined);
@@ -139,6 +144,8 @@ const Header: React.FC = () => {
       if (response.accessToken) {
         // 로그인 성공
         setIsLoginModalOpen(false);
+        // 즉시 true를 전달
+        onLoginStatusChange(true);
         // 홈 페이지로 리다이렉트
         navigate("/");
       } else {

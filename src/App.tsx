@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import {
   BrowserRouter as Router,
@@ -6,6 +6,7 @@ import {
   Route,
   Navigate,
   useLocation,
+  useNavigate,
 } from "react-router-dom";
 import Header from "./components/Header";
 import MainContent from "./components/MainContent";
@@ -52,17 +53,22 @@ const MainWrapper = styled.div`
   margin: 0 auto; /* 중앙 정렬 */
 `;
 
-// 라우트별 콘텐츠 래퍼
-const RouteContent: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+// 라우트별 콘텐츠 래퍼 - props 추가
+const RouteContent: React.FC<{ 
+  children: React.ReactNode;
+  loggedIn: boolean;
+  onLoginStatusChange: (status: boolean) => void;
+}> = ({ children, loggedIn, onLoginStatusChange }) => {
   const location = useLocation();
   const isHistoryPage = location.pathname === "/history";
   const isHistoryDetailPage = location.pathname.startsWith("/history/");
 
   return (
     <>
-      <Header />
+      <Header 
+        loggedIn={loggedIn} 
+        onLoginStatusChange={onLoginStatusChange}
+      />
       <ContentContainer allowScroll={isHistoryPage || isHistoryDetailPage}>
         {children}
       </ContentContainer>
@@ -82,6 +88,34 @@ const ContentContainer = styled.div<{ allowScroll: boolean }>`
 
 const App: React.FC = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
+  // 초기 로그인 상태를 localStorage에서 확인
+  const [loggedIn, setLoggedIn] = useState(() => {
+    const token = localStorage.getItem("accessToken");
+    return !!token;
+  });
+
+  // 로그인 상태를 실시간으로 감지하는 useEffect 수정
+  useEffect(() => {
+    // storage 이벤트 리스너 (다른 탭에서의 변경 감지만)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'accessToken') {
+        // 다른 탭에서의 변경만 감지
+        const currentStatus = isLoggedIn();
+        setLoggedIn(currentStatus);
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
+  // 로그인 상태 변경 핸들러 수정
+  const handleLoginStatusChange = (newStatus: boolean) => {
+    setLoggedIn(newStatus);
+  };
 
   const handleQuestionsGenerated = (newQuestions: Question[]) => {
     setQuestions(newQuestions);
@@ -103,7 +137,10 @@ const App: React.FC = () => {
                   <Navigate to="/quiz" replace />
                 ) : (
                   <>
-                    <Header />
+                    <Header 
+                      loggedIn={loggedIn} 
+                      onLoginStatusChange={handleLoginStatusChange}
+                    />
                     <ContentContainer allowScroll={false}>
                       <MainContent
                         onQuestionsGenerated={handleQuestionsGenerated}
@@ -118,7 +155,10 @@ const App: React.FC = () => {
               path="/quiz"
               element={
                 questions.length > 0 ? (
-                  <RouteContent>
+                  <RouteContent 
+                    loggedIn={loggedIn} 
+                    onLoginStatusChange={handleLoginStatusChange}
+                  >
                     <QuizPage questions={questions} onBack={handleBackToHome} />
                   </RouteContent>
                 ) : (
@@ -129,8 +169,11 @@ const App: React.FC = () => {
             <Route
               path="/history"
               element={
-                <RouteContent>
-                  {isLoggedIn() ? (
+                <RouteContent 
+                  loggedIn={loggedIn} 
+                  onLoginStatusChange={handleLoginStatusChange}
+                >
+                  {loggedIn ? (
                     <ProblemHistoryPage />
                   ) : (
                     <ProblemHistoryGuestPage />
@@ -141,7 +184,10 @@ const App: React.FC = () => {
             <Route
               path="/history/:date"
               element={
-                <RouteContent>
+                <RouteContent 
+                  loggedIn={loggedIn} 
+                  onLoginStatusChange={handleLoginStatusChange}
+                >
                   <ProblemDetailPage />
                 </RouteContent>
               }
@@ -149,8 +195,11 @@ const App: React.FC = () => {
             <Route
               path="/wrong-problems"
               element={
-                <RouteContent>
-                  {isLoggedIn() ? (
+                <RouteContent 
+                  loggedIn={loggedIn} 
+                  onLoginStatusChange={handleLoginStatusChange}
+                >
+                  {loggedIn ? (
                     <WrongProblemPage />
                   ) : (
                     <WrongProblemGuestPage />
@@ -161,7 +210,10 @@ const App: React.FC = () => {
             <Route
               path="/wrong-quiz"
               element={
-                <RouteContent>
+                <RouteContent 
+                  loggedIn={loggedIn} 
+                  onLoginStatusChange={handleLoginStatusChange}
+                >
                   <WrongQuizPage />
                 </RouteContent>
               }
@@ -169,7 +221,10 @@ const App: React.FC = () => {
             <Route
               path="/signup"
               element={
-                <RouteContent>
+                <RouteContent 
+                  loggedIn={loggedIn} 
+                  onLoginStatusChange={handleLoginStatusChange}
+                >
                   <SignUpPage />
                 </RouteContent>
               }
@@ -177,7 +232,10 @@ const App: React.FC = () => {
             <Route
               path="/mock-exam"
               element={
-                <RouteContent>
+                <RouteContent 
+                  loggedIn={loggedIn} 
+                  onLoginStatusChange={handleLoginStatusChange}
+                >
                   <MockExamPage />
                 </RouteContent>
               }
